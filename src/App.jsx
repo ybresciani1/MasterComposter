@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 // --- GAME DATA ---
-const SOIL_COMPONENTS = ['Minerals', 'Organic Matter', 'Water', 'Air'];
-const FALSE_COMPONENTS = ['Plastic', 'Magic', 'Gravel'];
+const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
+const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🪨 Gravel'];
 
 const COMPONENT_EXAMPLES = [
-  { text: "Sand, Silt, and Clay", correct: "Minerals" },
-  { text: "Compost, Decaying Leaves, and Microbes", correct: "Organic Matter" },
-  { text: "Soil Moisture and Groundwater", correct: "Water" },
-  { text: "Oxygen and Nitrogen pockets in pores", correct: "Air" },
+  { text: "Grass clippings, vegetable scraps, and coffee grounds", correct: "🍃 Nitrogen (Greens)" },
+  { text: "Dry leaves, cardboard, and twigs", correct: "🍂 Carbon (Browns)" },
+  { text: "Rainfall, hose water, and pile moisture", correct: "💧 Water" },
+  { text: "Oxygen pockets for microbes to breathe", correct: "💨 Air" },
 ];
 
 const SOIL_PROBLEMS = [
@@ -85,35 +85,48 @@ const PixelBox = ({ children, className = "" }) => (
   </div>
 );
 
-const DialogBox = ({ name, portrait, text, onNext, hideNext }) => (
-  <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50 animate-fade-in-up">
-    <PixelBox className="flex gap-4 items-start relative shadow-2xl">
-      <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden">
-        {name === 'Wallace' ? (
-          <img src="https://i.ibb.co/WLG8Tt3/wallace.png" alt="Wallace" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.ibb.co/WLG8Tt3.png'; }} />
-        ) : (
-          portrait
+const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' }) => {
+  let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
+  let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
+
+  if (emotion === 'sad') {
+    imgSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
+    fbSrc = 'https://i.ibb.co/zHNFQdVb.png';
+  } else if (emotion === 'surprised') {
+    imgSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
+    fbSrc = 'https://i.ibb.co/r2PcZQvP.png';
+  }
+
+  return (
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50 animate-fade-in-up">
+      <PixelBox className="flex gap-4 items-start relative shadow-2xl">
+        <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden">
+          {name === 'Wallace' ? (
+            <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
+          ) : (
+            portrait
+          )}
+        </div>
+        <div className="flex-1">
+          <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>
+          <p className="text-sm md:text-base leading-relaxed">{text}</p>
+        </div>
+        {!hideNext && (
+          <button 
+            onClick={onNext}
+            className="absolute bottom-2 right-2 animate-bounce text-xl bg-[#8b5a2b] text-white px-3 py-1 rounded hover:bg-[#5d4037]"
+          >
+            ▼
+          </button>
         )}
-      </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>
-        <p className="text-sm md:text-base leading-relaxed">{text}</p>
-      </div>
-      {!hideNext && (
-        <button 
-          onClick={onNext}
-          className="absolute bottom-2 right-2 animate-bounce text-xl bg-[#8b5a2b] text-white px-3 py-1 rounded hover:bg-[#5d4037]"
-        >
-          ▼
-        </button>
-      )}
-    </PixelBox>
-  </div>
-);
+      </PixelBox>
+    </div>
+  );
+};
 
 export default function App() {
   // --- STATE ---
-  const [gameState, setGameState] = useState('TITLE'); // TITLE, INTRO, CLASS, DREAM
+  const [gameState, setGameState] = useState('TITLE'); // TITLE, INTRO, CLASS, SLEEP_TRANSITION, DREAM
   const [dreamStage, setDreamStage] = useState('INTRO_DIALOG'); 
   // Dream Stages: INTRO_DIALOG, CRAFT_SOIL, MATCH_EXAMPLES, FIX_PLOTS, PLANT_SEEDS, END_DIALOG, WAKE_UP
   const [dialogIndex, setDialogIndex] = useState(0);
@@ -133,16 +146,21 @@ export default function App() {
   // WASD Movement States (Shared for CRAFT_SOIL and PLANT_SEEDS)
   const [heldItem, setHeldItem] = useState(null);
   const [groundItems, setGroundItems] = useState([]);
-  const farmerPosRef = useRef({ x: 150, y: 150 });
-  const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150 });
+  const farmerPosRef = useRef({ x: 150, y: 150, bounceY: 0 });
+  const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, bounceY: 0 });
   const keys = useRef({});
   
   // Custom Toast State
   const [toastMsg, setToastMsg] = useState(null);
+  const [wallaceEmotion, setWallaceEmotion] = useState('normal');
 
-  const showToast = (msg) => {
+  const showToast = (msg, emotion = 'normal') => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
+    if (emotion !== 'normal') setWallaceEmotion(emotion);
+    setTimeout(() => {
+      setToastMsg(null);
+      setWallaceEmotion('normal');
+    }, 3500);
   };
 
   // --- AUDIO HANDLING ---
@@ -204,6 +222,13 @@ export default function App() {
     "I reckon you're ready to go back to the surface now. Wake up, Master Composter!"
   ];
 
+  const wakeUpStory = [
+    { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center." },
+    { name: "Instructor", portrait: "🧑‍🏫", text: "...and that concludes our section on soil properties and compost components!" },
+    { name: "You", portrait: <div className="w-14 h-14"><FarmerSprite /></div>, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
+    { name: "You", portrait: <div className="w-14 h-14"><FarmerSprite /></div>, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
+  ];
+
   // --- HANDLERS ---
   const handleDialogNext = (script, nextStage) => {
     if (dialogIndex < script.length - 1) {
@@ -220,6 +245,17 @@ export default function App() {
   };
 
   // --- MINIGAME LOGIC ---
+  
+  // Transition timer for sleep phase
+  useEffect(() => {
+    if (gameState === 'SLEEP_TRANSITION') {
+      const timer = setTimeout(() => {
+        handleStartDream();
+      }, 4000); // Wait 4 seconds then launch the dream
+      return () => clearTimeout(timer);
+    }
+  }, [gameState]);
+
   const initializeGroundItems = () => {
     const items = [...SOIL_COMPONENTS, ...FALSE_COMPONENTS]
       .sort(() => Math.random() - 0.5)
@@ -231,8 +267,8 @@ export default function App() {
     setGroundItems(items);
     setCauldron([]);
     setHeldItem(null);
-    farmerPosRef.current = { x: 150, y: 150 };
-    setFarmerRenderPos({ x: 150, y: 150 });
+    farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+    setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
   };
 
   useEffect(() => {
@@ -246,7 +282,7 @@ export default function App() {
     if (dreamStage !== 'CRAFT_SOIL' && dreamStage !== 'PLANT_SEEDS') return;
 
     let animationFrameId;
-    const speed = 4;
+    const speed = 2.5; // Slower speed for smoother walking
     const maxX = 340 - 40; // Arena width (340) - farmer width (40)
     const maxY = 300 - 40; // Arena height (300) - farmer height (40)
 
@@ -260,6 +296,14 @@ export default function App() {
        if (moved) {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
+           
+           // Calculate a slight bounce effect based on time while moving
+           farmerPosRef.current.bounceY = -Math.abs(Math.sin(Date.now() / 120)) * 6;
+           
+           setFarmerRenderPos({ ...farmerPosRef.current });
+       } else if (farmerPosRef.current.bounceY !== 0) {
+           // Reset bounce smoothly when stopped
+           farmerPosRef.current.bounceY = 0;
            setFarmerRenderPos({ ...farmerPosRef.current });
        }
        animationFrameId = requestAnimationFrame(loop);
@@ -325,10 +369,10 @@ export default function App() {
                       const isCorrect = next.every(c => SOIL_COMPONENTS.includes(c));
                       if (isCorrect) {
                          setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 1000);
-                         showToast("Perfect! That's the right soil mix!");
+                         showToast("Perfect! That's the right soil mix!", 'surprised');
                       } else {
                          setTimeout(() => {
-                           showToast("Wallace: That ain't soil! Try again.");
+                           showToast("Wallace: That ain't soil! Try again.", 'sad');
                            initializeGroundItems();
                          }, 2000);
                       }
@@ -369,14 +413,14 @@ export default function App() {
                    if (heldItem.soil === closestBed.soil) {
                       const next = { ...prev, [closestBed.id]: heldItem };
                       setHeldItem(null);
-                      showToast(`Planted ${heldItem.name}!`);
+                      showToast(`Planted ${heldItem.name}!`, 'surprised');
                       
                       if (Object.keys(next).length === 3) {
                          setTimeout(() => setDreamStage('END_DIALOG'), 1500);
                       }
                       return next;
                    } else {
-                      showToast("Wallace: This plant won't survive in this soil!");
+                      showToast("Wallace: This plant won't survive in this soil!", 'sad');
                       return prev;
                    }
                 });
@@ -405,11 +449,13 @@ export default function App() {
     if (comp === COMPONENT_EXAMPLES[exampleIndex].correct) {
       if (exampleIndex < COMPONENT_EXAMPLES.length - 1) {
         setExampleIndex(exampleIndex + 1);
+        setWallaceEmotion('surprised');
+        setTimeout(() => setWallaceEmotion('normal'), 1500);
       } else {
         setDreamStage('FIX_PLOTS');
       }
     } else {
-      showToast("Wallace: Nope! Think carefully about what that is.");
+      showToast("Wallace: Nope! Think carefully about what that is.", 'sad');
     }
   };
 
@@ -418,6 +464,8 @@ export default function App() {
       const newFixed = [...fixedPlots, plotId];
       setFixedPlots(newFixed);
       setActivePlot(null);
+      setWallaceEmotion('surprised');
+      setTimeout(() => setWallaceEmotion('normal'), 1500);
       if (newFixed.length === 3) {
         // Setup for PLANT_SEEDS
         const seedsToPlant = PLANTS.slice(0, 3).map((p, i) => ({
@@ -427,13 +475,13 @@ export default function App() {
         }));
         setGroundItems(seedsToPlant);
         setHeldItem(null);
-        farmerPosRef.current = { x: 150, y: 150 };
-        setFarmerRenderPos({ x: 150, y: 150 });
+        farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+        setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
         setPlantedBeds({});
         setDreamStage('PLANT_SEEDS');
       }
     } else {
-      showToast("Wallace: That'll ruin the soil even more! Try a different tool.");
+      showToast("Wallace: That'll ruin the soil even more! Try a different tool.", 'sad');
     }
   };
 
@@ -473,6 +521,14 @@ export default function App() {
         >
           [ Click to continue ]
         </button>
+      </div>
+    </div>
+  );
+
+  const renderSleepTransition = () => (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      <div className="text-center">
+        <p className="text-white font-mono text-3xl md:text-4xl tracking-[0.5em] animate-pulse">Z z z . . .</p>
       </div>
     </div>
   );
@@ -538,7 +594,7 @@ export default function App() {
                  {/* Farmer Sprite */}
                  <div 
                    className="absolute w-10 h-10 flex items-center justify-center z-30"
-                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)` }}
+                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}
                  >
                    <FarmerSprite />
                    {/* Held Item */}
@@ -551,7 +607,7 @@ export default function App() {
 
               </div>
 
-              <DialogBox name="Wallace" portrait="🪱" text="Time to craft! Walk around (WASD), pick up the 4 soil components (SPACE), and walk near the bin to toss them in (E)!" hideNext />
+              <DialogBox name="Wallace" portrait="🪱" text="Time to craft! Walk around (WASD), pick up the 4 compost elements (SPACE), and walk near the bin to toss them in (E)!" hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
@@ -573,7 +629,7 @@ export default function App() {
                     </button>
                  ))}
               </div>
-              <DialogBox name="Wallace" portrait="🪱" text={`Great batch of soil! Now, match these examples to the 4 components we just used. (${exampleIndex + 1}/4)`} hideNext />
+              <DialogBox name="Wallace" portrait="🪱" text={`Great batch of soil! Now, match these examples to the 4 components we just used. (${exampleIndex + 1}/4)`} hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
@@ -621,7 +677,7 @@ export default function App() {
                  </div>
                )}
 
-               {!activePlot && <DialogBox name="Wallace" portrait="🪱" text="Uh oh, the weather wreaked havoc on my fields. Click a broken plot and choose the right technique to fix it!" hideNext />}
+               {!activePlot && <DialogBox name="Wallace" portrait="🪱" text="Uh oh, the weather wreaked havoc on my fields. Click a broken plot and choose the right technique to fix it!" hideNext emotion={wallaceEmotion} />}
             </div>
           )}
 
@@ -676,7 +732,7 @@ export default function App() {
                  {/* Farmer Sprite */}
                  <div 
                    className="absolute w-10 h-10 flex items-center justify-center z-30"
-                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)` }}
+                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}
                  >
                    <FarmerSprite />
                    {/* Held Seed */}
@@ -689,7 +745,7 @@ export default function App() {
 
               </div>
 
-               <DialogBox name="Wallace" portrait="🪱" text="Time to plant! Walk to the seeds (SPACE), read the soil labels on each bed, and plant them in the right dirt (E)!" hideNext />
+               <DialogBox name="Wallace" portrait="🪱" text="Time to plant! Walk to the seeds (SPACE), read the soil labels on each bed, and plant them in the right dirt (E)!" hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
@@ -699,6 +755,7 @@ export default function App() {
               name="Wallace" portrait="🪱" 
               text={wormIntro[dialogIndex]} 
               onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} 
+              emotion={wallaceEmotion}
             />
           )}
           
@@ -707,6 +764,7 @@ export default function App() {
               name="Wallace" portrait="🪱" 
               text={endStory[dialogIndex]} 
               onNext={() => handleDialogNext(endStory, 'WAKE_UP')} 
+              emotion={wallaceEmotion}
             />
           )}
 
@@ -716,48 +774,95 @@ export default function App() {
     );
   };
 
-  const renderWakeUp = () => (
-    <div className="min-h-screen bg-emerald-50 flex flex-col items-center justify-center p-4 font-sans text-stone-800">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border-4 border-stone-800 p-10 text-center space-y-6">
-        <div className="text-8xl">🌱</div>
-        <h2 className="text-4xl font-extrabold text-emerald-800">You Woke Up!</h2>
-        <div className="text-lg bg-emerald-50 p-6 rounded-xl border border-emerald-100 text-left leading-relaxed">
-          You jolt awake in your chair at the Living Coast Discovery Center. The instructor is just finishing up their slide on soil properties.
-          <br/><br/>
-          Surprisingly, you realize you know exactly what they are talking about. The vivid dream burned the knowledge right into your brain!
-          <br/><br/>
-          <strong>You successfully learned:</strong>
-          <ul className="list-disc list-inside mt-2 text-stone-600 font-medium">
-            <li>The 4 Components of Soil (and examples!)</li>
-            <li>How to manage Compaction, Erosion, and Drainage</li>
-            <li>Optimal soil pairings for Tomatoes, Succulents, and Blueberries</li>
-          </ul>
+  const renderWakeUp = () => {
+    if (dialogIndex < wakeUpStory.length) {
+      const currentLine = wakeUpStory[dialogIndex];
+      return (
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
+           {/* The Room Container */}
+           <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
+              {/* Chalkboard */}
+              <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center shadow-inner">
+                 <span className="text-white font-mono text-sm md:text-base opacity-80">SOIL = 🍃+🍂+💧+💨</span>
+              </div>
+
+              {/* Floor */}
+              <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
+                {/* Desk Grids - Background */}
+                <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
+                <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
+              </div>
+
+              {/* Instructor */}
+              <div className="absolute top-[100px] left-1/4 text-5xl">🧑‍🏫</div>
+
+              {/* Desk & Farmer */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                 {/* Farmer */}
+                 <div className={`w-14 h-14 relative z-10 transition-transform ${dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}>
+                    <FarmerSprite />
+                    {dialogIndex === 0 && <div className="absolute -top-4 -right-4 text-xl animate-pulse">❗</div>}
+                 </div>
+                 {/* Main Desk */}
+                 <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4 flex justify-center p-1">
+                   {/* Paper on desk */}
+                   <div className="w-6 h-8 bg-white opacity-80 rotate-12"></div>
+                 </div>
+              </div>
+           </div>
+
+           <DialogBox 
+              name={currentLine.name} 
+              portrait={currentLine.portrait} 
+              text={currentLine.text} 
+              onNext={() => setDialogIndex(dialogIndex + 1)} 
+           />
         </div>
-        <button 
-          onClick={() => {
-            setGameState('TITLE');
-            setDreamStage('INTRO_DIALOG');
-            setDialogIndex(0);
-            setCauldron([]);
-            setExampleIndex(0);
-            setFixedPlots([]);
-            setPlantedBeds({});
-            setAudioDismissed(false);
-          }}
-          className="bg-emerald-600 text-white w-full py-3 rounded-xl font-bold text-lg hover:bg-emerald-700 active:scale-95 transition-transform"
-        >
-          Play Again
-        </button>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800">
+        <PixelBox className="text-center max-w-2xl w-full shadow-2xl">
+          <div className="text-6xl mb-4 animate-bounce">🌱</div>
+          <h2 className="text-4xl font-extrabold text-[#5d4037] mb-6 border-b-4 border-[#8b5a2b] pb-4">Quest Complete!</h2>
+          
+          <div className="text-lg bg-[#d7ccc8] p-6 border-4 border-[#8b5a2b] text-left leading-relaxed shadow-inner mb-8">
+            <p className="font-bold mb-4 text-[#5d4037]">You successfully learned:</p>
+            <ul className="list-disc list-inside space-y-2 text-[#3e2723] font-medium">
+              <li>The 4 Components of Compost (and examples!)</li>
+              <li>How to manage Compaction, Erosion, and Drainage</li>
+              <li>Optimal soil pairings for Tomatoes, Succulents, and Blueberries</li>
+            </ul>
+          </div>
+          
+          <button 
+            onClick={() => {
+              setGameState('TITLE');
+              setDreamStage('INTRO_DIALOG');
+              setDialogIndex(0);
+              setCauldron([]);
+              setExampleIndex(0);
+              setFixedPlots([]);
+              setPlantedBeds({});
+              setAudioDismissed(false);
+            }}
+            className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full"
+          >
+            Play Again
+          </button>
+        </PixelBox>
       </div>
-    </div>
-  );
+    );
+  };
 
   // --- MAIN RENDER ROUTING ---
   const renderCurrentScene = () => {
     switch (gameState) {
       case 'TITLE': return renderTitle();
       case 'INTRO': return renderCutscene(introStory, () => setGameState('CLASS'));
-      case 'CLASS': return renderCutscene(classStory, handleStartDream);
+      case 'CLASS': return renderCutscene(classStory, () => setGameState('SLEEP_TRANSITION'));
+      case 'SLEEP_TRANSITION': return renderSleepTransition();
       case 'DREAM': return dreamStage === 'WAKE_UP' ? renderWakeUp() : renderDream();
       default: return renderTitle();
     }
