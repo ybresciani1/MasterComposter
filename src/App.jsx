@@ -66,6 +66,19 @@ const FarmerSprite = () => (
   </svg>
 );
 
+const WormSprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Body */}
+    <path d="M2,11 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
+    {/* Darker segments for texture */}
+    <path d="M4,9 h1 v2 h-1 z M7,11 h1 v1 h-1 z M10,8 h1 v3 h-1 z M13,9 h1 v1 h-1 z" fill="#d81b60" />
+    {/* Head */}
+    <path d="M12,6 h4 v4 h-4 z" fill="#f48fb1" />
+    {/* Eyes */}
+    <path d="M13,7 h1 v1 h-1 z M15,7 h1 v1 h-1 z" fill="#3e2723" />
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -77,8 +90,10 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext }) => (
     <PixelBox className="flex gap-4 items-start relative shadow-2xl">
       <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden">
         {name === 'Wallace' ? (
-          <img src="https://i.ibb.co/Cp49ZLTZ/wallace.png" alt="Wallace" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.ibb.co/Cp49ZLTZ.png'; }} />
-        ) : portrait}
+          <img src="https://i.ibb.co/WLG8Tt3/wallace.png" alt="Wallace" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.ibb.co/WLG8Tt3.png'; }} />
+        ) : (
+          portrait
+        )}
       </div>
       <div className="flex-1">
         <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>
@@ -259,9 +274,20 @@ export default function App() {
           e.preventDefault();
       }
 
-      // SPACE TO PICK UP
+      // SPACE TO PICK UP OR DROP
       if (e.key === ' ' || e.code === 'Space') {
-         if (heldItem) return;
+         if (heldItem) {
+            // Drop the currently held item at the farmer's feet
+            setGroundItems(prev => [...prev, {
+               ...heldItem,
+               x: farmerPosRef.current.x,
+               y: farmerPosRef.current.y + 20
+            }]);
+            setHeldItem(null);
+            showToast(`Dropped ${heldItem.name}.`);
+            return;
+         }
+
          let closest = null;
          let minDist = 60; // Interaction radius
          
@@ -278,7 +304,7 @@ export default function App() {
          if (closest) {
             setHeldItem(closest); // Store the entire object
             setGroundItems(prev => prev.filter(i => i.name !== closest.name));
-            showToast(`Picked up ${closest.name}! Press 'E' to interact.`);
+            showToast(`Picked up ${closest.name}! Press 'E' to interact or 'SPACE' to drop.`);
          }
       }
 
@@ -418,9 +444,9 @@ export default function App() {
       <PixelBox className="text-center max-w-lg w-full">
         <h1 className="text-4xl font-extrabold text-[#5d4037] mb-2">Master Composter</h1>
         <h2 className="text-xl text-[#8b5a2b] mb-8 tracking-widest">VALLEY</h2>
-        <div className="h-20 mb-8 animate-bounce flex items-center justify-center gap-4">
+        <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
-          <span className="text-6xl">🪱</span>
+          <div className="w-16 h-16"><WormSprite /></div>
         </div>
         <button 
           onClick={() => setGameState('INTRO')}
@@ -511,7 +537,7 @@ export default function App() {
 
                  {/* Farmer Sprite */}
                  <div 
-                   className="absolute w-10 h-10 flex items-center justify-center z-30 transition-transform duration-75"
+                   className="absolute w-10 h-10 flex items-center justify-center z-30"
                    style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)` }}
                  >
                    <FarmerSprite />
@@ -649,7 +675,7 @@ export default function App() {
 
                  {/* Farmer Sprite */}
                  <div 
-                   className="absolute w-10 h-10 flex items-center justify-center z-30 transition-transform duration-75"
+                   className="absolute w-10 h-10 flex items-center justify-center z-30"
                    style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)` }}
                  >
                    <FarmerSprite />
