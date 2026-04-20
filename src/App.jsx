@@ -4,11 +4,23 @@ import React, { useState, useEffect, useRef } from 'react';
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
 const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🪨 Gravel'];
 
-const COMPONENT_EXAMPLES = [
-  { text: "Grass clippings, vegetable scraps, and coffee grounds", correct: "🍃 Nitrogen (Greens)" },
-  { text: "Dry leaves, cardboard, and twigs", correct: "🍂 Carbon (Browns)" },
-  { text: "Rainfall, hose water, and pile moisture", correct: "💧 Water" },
-  { text: "Oxygen pockets for microbes to breathe", correct: "💨 Air" },
+// Expanded data for the matching mini-game
+const EXAMPLE_ITEMS = [
+  { id: 'ex_n1', name: 'Grass Clippings', sprite: '🥬', comp: '🍃 Nitrogen (Greens)' },
+  { id: 'ex_n2', name: 'Vegetable Scraps', sprite: '🥦', comp: '🍃 Nitrogen (Greens)' },
+  { id: 'ex_n3', name: 'Coffee Grounds', sprite: '☕', comp: '🍃 Nitrogen (Greens)' },
+  { id: 'ex_c1', name: 'Dry Leaves', sprite: '🍂', comp: '🍂 Carbon (Browns)' },
+  { id: 'ex_c2', name: 'Cardboard', sprite: '📦', comp: '🍂 Carbon (Browns)' },
+  { id: 'ex_c3', name: 'Twigs', sprite: '🪵', comp: '🍂 Carbon (Browns)' },
+  { id: 'ex_w', name: 'Watering Can', type: 'tool', sprite: '🚿', comp: '💧 Water' },
+  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '🔱', comp: '💨 Air' }
+];
+
+const EXAMPLE_BINS = [
+  { id: 'bin_n', x: 10, y: 10, comp: '🍃 Nitrogen (Greens)', color: 'bg-green-700', label: 'Greens' },
+  { id: 'bin_c', x: 245, y: 10, comp: '🍂 Carbon (Browns)', color: 'bg-[#8d6e63]', label: 'Browns' },
+  { id: 'bin_w', x: 10, y: 205, comp: '💧 Water', color: 'bg-blue-600', label: 'Water' },
+  { id: 'bin_a', x: 245, y: 205, comp: '💨 Air', color: 'bg-stone-500', label: 'Air' }
 ];
 
 const SOIL_PROBLEMS = [
@@ -29,20 +41,20 @@ const SOIL_PROBLEMS = [
     sprite: "💨",
     description: "Wind and water are washing the topsoil away.",
     options: [
-      { text: "Remove all plants", correct: false },
-      { text: "Add heavy sand", correct: false },
-      { text: "Plant cover crops & apply mulch", correct: true }
+      { text: "Removing all plants to let the soil breathe.", correct: false },
+      { text: "Planting cover crops, applying mulch, and building terraces.", correct: true },
+      { text: "Adding more sand to make it heavier.", correct: false }
     ]
   },
   {
     id: 'drainage',
     name: "Flooded Plot",
     sprite: "💧",
-    description: "Water pools on the surface and won't drain.",
+    description: "Water pools on the surface and won't drain, drowning plants.",
     options: [
-      { text: "Pave over it with concrete", correct: false },
-      { text: "Add organic matter & create raised beds", correct: true },
-      { text: "Step on it to squeeze water out", correct: false }
+      { text: "Pave over it with concrete.", correct: false },
+      { text: "Adding organic matter, creating raised beds, and proper grading.", correct: true },
+      { text: "Step on the soil to squeeze the water out.", correct: false }
     ]
   }
 ];
@@ -68,14 +80,29 @@ const FarmerSprite = () => (
 
 const WormSprite = () => (
   <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Body */}
     <path d="M2,11 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
-    {/* Darker segments for texture */}
     <path d="M4,9 h1 v2 h-1 z M7,11 h1 v1 h-1 z M10,8 h1 v3 h-1 z M13,9 h1 v1 h-1 z" fill="#d81b60" />
-    {/* Head */}
     <path d="M12,6 h4 v4 h-4 z" fill="#f48fb1" />
-    {/* Eyes */}
     <path d="M13,7 h1 v1 h-1 z M15,7 h1 v1 h-1 z" fill="#3e2723" />
+  </svg>
+);
+
+const PitchforkSprite = () => (
+  <svg viewBox="0 0 11 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,0 h3 v11 h-3 z" fill="#8b5a2b" />
+    <path d="M6,0 h1 v11 h-1 z" fill="#5d4037" />
+    <path d="M2,11 h7 v2 h-7 z" fill="#9e9e9e" />
+    <path d="M2,12 h7 v1 h-7 z" fill="#757575" />
+    <path d="M2,13 h1 v3 h-1 z M5,13 h1 v3 h-1 z M8,13 h1 v3 h-1 z" fill="#9e9e9e" />
+  </svg>
+);
+
+const WateringCanSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,2 h8 v8 h-8 z" fill="#0288d1" />
+    <path d="M12,4 h3 v1 h-3 z M13,5 h2 v1 h-2 z" fill="#b3e5fc" />
+    <path d="M1,4 h3 v1 h-3 z" fill="#01579b" />
+    <path d="M5,0 h6 v2 h-6 z" fill="#01579b" />
   </svg>
 );
 
@@ -104,7 +131,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
           {name === 'Wallace' ? (
             <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
           ) : (
-            portrait
+            <div className="w-full h-full p-2">{portrait}</div>
           )}
         </div>
         <div className="flex-1">
@@ -126,31 +153,27 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
 
 export default function App() {
   // --- STATE ---
-  const [gameState, setGameState] = useState('TITLE'); // TITLE, INTRO, CLASS, SLEEP_TRANSITION, DREAM
+  const [gameState, setGameState] = useState('TITLE'); 
   const [dreamStage, setDreamStage] = useState('INTRO_DIALOG'); 
-  // Dream Stages: INTRO_DIALOG, CRAFT_SOIL, MATCH_EXAMPLES, FIX_PLOTS, PLANT_SEEDS, END_DIALOG, WAKE_UP
   const [dialogIndex, setDialogIndex] = useState(0);
   
-  // Audio
   const audioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
 
-  // Minigame States
   const [cauldron, setCauldron] = useState([]);
-  const [exampleIndex, setExampleIndex] = useState(0);
+  const [completedExamples, setCompletedExamples] = useState([]);
   const [fixedPlots, setFixedPlots] = useState([]);
   const [activePlot, setActivePlot] = useState(null);
   const [plantedBeds, setPlantedBeds] = useState({});
+  const [isStirring, setIsStirring] = useState(false);
 
-  // WASD Movement States (Shared for CRAFT_SOIL and PLANT_SEEDS)
   const [heldItem, setHeldItem] = useState(null);
   const [groundItems, setGroundItems] = useState([]);
   const farmerPosRef = useRef({ x: 150, y: 150, bounceY: 0 });
   const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, bounceY: 0 });
   const keys = useRef({});
   
-  // Custom Toast State
   const [toastMsg, setToastMsg] = useState(null);
   const [wallaceEmotion, setWallaceEmotion] = useState('normal');
 
@@ -163,7 +186,6 @@ export default function App() {
     }, 3500);
   };
 
-  // --- AUDIO HANDLING ---
   const playAudio = () => {
     if (audioRef.current) {
       audioRef.current.volume = 0.3;
@@ -182,25 +204,22 @@ export default function App() {
         audioRef.current.pause();
         setIsMusicPlaying(false);
       } else {
-        if (audioRef.current.readyState === 0) {
-           audioRef.current.load();
-        }
+        if (audioRef.current.readyState === 0) audioRef.current.load();
         audioRef.current.play()
           .then(() => setIsMusicPlaying(true))
           .catch(e => {
             console.log("Audio play prevented:", e);
-            showToast("Audio blocked by browser, but the game will continue! 🎵");
+            showToast("Audio blocked by browser! 🎵");
           });
       }
     }
   };
 
-  // --- DIALOGUES ---
   const introStory = [
     "5:00 PM. You hold the familiar orange pill bottle in your hand.",
     "You pop the white plastic cap off, peer inside, and tip it upside down. Nothing. Just a dusting of powder falls out.",
     "Ugh, completely out of my ADHD medication... My brain feels like a browser with 40 tabs open and music playing from an unknown source.",
-    "But tonight is important. It's the Chula Vista Master Composter class at the Living Coast Discovery Center at 6:00 PM.",
+    "But tonight is important. It's the Chula Vista Master Composter class at 6:00 PM.",
     "You grab your keys, hop in your car, and hit the I-5."
   ];
 
@@ -225,11 +244,10 @@ export default function App() {
   const wakeUpStory = [
     { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center." },
     { name: "Instructor", portrait: "🧑‍🏫", text: "...and that concludes our section on soil properties and compost components!" },
-    { name: "You", portrait: <div className="w-14 h-14"><FarmerSprite /></div>, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
-    { name: "You", portrait: <div className="w-14 h-14"><FarmerSprite /></div>, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
+    { name: "You", portrait: <FarmerSprite />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
+    { name: "You", portrait: <FarmerSprite />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
   ];
 
-  // --- HANDLERS ---
   const handleDialogNext = (script, nextStage) => {
     if (dialogIndex < script.length - 1) {
       setDialogIndex(dialogIndex + 1);
@@ -244,14 +262,9 @@ export default function App() {
     playAudio();
   };
 
-  // --- MINIGAME LOGIC ---
-  
-  // Transition timer for sleep phase
   useEffect(() => {
     if (gameState === 'SLEEP_TRANSITION') {
-      const timer = setTimeout(() => {
-        handleStartDream();
-      }, 4000); // Wait 4 seconds then launch the dream
+      const timer = setTimeout(() => handleStartDream(), 4000);
       return () => clearTimeout(timer);
     }
   }, [gameState]);
@@ -259,10 +272,11 @@ export default function App() {
   const initializeGroundItems = () => {
     const items = [...SOIL_COMPONENTS, ...FALSE_COMPONENTS]
       .sort(() => Math.random() - 0.5)
-      .map((name) => ({
+      .map((name, idx) => ({
+           id: `craft-${idx}`,
            name,
-           x: 20 + Math.random() * 260, // Keep inside 340px width arena
-           y: 110 + Math.random() * 140 // Spawns below the top bin
+           x: 20 + Math.random() * 260,
+           y: 110 + Math.random() * 140 
       }));
     setGroundItems(items);
     setCauldron([]);
@@ -271,20 +285,53 @@ export default function App() {
     setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
   };
 
+  const initializeExamplesItems = () => {
+    const items = [...EXAMPLE_ITEMS]
+      .sort(() => Math.random() - 0.5)
+      .map((item) => ({
+           ...item,
+           x: 40 + Math.random() * 220,
+           y: 100 + Math.random() * 80
+      }));
+    setGroundItems(items);
+    setCompletedExamples([]);
+    setHeldItem(null);
+    farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+    setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+  };
+
   useEffect(() => {
-     if (dreamStage === 'CRAFT_SOIL') {
-        initializeGroundItems();
-     }
+     if (dreamStage === 'CRAFT_SOIL') initializeGroundItems();
+     else if (dreamStage === 'MATCH_EXAMPLES') initializeExamplesItems();
   }, [dreamStage]);
 
   useEffect(() => {
-    // Only run WASD logic during these two active movement stages
-    if (dreamStage !== 'CRAFT_SOIL' && dreamStage !== 'PLANT_SEEDS') return;
+    if (dreamStage === 'CRAFT_SOIL' && cauldron.length === 4) {
+      const isCorrect = cauldron.every(c => SOIL_COMPONENTS.includes(c));
+      if (isCorrect) {
+        setIsStirring(true);
+        showToast("Stirring it all together...", 'surprised');
+        setTimeout(() => {
+          setIsStirring(false);
+          showToast("Perfect! Compost is made!", 'surprised');
+          setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 2000);
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          showToast("Wallace: That ain't soil! Try again.", 'sad');
+          initializeGroundItems();
+        }, 2000);
+      }
+    }
+  }, [cauldron, dreamStage]);
+
+  useEffect(() => {
+    if (dreamStage !== 'CRAFT_SOIL' && dreamStage !== 'MATCH_EXAMPLES' && dreamStage !== 'PLANT_SEEDS') return;
 
     let animationFrameId;
-    const speed = 2.5; // Slower speed for smoother walking
-    const maxX = 340 - 40; // Arena width (340) - farmer width (40)
-    const maxY = 300 - 40; // Arena height (300) - farmer height (40)
+    const speed = 2.5;
+    const maxX = 340 - 40;
+    const maxY = 300 - 40;
 
     const loop = () => {
        let moved = false;
@@ -296,13 +343,9 @@ export default function App() {
        if (moved) {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
-           
-           // Calculate a slight bounce effect based on time while moving
            farmerPosRef.current.bounceY = -Math.abs(Math.sin(Date.now() / 120)) * 6;
-           
            setFarmerRenderPos({ ...farmerPosRef.current });
        } else if (farmerPosRef.current.bounceY !== 0) {
-           // Reset bounce smoothly when stopped
            farmerPosRef.current.bounceY = 0;
            setFarmerRenderPos({ ...farmerPosRef.current });
        }
@@ -312,183 +355,104 @@ export default function App() {
 
     const handleKeyDown = (e) => {
       keys.current[e.key] = true;
-      
-      // Prevent scrolling with arrows/space while playing
-      if (['w','a','s','d','W','A','S','D',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
-          e.preventDefault();
-      }
+      if (['w','a','s','d','W','A','S','D',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
 
-      // SPACE TO PICK UP OR DROP
       if (e.key === ' ' || e.code === 'Space') {
          if (heldItem) {
-            // Drop the currently held item at the farmer's feet
-            setGroundItems(prev => [...prev, {
-               ...heldItem,
-               x: farmerPosRef.current.x,
-               y: farmerPosRef.current.y + 20
-            }]);
+            setGroundItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
+            showToast(`Dropped ${heldItem.name || heldItem}.`);
             setHeldItem(null);
-            showToast(`Dropped ${heldItem.name}.`);
             return;
          }
-
-         let closest = null;
-         let minDist = 60; // Interaction radius
-         
+         let closest = null; let minDist = 60;
          groundItems.forEach(item => {
             const dx = (farmerPosRef.current.x + 20) - (item.x + 20); 
             const dy = (farmerPosRef.current.y + 20) - (item.y + 10);
             const dist = Math.hypot(dx, dy);
-            if (dist < minDist) {
-               minDist = dist;
-               closest = item;
-            }
+            if (dist < minDist) { minDist = dist; closest = item; }
          });
-         
          if (closest) {
-            setHeldItem(closest); // Store the entire object
-            setGroundItems(prev => prev.filter(i => i.name !== closest.name));
-            showToast(`Picked up ${closest.name}! Press 'E' to interact or 'SPACE' to drop.`);
+            setHeldItem(closest);
+            const identifier = closest.id || closest.name;
+            setGroundItems(prev => prev.filter(i => (i.id || i.name) !== identifier));
+            showToast(`Picked up ${closest.name || closest}! Press 'E' to use.`);
          }
       }
 
-      // E TO TOSS OR PLANT
       if (e.key === 'e' || e.key === 'E') {
          if (!heldItem) return;
          const farmerCenter = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
 
          if (dreamStage === 'CRAFT_SOIL') {
-             // Logic for tossing into the mixing bin
              const binCenter = { x: 170, y: 50 };
-             const dist = Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y);
-             
-             if (dist < 110) { // Allowed toss distance
-                setCauldron(prev => {
-                   const next = [...prev, heldItem.name];
-                   if (next.length === 4) {
-                      const isCorrect = next.every(c => SOIL_COMPONENTS.includes(c));
-                      if (isCorrect) {
-                         setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 1000);
-                         showToast("Perfect! That's the right soil mix!", 'surprised');
-                      } else {
-                         setTimeout(() => {
-                           showToast("Wallace: That ain't soil! Try again.", 'sad');
-                           initializeGroundItems();
-                         }, 2000);
-                      }
-                   }
-                   return next;
-                });
+             if (Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y) < 110) {
+                setCauldron(prev => [...prev, heldItem.name || heldItem]);
                 setHeldItem(null);
-             } else {
-                showToast("Get closer to the mixing bin to toss!");
-             }
-         } else if (dreamStage === 'PLANT_SEEDS') {
-             // Logic for planting seeds in beds
-             const beds = [
-                { id: 0, x: 25, y: 30, soil: PLANTS[0].soil },
-                { id: 1, x: 135, y: 30, soil: PLANTS[1].soil },
-                { id: 2, x: 245, y: 30, soil: PLANTS[2].soil }
-             ];
-             
-             let closestBed = null;
-             let minDist = 70; // Planting interaction distance
+             } else showToast("Get closer to the mixing bin!");
+         } else if (dreamStage === 'MATCH_EXAMPLES') {
+             let closestBin = null; let minDist = 75;
+             EXAMPLE_BINS.forEach(bin => {
+                const dx = farmerCenter.x - (bin.x + 40); const dy = farmerCenter.y - (bin.y + 40);
+                const dist = Math.hypot(dx, dy);
+                if (dist < minDist) { minDist = dist; closestBin = bin; }
+             });
 
+             if (closestBin) {
+                if (heldItem.comp === closestBin.comp) {
+                   setCompletedExamples(prev => {
+                      const next = [...prev, heldItem.id];
+                      if (next.length === 8) {
+                         setTimeout(() => setDreamStage('FIX_PLOTS'), 1500);
+                         showToast("Farm is tidy! Great job!", 'surprised');
+                      } else showToast(`Correct! Added ${heldItem.name}.`, 'surprised');
+                      return next;
+                   });
+                   setHeldItem(null);
+                } else showToast("Wallace: That doesn't belong there!", 'sad');
+             } else showToast("Get closer to a station!");
+         } else if (dreamStage === 'PLANT_SEEDS') {
+             const beds = [{ id: 0, x: 25, y: 30, soil: PLANTS[0].soil }, { id: 1, x: 135, y: 30, soil: PLANTS[1].soil }, { id: 2, x: 245, y: 30, soil: PLANTS[2].soil }];
+             let closestBed = null; let minDist = 70;
              beds.forEach(bed => {
-                const bx = bed.x + 32; // Center of the 64px bed
-                const by = bed.y + 32;
-                const dist = Math.hypot(farmerCenter.x - bx, farmerCenter.y - by);
-                if (dist < minDist) {
-                   minDist = dist;
-                   closestBed = bed;
-                }
+                const dist = Math.hypot(farmerCenter.x - (bed.x + 32), farmerCenter.y - (bed.y + 32));
+                if (dist < minDist) { minDist = dist; closestBed = bed; }
              });
 
              if (closestBed) {
                 setPlantedBeds(prev => {
-                   if (prev[closestBed.id]) {
-                      showToast("There's already a plant here!");
-                      return prev;
-                   }
+                   if (prev[closestBed.id]) { showToast("Already planted!"); return prev; }
                    if (heldItem.soil === closestBed.soil) {
                       const next = { ...prev, [closestBed.id]: heldItem };
-                      setHeldItem(null);
-                      showToast(`Planted ${heldItem.name}!`, 'surprised');
-                      
-                      if (Object.keys(next).length === 3) {
-                         setTimeout(() => setDreamStage('END_DIALOG'), 1500);
-                      }
+                      setHeldItem(null); showToast(`Planted ${heldItem.name}!`, 'surprised');
+                      if (Object.keys(next).length === 3) setTimeout(() => setDreamStage('END_DIALOG'), 1500);
                       return next;
-                   } else {
-                      showToast("Wallace: This plant won't survive in this soil!", 'sad');
-                      return prev;
-                   }
+                   } else { showToast("Wallace: Wrong soil!", 'sad'); return prev; }
                 });
-             } else {
-                showToast("Get closer to a soil bed to plant!");
-             }
+             } else showToast("Get closer to a bed!");
          }
       }
     };
 
-    const handleKeyUp = (e) => {
-      keys.current[e.key] = false;
-    };
-
+    const handleKeyUp = (e) => keys.current[e.key] = false;
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-       cancelAnimationFrame(animationFrameId);
-       window.removeEventListener('keydown', handleKeyDown);
-       window.removeEventListener('keyup', handleKeyUp);
-    };
+    return () => { cancelAnimationFrame(animationFrameId); window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
   }, [dreamStage, heldItem, groundItems]);
-
-  const handleExampleAnswer = (comp) => {
-    if (comp === COMPONENT_EXAMPLES[exampleIndex].correct) {
-      if (exampleIndex < COMPONENT_EXAMPLES.length - 1) {
-        setExampleIndex(exampleIndex + 1);
-        setWallaceEmotion('surprised');
-        setTimeout(() => setWallaceEmotion('normal'), 1500);
-      } else {
-        setDreamStage('FIX_PLOTS');
-      }
-    } else {
-      showToast("Wallace: Nope! Think carefully about what that is.", 'sad');
-    }
-  };
 
   const handleFixPlot = (plotId, isCorrect) => {
     if (isCorrect) {
       const newFixed = [...fixedPlots, plotId];
-      setFixedPlots(newFixed);
-      setActivePlot(null);
-      setWallaceEmotion('surprised');
-      setTimeout(() => setWallaceEmotion('normal'), 1500);
+      setFixedPlots(newFixed); setActivePlot(null); setWallaceEmotion('surprised');
       if (newFixed.length === 3) {
-        // Setup for PLANT_SEEDS
-        const seedsToPlant = PLANTS.slice(0, 3).map((p, i) => ({
-           ...p,
-           x: 50 + (i * 100), // Space them out evenly at the bottom
-           y: 230
-        }));
-        setGroundItems(seedsToPlant);
-        setHeldItem(null);
-        farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
-        setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
-        setPlantedBeds({});
-        setDreamStage('PLANT_SEEDS');
+        const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
+        setGroundItems(seeds); setHeldItem(null); farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+        setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 }); setPlantedBeds({}); setDreamStage('PLANT_SEEDS');
       }
-    } else {
-      showToast("Wallace: That'll ruin the soil even more! Try a different tool.", 'sad');
-    }
+    } else showToast("Wallace: Try a different tool.", 'sad');
   };
 
-
-  // --- RENDERERS ---
   const renderTitle = () => (
-    <div className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4">
+    <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4">
       <PixelBox className="text-center max-w-lg w-full">
         <h1 className="text-4xl font-extrabold text-[#5d4037] mb-2">Master Composter</h1>
         <h2 className="text-xl text-[#8b5a2b] mb-8 tracking-widest">VALLEY</h2>
@@ -496,367 +460,190 @@ export default function App() {
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-16 h-16"><WormSprite /></div>
         </div>
-        <button 
-          onClick={() => setGameState('INTRO')}
-          className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full"
-        >
-          New Game
-        </button>
+        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">New Game</button>
       </PixelBox>
     </div>
   );
 
   const renderCutscene = (script, onComplete) => (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+    <div key="scene-cutscene" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <p className="text-white font-mono text-xl md:text-2xl leading-loose mb-12 animate-pulse">
-          {script[dialogIndex]}
-        </p>
-        <button 
-          onClick={() => {
-            if (dialogIndex < script.length - 1) setDialogIndex(dialogIndex + 1);
-            else { setDialogIndex(0); onComplete(); }
-          }}
-          className="text-amber-500 font-mono text-lg hover:text-amber-300"
-        >
-          [ Click to continue ]
-        </button>
+        <p className="text-white font-mono text-xl md:text-2xl leading-loose mb-12 animate-pulse">{script[dialogIndex]}</p>
+        <button onClick={() => { if (dialogIndex < script.length - 1) setDialogIndex(dialogIndex + 1); else { setDialogIndex(0); onComplete(); } }} className="text-amber-500 font-mono text-lg hover:text-amber-300">[ Click to continue ]</button>
       </div>
     </div>
   );
 
   const renderSleepTransition = () => (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
-      <div className="text-center">
-        <p className="text-white font-mono text-3xl md:text-4xl tracking-[0.5em] animate-pulse">Z z z . . .</p>
-      </div>
+    <div key="scene-sleep" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      <p className="text-white font-mono text-3xl md:text-4xl tracking-[0.5em] animate-pulse">Z z z . . .</p>
     </div>
   );
 
-  const renderDream = () => {
-    return (
-      <div className="min-h-screen bg-[#7ec850] relative overflow-hidden font-mono p-4 flex flex-col items-center">
-        {/* Background Details */}
+  const renderDream = () => (
+    <div key="scene-dream" className="min-h-screen bg-[#7ec850] relative overflow-hidden font-mono p-4 flex flex-col items-center">
         <div className="absolute top-10 left-10 text-4xl opacity-50">🌲</div>
         <div className="absolute top-20 right-20 text-4xl opacity-50">🌲</div>
-        <div className="absolute bottom-40 left-20 text-4xl opacity-50">🪨</div>
-        
-        {/* Game Area */}
         <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
-          
-          {/* HEADER / UI */}
           <div className="flex justify-between items-center mb-8">
              <PixelBox className="py-2 px-4"><span className="text-amber-700">Day 1</span> | 9:00 AM</PixelBox>
              <PixelBox className="py-2 px-4 flex gap-4 items-center">
                 <span>Funds: 0g</span>
-                <button
-                  onClick={toggleMusic}
-                  className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] active:scale-95 border-2 border-[#3e2723]"
-                >
-                  🎵 {isMusicPlaying ? 'ON' : 'OFF'}
-                </button>
+                <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
              </PixelBox>
           </div>
 
-          {/* STAGE: CRAFT SOIL */}
           {dreamStage === 'CRAFT_SOIL' && (
             <div className="text-center animate-fade-in relative flex flex-col items-center">
-              <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2">
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">WASD to Move</span>
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">SPACE to Pick Up</span>
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">E to Toss</span>
+              <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
+                  <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Toss</span>
               </div>
-
-              {/* The Arena Container */}
-              <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner shadow-black/30">
-                 
-                 {/* Mixing Bin */}
-                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 border-[#3e2723] shadow-inner flex flex-wrap items-center justify-center p-2 z-10">
-                    {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs text-center w-full font-bold">BIN</span>}
-                    {cauldron.map(item => (
-                      <span key={item} className="bg-[#d7ccc8] text-[8px] sm:text-[10px] p-0.5 m-0.5 font-bold rounded truncate max-w-full text-[#3e2723]">
-                        {item}
-                      </span>
-                    ))}
+              <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner">
+                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 border-[#3e2723] flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden">
+                    {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
+                    {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] p-0.5 m-0.5 font-bold rounded">{item}</span>)}
+                    {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
                  </div>
+                 {groundItems.map((item) => <div key={item.id || item.name} className="absolute bg-white border-2 border-amber-600 px-2 py-1 rounded text-[10px] font-bold shadow-md z-20" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>{item.name}</div>)}
+                 <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}><FarmerSprite />{heldItem && <div className="absolute -top-6 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md">{heldItem.name || heldItem}</div>}</div>
+              </div>
+              <DialogBox name="Wallace" text="Gather Nitrogen (Greens), Carbon (Browns), Water, and Air! Use WASD to walk, SPACE to pick up, and E near the bin to toss them in!" hideNext emotion={wallaceEmotion} />
+            </div>
+          )}
 
-                 {/* Ground Items */}
+          {dreamStage === 'MATCH_EXAMPLES' && (
+            <div className="text-center animate-fade-in relative flex flex-col items-center">
+              <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
+                  <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
+              </div>
+              <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner">
+                 {EXAMPLE_BINS.map(bin => {
+                    const count = completedExamples.filter(id => EXAMPLE_ITEMS.find(i => i.id === id)?.comp === bin.comp).length;
+                    const max = EXAMPLE_ITEMS.filter(i => i.comp === bin.comp).length;
+                    return (
+                       <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md ${bin.color}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
+                         <span className="text-white text-[9px] font-bold text-center leading-tight drop-shadow-md">{bin.label}</span>
+                         <span className="text-white text-[10px] font-bold mt-1 bg-black/30 px-1 rounded">{count}/{max}</span>
+                         {count === max && <span className="absolute -top-2 -right-2 text-xl">⭐</span>}
+                       </div>
+                    );
+                 })}
                  {groundItems.map(item => (
-                    <div 
-                      key={item.name} 
-                      className="absolute bg-white border-2 border-amber-600 px-2 py-1 rounded text-[10px] font-bold shadow-md z-20 text-stone-800"
-                      style={{ transform: `translate(${item.x}px, ${item.y}px)` }}
-                    >
-                      {item.name}
+                    <div key={item.id} className="absolute bg-white border-2 border-amber-600 p-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        {item.id === 'ex_w' ? <WateringCanSprite/> : item.id === 'ex_a' ? <PitchforkSprite/> : <span className="text-sm">{item.sprite}</span>}
+                      </div>
+                      <span className="truncate max-w-[60px]">{item.name}</span>
                     </div>
                  ))}
-
-                 {/* Farmer Sprite */}
-                 <div 
-                   className="absolute w-10 h-10 flex items-center justify-center z-30"
-                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}
-                 >
+                 <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
                    <FarmerSprite />
-                   {/* Held Item */}
                    {heldItem && (
-                     <div className="absolute -top-6 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded whitespace-nowrap animate-bounce shadow-md">
-                       {heldItem.name}
+                     <div className="absolute -top-8 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1">
+                        <div className="w-4 h-4">{heldItem.id === 'ex_w' ? <WateringCanSprite/> : heldItem.id === 'ex_a' ? <PitchforkSprite/> : <span>{heldItem.sprite}</span>}</div>
+                        <span>{heldItem.name}</span>
                      </div>
                    )}
                  </div>
-
               </div>
-
-              <DialogBox name="Wallace" portrait="🪱" text="Time to craft! Walk around (WASD), pick up the 4 compost elements (SPACE), and walk near the bin to toss them in (E)!" hideNext emotion={wallaceEmotion} />
+              <DialogBox name="Wallace" text="Gather the Nitrogen materials, Carbon materials, Watering Can, and Pitchfork! Take them to the correct colored bins!" hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
-          {/* STAGE: MATCH EXAMPLES */}
-          {dreamStage === 'MATCH_EXAMPLES' && (
-            <div className="text-center animate-fade-in">
-              <PixelBox className="mb-8">
-                <h3 className="text-sm text-amber-800 mb-2">Identify this example:</h3>
-                <p className="text-xl font-bold">{COMPONENT_EXAMPLES[exampleIndex].text}</p>
-              </PixelBox>
-              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                 {SOIL_COMPONENTS.map(comp => (
-                    <button 
-                      key={comp}
-                      onClick={() => handleExampleAnswer(comp)}
-                      className="bg-white border-4 border-[#8b5a2b] p-4 font-bold hover:bg-amber-100 active:scale-95 transition-transform"
-                    >
-                      {comp}
-                    </button>
-                 ))}
-              </div>
-              <DialogBox name="Wallace" portrait="🪱" text={`Great batch of soil! Now, match these examples to the 4 components we just used. (${exampleIndex + 1}/4)`} hideNext emotion={wallaceEmotion} />
-            </div>
-          )}
-
-          {/* STAGE: FIX PLOTS */}
           {dreamStage === 'FIX_PLOTS' && (
             <div className="animate-fade-in">
                <div className="flex justify-center gap-6 mt-12">
                  {SOIL_PROBLEMS.map(plot => {
                    const isFixed = fixedPlots.includes(plot.id);
                    return (
-                     <div key={plot.id} className="text-center flex flex-col items-center relative">
-                       <button 
-                         onClick={() => !isFixed && setActivePlot(plot)}
-                         className={`w-32 h-32 border-4 ${isFixed ? 'bg-[#5d4037] border-[#3e2723]' : 'bg-[#a1887f] border-[#5d4037] animate-pulse'} flex items-center justify-center text-5xl transition-transform hover:scale-105`}
-                       >
-                         {isFixed ? '🌱' : plot.sprite}
-                       </button>
+                     <div key={plot.id} className="text-center flex flex-col items-center">
+                       <button onClick={() => !isFixed && setActivePlot(plot)} className={`w-32 h-32 border-4 ${isFixed ? 'bg-[#5d4037] border-[#3e2723]' : 'bg-[#a1887f] border-[#5d4037] animate-pulse'} flex items-center justify-center text-5xl hover:scale-105 transition-transform`}>{isFixed ? '🌱' : plot.sprite}</button>
                        <span className="mt-2 bg-[#f4e2b8] px-2 text-xs font-bold border border-[#8b5a2b]">{plot.name}</span>
                      </div>
                    );
                  })}
                </div>
-
-               {/* Action Modal */}
                {activePlot && (
                  <div className="absolute inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
                    <PixelBox className="w-full max-w-lg">
-                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold flex items-center gap-2">{activePlot.sprite} {activePlot.name}</h2>
-                        <button onClick={() => setActivePlot(null)} className="text-red-500 font-bold text-xl">X</button>
-                     </div>
+                     <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">{activePlot.name}</h2><button onClick={() => setActivePlot(null)} className="text-red-500 font-bold text-xl">X</button></div>
                      <p className="mb-6">{activePlot.description}</p>
-                     <div className="space-y-3">
-                       {activePlot.options.map((opt, i) => (
-                         <button 
-                           key={i}
-                           onClick={() => handleFixPlot(activePlot.id, opt.correct)}
-                           className="w-full text-left bg-white p-3 border-2 border-stone-300 hover:border-amber-500 hover:bg-amber-50"
-                         >
-                           ▶ {opt.text}
-                         </button>
-                       ))}
-                     </div>
+                     <div className="space-y-3">{activePlot.options.map((opt, i) => <button key={`opt-${i}`} onClick={() => handleFixPlot(activePlot.id, opt.correct)} className="w-full text-left bg-white p-3 border-2 border-stone-300 hover:border-amber-500 hover:bg-amber-50">▶ {opt.text}</button>)}</div>
                    </PixelBox>
                  </div>
                )}
-
-               {!activePlot && <DialogBox name="Wallace" portrait="🪱" text="Uh oh, the weather wreaked havoc on my fields. Click a broken plot and choose the right technique to fix it!" hideNext emotion={wallaceEmotion} />}
+               {!activePlot && <DialogBox name="Wallace" text="Fix these soil problems! Click a plot and select the correct practice." hideNext emotion={wallaceEmotion} />}
             </div>
           )}
 
-          {/* STAGE: PLANT SEEDS */}
           {dreamStage === 'PLANT_SEEDS' && (
-            <div className="text-center animate-fade-in w-full flex flex-col items-center">
-              
-               <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2">
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">WASD to Move</span>
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">SPACE to Pick Up</span>
-                  <span className="bg-[#5d4037] text-white px-2 py-1 text-[10px] sm:text-xs rounded border border-[#3e2723]">E to Plant</span>
-              </div>
-
-               {/* The Arena Container */}
-              <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner shadow-black/30">
-                 
-                 {/* Soil Beds */}
+            <div className="text-center animate-fade-in flex flex-col items-center">
+               <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded"><span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Plant</span></div>
+              <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner">
                  {[0, 1, 2].map(index => {
-                    const bedData = { 0: { x: 25, y: 30 }, 1: { x: 135, y: 30 }, 2: { x: 245, y: 30 } }[index];
-                    const requiredSoil = PLANTS[index].soil;
-                    const planted = plantedBeds[index];
+                    const bed = { 0: { x: 25, y: 30 }, 1: { x: 135, y: 30 }, 2: { x: 245, y: 30 } }[index];
+                    const soil = PLANTS[index].soil; const planted = plantedBeds[index];
                     return (
-                       <React.Fragment key={index}>
-                         <div 
-                           className="absolute w-16 h-16 bg-[#5d4037] border-4 border-[#3e2723] flex flex-col items-center justify-center z-10"
-                           style={{ transform: `translate(${bedData.x}px, ${bedData.y}px)` }}
-                         >
-                           {planted ? <span className="text-3xl">{planted.sprite}</span> : <span className="text-[#8d6e63] text-[10px] font-bold">DIRT</span>}
-                         </div>
-                         <div 
-                           className="absolute w-[80px] bg-white border border-[#388e3c] text-[9px] leading-tight text-center font-bold text-[#1b5e20] p-1 rounded shadow-sm z-20"
-                           style={{ transform: `translate(${bedData.x - 8}px, ${bedData.y + 70}px)` }}
-                         >
-                           {requiredSoil}
-                         </div>
+                       <React.Fragment key={`bed-fragment-${index}`}>
+                         <div key={`bed-${index}`} className="absolute w-16 h-16 bg-[#5d4037] border-4 border-[#3e2723] flex items-center justify-center z-10" style={{ transform: `translate(${bed.x}px, ${bed.y}px)` }}>{planted ? <span className="text-3xl">{planted.sprite}</span> : <span className="text-[#8d6e63] text-[9px] font-bold">SOIL</span>}</div>
+                         <div key={`label-${index}`} className="absolute w-[80px] bg-white border border-[#388e3c] text-[8px] leading-tight text-center font-bold p-1 rounded z-20" style={{ transform: `translate(${bed.x - 8}px, ${bed.y + 70}px)` }}>{soil}</div>
                        </React.Fragment>
                     )
                  })}
-
-                 {/* Ground Items (Seeds) */}
-                 {groundItems.map(item => (
-                    <div 
-                      key={item.name} 
-                      className="absolute bg-white border-2 border-[#8b5a2b] w-8 h-8 flex items-center justify-center rounded-full text-lg shadow-md z-20"
-                      style={{ transform: `translate(${item.x}px, ${item.y}px)` }}
-                      title={item.name}
-                    >
-                      {item.sprite}
-                    </div>
-                 ))}
-
-                 {/* Farmer Sprite */}
-                 <div 
-                   className="absolute w-10 h-10 flex items-center justify-center z-30"
-                   style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}
-                 >
-                   <FarmerSprite />
-                   {/* Held Seed */}
-                   {heldItem && (
-                     <div className="absolute -top-6 bg-white border-2 border-[#8b5a2b] w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold whitespace-nowrap animate-bounce shadow-md">
-                       {heldItem.sprite}
-                     </div>
-                   )}
-                 </div>
-
+                 {groundItems.map(item => <div key={item.id || item.name} className="absolute bg-white border-2 border-[#8b5a2b] w-8 h-8 flex items-center justify-center rounded-full text-lg shadow-md z-20" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>{item.sprite}</div>)}
+                 <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}><FarmerSprite />{heldItem && <div className="absolute -top-6 bg-white border-2 border-[#8b5a2b] w-6 h-6 flex items-center justify-center rounded-full text-sm animate-bounce">{heldItem.sprite}</div>}</div>
               </div>
-
-               <DialogBox name="Wallace" portrait="🪱" text="Time to plant! Walk to the seeds (SPACE), read the soil labels on each bed, and plant them in the right dirt (E)!" hideNext emotion={wallaceEmotion} />
+              <DialogBox name="Wallace" text="Match the plants to their preferred soil! Pick them up with SPACE and plant with E." hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
-          {/* STAGE: INTRO & END DIALOGS */}
-          {dreamStage === 'INTRO_DIALOG' && (
-            <DialogBox 
-              name="Wallace" portrait="🪱" 
-              text={wormIntro[dialogIndex]} 
-              onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} 
-              emotion={wallaceEmotion}
-            />
-          )}
-          
-          {dreamStage === 'END_DIALOG' && (
-            <DialogBox 
-              name="Wallace" portrait="🪱" 
-              text={endStory[dialogIndex]} 
-              onNext={() => handleDialogNext(endStory, 'WAKE_UP')} 
-              emotion={wallaceEmotion}
-            />
-          )}
-
+          {dreamStage === 'INTRO_DIALOG' && <DialogBox key="intro-dialog" name="Wallace" text={wormIntro[dialogIndex]} onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} emotion={wallaceEmotion} />}
+          {dreamStage === 'END_DIALOG' && <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />}
         </div>
-
       </div>
-    );
-  };
+  );
 
   const renderWakeUp = () => {
     if (dialogIndex < wakeUpStory.length) {
-      const currentLine = wakeUpStory[dialogIndex];
+      const current = wakeUpStory[dialogIndex];
       return (
-        <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
-           {/* The Room Container */}
+        <div key="scene-wakeup-classroom" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
            <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
-              {/* Chalkboard */}
-              <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center shadow-inner">
-                 <span className="text-white font-mono text-sm md:text-base opacity-80">SOIL = 🍃+🍂+💧+💨</span>
-              </div>
-
-              {/* Floor */}
+              <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
               <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
-                {/* Desk Grids - Background */}
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
               </div>
-
-              {/* Instructor */}
               <div className="absolute top-[100px] left-1/4 text-5xl">🧑‍🏫</div>
-
-              {/* Desk & Farmer */}
               <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                 {/* Farmer */}
-                 <div className={`w-14 h-14 relative z-10 transition-transform ${dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}>
-                    <FarmerSprite />
-                    {dialogIndex === 0 && <div className="absolute -top-4 -right-4 text-xl animate-pulse">❗</div>}
-                 </div>
-                 {/* Main Desk */}
-                 <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4 flex justify-center p-1">
-                   {/* Paper on desk */}
-                   <div className="w-6 h-8 bg-white opacity-80 rotate-12"></div>
-                 </div>
+                 <div className={`w-14 h-14 relative z-10 ${dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}><FarmerSprite />{dialogIndex === 0 && <div key="alert-bubble" className="absolute -top-4 -right-4 text-xl animate-pulse text-red-600 font-bold">❗</div>}</div>
+                 <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4"><div className="absolute left-4 top-2 w-6 h-8 bg-white opacity-80 rotate-12"></div></div>
               </div>
            </div>
-
-           <DialogBox 
-              name={currentLine.name} 
-              portrait={currentLine.portrait} 
-              text={currentLine.text} 
-              onNext={() => setDialogIndex(dialogIndex + 1)} 
-           />
+           <DialogBox name={current.name} portrait={current.portrait} text={current.text} onNext={() => setDialogIndex(dialogIndex + 1)} />
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800">
+      <div key="scene-wakeup-complete" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800">
         <PixelBox className="text-center max-w-2xl w-full shadow-2xl">
           <div className="text-6xl mb-4 animate-bounce">🌱</div>
           <h2 className="text-4xl font-extrabold text-[#5d4037] mb-6 border-b-4 border-[#8b5a2b] pb-4">Quest Complete!</h2>
-          
           <div className="text-lg bg-[#d7ccc8] p-6 border-4 border-[#8b5a2b] text-left leading-relaxed shadow-inner mb-8">
             <p className="font-bold mb-4 text-[#5d4037]">You successfully learned:</p>
             <ul className="list-disc list-inside space-y-2 text-[#3e2723] font-medium">
-              <li>The 4 Components of Compost (and examples!)</li>
-              <li>How to manage Compaction, Erosion, and Drainage</li>
-              <li>Optimal soil pairings for Tomatoes, Succulents, and Blueberries</li>
+              <li key="learned-1">Compost Components: Nitrogen (Greens), Carbon (Browns), Water, Air</li>
+              <li key="learned-2">Managing Compaction, Erosion, and Drainage</li>
+              <li key="learned-3">Optimal soil pairings for your garden</li>
             </ul>
           </div>
-          
-          <button 
-            onClick={() => {
-              setGameState('TITLE');
-              setDreamStage('INTRO_DIALOG');
-              setDialogIndex(0);
-              setCauldron([]);
-              setExampleIndex(0);
-              setFixedPlots([]);
-              setPlantedBeds({});
-              setAudioDismissed(false);
-            }}
-            className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full"
-          >
-            Play Again
-          </button>
+          <button onClick={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setPlantedBeds({}); setAudioDismissed(false); }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
         </PixelBox>
       </div>
     );
   };
 
-  // --- MAIN RENDER ROUTING ---
   const renderCurrentScene = () => {
     switch (gameState) {
       case 'TITLE': return renderTitle();
@@ -869,43 +656,23 @@ export default function App() {
   };
 
   return (
-    <>
-      {renderCurrentScene()}
-
-      {/* Forced Audio Interaction Overlay - Bypasses Strict Browser Policies */}
+    <div className="app-container">
+      <style>{`
+        @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
+        .animate-stir { animation: stir-animation 0.3s infinite linear; }
+      `}</style>
+      <div key="active-scene-wrapper">{renderCurrentScene()}</div>
       {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && (
-         <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
+         <div key="audio-prompt-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
             <PixelBox className="text-center animate-bounce max-w-sm mx-4">
-               <h3 className="text-2xl mb-4 font-bold text-amber-900">Start Farm?</h3>
-               <p className="text-sm mb-6">Click to enter the dream and attempt to start background music.</p>
-               <button 
-                 onClick={() => {
-                   setAudioDismissed(true);
-                   toggleMusic();
-                 }}
-                 className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg"
-               >
-                 Let's Go! 🧑‍🌾
-               </button>
+               <h3 className="text-2xl mb-4 font-bold text-amber-900">Start Dream?</h3>
+               <p className="text-sm mb-6 font-mono">Click to begin the quest and start the music!</p>
+               <button onClick={() => { setAudioDismissed(true); toggleMusic(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg">Let's Go! 🧑‍🌾</button>
             </PixelBox>
          </div>
       )}
-
-      {/* Custom Toast Notification for in-game messages */}
-      {toastMsg && (
-        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">
-          {toastMsg}
-        </div>
-      )}
-
-      {/* Audio Player moved to root so it never unmounts */}
-      <audio 
-          ref={audioRef}
-          loop 
-          src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" 
-          className="hidden"
-          crossOrigin="anonymous"
-      />
-    </>
+      {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
+      <audio ref={audioRef} key="background-audio-element" loop src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" className="hidden" crossOrigin="anonymous" />
+    </div>
   );
 }
