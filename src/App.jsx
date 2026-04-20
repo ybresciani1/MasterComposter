@@ -17,10 +17,8 @@ const EXAMPLE_ITEMS = [
 ];
 
 const EXAMPLE_BINS = [
-  { id: 'bin_n', x: 10, y: 10, comp: '🍃 Nitrogen (Greens)', color: 'bg-green-700', label: 'Greens' },
-  { id: 'bin_c', x: 245, y: 10, comp: '🍂 Carbon (Browns)', color: 'bg-[#8d6e63]', label: 'Browns' },
-  { id: 'bin_w', x: 10, y: 205, comp: '💧 Water', color: 'bg-blue-600', label: 'Water' },
-  { id: 'bin_a', x: 245, y: 205, comp: '💨 Air', color: 'bg-stone-500', label: 'Air' }
+  { id: 'bin_n', x: 20, y: 15, comp: '🍃 Nitrogen (Greens)', color: 'bg-green-700', label: 'Greens Bin' },
+  { id: 'bin_c', x: 240, y: 15, comp: '🍂 Carbon (Browns)', color: 'bg-[#8d6e63]', label: 'Browns Bin' },
 ];
 
 const SOIL_PROBLEMS = [
@@ -155,6 +153,8 @@ export default function App() {
   // --- STATE ---
   const [gameState, setGameState] = useState('TITLE'); 
   const [dreamStage, setDreamStage] = useState('INTRO_DIALOG'); 
+  const [matchPhase, setMatchPhase] = useState(0); // 0: filling, 1: combining, 2: watering, 3: aerating
+  const [combinedBins, setCombinedBins] = useState([]); // tracks 'bin_n' or 'bin_c'
   const [dialogIndex, setDialogIndex] = useState(0);
   
   const audioRef = useRef(null);
@@ -167,6 +167,7 @@ export default function App() {
   const [activePlot, setActivePlot] = useState(null);
   const [plantedBeds, setPlantedBeds] = useState({});
   const [isStirring, setIsStirring] = useState(false);
+  const [isWatering, setIsWatering] = useState(false);
 
   const [heldItem, setHeldItem] = useState(null);
   const [groundItems, setGroundItems] = useState([]);
@@ -285,24 +286,40 @@ export default function App() {
     setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
   };
 
-  const initializeExamplesItems = () => {
-    const items = [...EXAMPLE_ITEMS]
-      .sort(() => Math.random() - 0.5)
-      .map((item) => ({
-           ...item,
-           x: 40 + Math.random() * 220,
-           y: 100 + Math.random() * 80
-      }));
-    setGroundItems(items);
-    setCompletedExamples([]);
+  const initializeExamplesItems = (phase = 0) => {
+    let items = [];
+    if (phase === 0) {
+      // Just Greens and Browns
+      items = EXAMPLE_ITEMS.filter(i => i.comp.includes('Nitrogen') || i.comp.includes('Carbon'));
+    } else if (phase === 2) {
+      // Watering Can
+      items = [EXAMPLE_ITEMS.find(i => i.id === 'ex_w')];
+    } else if (phase === 3) {
+      // Pitchfork
+      items = [EXAMPLE_ITEMS.find(i => i.id === 'ex_a')];
+    }
+
+    const positionedItems = items.map((item) => ({
+      ...item,
+      x: 40 + Math.random() * 220,
+      y: 110 + Math.random() * 140
+    }));
+
+    setGroundItems(positionedItems);
     setHeldItem(null);
-    farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
-    setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+    // Only reset farmer pos on first load of stage
+    if (phase === 0) {
+      farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+      setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+      setCompletedExamples([]);
+      setMatchPhase(0);
+      setCombinedBins([]);
+    }
   };
 
   useEffect(() => {
      if (dreamStage === 'CRAFT_SOIL') initializeGroundItems();
-     else if (dreamStage === 'MATCH_EXAMPLES') initializeExamplesItems();
+     else if (dreamStage === 'MATCH_EXAMPLES') initializeExamplesItems(0);
   }, [dreamStage]);
 
   useEffect(() => {
@@ -324,6 +341,26 @@ export default function App() {
       }
     }
   }, [cauldron, dreamStage]);
+
+  // Phase Transition Management for MATCH_EXAMPLES
+  useEffect(() => {
+    if (dreamStage === 'MATCH_EXAMPLES') {
+      if (matchPhase === 0) {
+        const greens = completedExamples.filter(id => EXAMPLE_ITEMS.find(i => i.id === id)?.comp.includes('Nitrogen')).length;
+        const browns = completedExamples.filter(id => EXAMPLE_ITEMS.find(i => i.id === id)?.comp.includes('Carbon')).length;
+        if (greens === 3 && browns === 3) {
+          setMatchPhase(1);
+          showToast("Bins are full! Now combine them in the center pile!", 'surprised');
+        }
+      } else if (matchPhase === 1) {
+        if (combinedBins.length === 2) {
+          setMatchPhase(2);
+          initializeExamplesItems(2); // Spawn Watering Can
+          showToast("Combined! Now find the Watering Can to moisten the pile.", 'surprised');
+        }
+      }
+    }
+  }, [completedExamples, combinedBins, matchPhase, dreamStage]);
 
   useEffect(() => {
     if (dreamStage !== 'CRAFT_SOIL' && dreamStage !== 'MATCH_EXAMPLES' && dreamStage !== 'PLANT_SEEDS') return;
@@ -359,6 +396,19 @@ export default function App() {
 
       if (e.key === ' ' || e.code === 'Space') {
          if (heldItem) {
+            // Check if user is trying to "empty" a bin they are carrying (Phase 1 logic)
+            if (heldItem.id === 'held_bin_n' || heldItem.id === 'held_bin_c') {
+              const farmerCenter = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
+              const pileCenter = { x: 170, y: 150 };
+              if (Math.hypot(farmerCenter.x - pileCenter.x, farmerCenter.y - pileCenter.y) < 80) {
+                const binType = heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c';
+                setCombinedBins(prev => [...prev, binType]);
+                setHeldItem(null);
+                showToast(`Emptied ${heldItem.name} into the pile!`);
+                return;
+              }
+            }
+
             setGroundItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
             showToast(`Dropped ${heldItem.name || heldItem}.`);
             setHeldItem(null);
@@ -371,6 +421,19 @@ export default function App() {
             const dist = Math.hypot(dx, dy);
             if (dist < minDist) { minDist = dist; closest = item; }
          });
+
+         // Logic for picking up full bins in Phase 1
+         if (!closest && dreamStage === 'MATCH_EXAMPLES' && matchPhase === 1) {
+            const farmerCenter = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
+            EXAMPLE_BINS.forEach(bin => {
+               if (combinedBins.includes(bin.id)) return;
+               const dist = Math.hypot(farmerCenter.x - (bin.x + 40), farmerCenter.y - (bin.y + 40));
+               if (dist < 60) {
+                  closest = { id: `held_${bin.id}`, name: bin.label, sprite: '📦', isBin: true };
+               }
+            });
+         }
+
          if (closest) {
             setHeldItem(closest);
             const identifier = closest.id || closest.name;
@@ -390,26 +453,56 @@ export default function App() {
                 setHeldItem(null);
              } else showToast("Get closer to the mixing bin!");
          } else if (dreamStage === 'MATCH_EXAMPLES') {
-             let closestBin = null; let minDist = 75;
-             EXAMPLE_BINS.forEach(bin => {
-                const dx = farmerCenter.x - (bin.x + 40); const dy = farmerCenter.y - (bin.y + 40);
-                const dist = Math.hypot(dx, dy);
-                if (dist < minDist) { minDist = dist; closestBin = bin; }
-             });
+             const pileCenter = { x: 170, y: 150 };
+             const distToPile = Math.hypot(farmerCenter.x - pileCenter.x, farmerCenter.y - pileCenter.y);
 
-             if (closestBin) {
-                if (heldItem.comp === closestBin.comp) {
-                   setCompletedExamples(prev => {
-                      const next = [...prev, heldItem.id];
-                      if (next.length === 8) {
-                         setTimeout(() => setDreamStage('FIX_PLOTS'), 1500);
-                         showToast("Farm is tidy! Great job!", 'surprised');
-                      } else showToast(`Correct! Added ${heldItem.name}.`, 'surprised');
-                      return next;
-                   });
+             if (matchPhase === 0) {
+               let closestBin = null; let minDist = 75;
+               EXAMPLE_BINS.forEach(bin => {
+                  const dx = farmerCenter.x - (bin.x + 40); const dy = farmerCenter.y - (bin.y + 40);
+                  const dist = Math.hypot(dx, dy);
+                  if (dist < minDist) { minDist = dist; closestBin = bin; }
+               });
+
+               if (closestBin) {
+                  if (heldItem.comp === closestBin.comp) {
+                     setCompletedExamples(prev => [...prev, heldItem.id]);
+                     setHeldItem(null);
+                     showToast(`Correct! Added ${heldItem.name}.`, 'surprised');
+                  } else showToast("Wallace: That doesn't belong there!", 'sad');
+               } else showToast("Get closer to a station!");
+             } else if (matchPhase === 1) {
+                // Empty bin logic handled in Space bar or here
+                if (heldItem.isBin && distToPile < 80) {
+                   const binType = heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c';
+                   setCombinedBins(prev => [...prev, binType]);
                    setHeldItem(null);
-                } else showToast("Wallace: That doesn't belong there!", 'sad');
-             } else showToast("Get closer to a station!");
+                   showToast(`Combined ${heldItem.name} into the pile!`, 'surprised');
+                } else showToast("Take the full bin to the center pile!");
+             } else if (matchPhase === 2) {
+                if (heldItem.id === 'ex_w' && distToPile < 80) {
+                   setIsWatering(true);
+                   setHeldItem(null);
+                   showToast("Watering the compost pile...", 'surprised');
+                   setTimeout(() => {
+                      setIsWatering(false);
+                      setMatchPhase(3);
+                      initializeExamplesItems(3); // Spawn Pitchfork
+                      showToast("Pile is moist! Now get the Pitchfork to add air.", 'surprised');
+                   }, 3000);
+                } else showToast("Use the Watering Can on the center pile!");
+             } else if (matchPhase === 3) {
+                if (heldItem.id === 'ex_a' && distToPile < 80) {
+                   setIsStirring(true);
+                   setHeldItem(null);
+                   showToast("Turning the pile for aeration...", 'surprised');
+                   setTimeout(() => {
+                      setIsStirring(false);
+                      showToast("Compost complete! Now let's use it.", 'surprised');
+                      setTimeout(() => setDreamStage('FIX_PLOTS'), 2000);
+                   }, 2500);
+                } else showToast("Use the Pitchfork on the center pile!");
+             }
          } else if (dreamStage === 'PLANT_SEEDS') {
              const beds = [{ id: 0, x: 25, y: 30, soil: PLANTS[0].soil }, { id: 1, x: 135, y: 30, soil: PLANTS[1].soil }, { id: 2, x: 245, y: 30, soil: PLANTS[2].soil }];
              let closestBed = null; let minDist = 70;
@@ -437,7 +530,7 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('keyup', handleKeyUp);
     return () => { cancelAnimationFrame(animationFrameId); window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
-  }, [dreamStage, heldItem, groundItems]);
+  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins]);
 
   const handleFixPlot = (plotId, isCorrect) => {
     if (isCorrect) {
@@ -514,20 +607,47 @@ export default function App() {
           {dreamStage === 'MATCH_EXAMPLES' && (
             <div className="text-center animate-fade-in relative flex flex-col items-center">
               <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
-                  <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
+                  <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Action</span>
               </div>
               <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner">
+                 {/* Nitrogen/Carbon Bins */}
                  {EXAMPLE_BINS.map(bin => {
                     const count = completedExamples.filter(id => EXAMPLE_ITEMS.find(i => i.id === id)?.comp === bin.comp).length;
-                    const max = EXAMPLE_ITEMS.filter(i => i.comp === bin.comp).length;
+                    const max = 3;
+                    const isCombined = combinedBins.includes(bin.id);
                     return (
-                       <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md ${bin.color}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
-                         <span className="text-white text-[9px] font-bold text-center leading-tight drop-shadow-md">{bin.label}</span>
-                         <span className="text-white text-[10px] font-bold mt-1 bg-black/30 px-1 rounded">{count}/{max}</span>
-                         {count === max && <span className="absolute -top-2 -right-2 text-xl">⭐</span>}
+                       <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md transition-opacity duration-500 ${bin.color} ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
+                         <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
+                         {!isCombined && <span className="text-white text-[10px] font-bold mt-1 bg-black/30 px-1 rounded">{count}/{max}</span>}
+                         {count === max && !isCombined && <span className="absolute -top-2 -right-2 text-xl animate-bounce">✨</span>}
                        </div>
                     );
                  })}
+
+                 {/* The Central Compost Pile */}
+                 <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-[#4e342e] border-4 border-[#3e2723] rounded-full transition-all duration-700 flex items-center justify-center z-5 shadow-inner ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                    {matchPhase === 1 && <span className="text-[10px] text-white font-bold text-center p-1">COMPOST PILE</span>}
+                    
+                    {/* Watering Animation */}
+                    {isWatering && (
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                        <div className="w-12 h-10 animate-pour origin-right">
+                          <WateringCanSprite />
+                        </div>
+                        {/* Pixelated Droplets */}
+                        <div className="flex justify-center gap-1 mt-2">
+                           {[1,2,3,4].map(i => (
+                             <div key={i} className="w-1 h-2 bg-blue-400 animate-droplet" style={{ animationDelay: `${i * 0.1}s` }}></div>
+                           ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stirring Animation */}
+                    {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
+                 </div>
+
+                 {/* Ground Items (Scraps, Tools, etc) */}
                  {groundItems.map(item => (
                     <div key={item.id} className="absolute bg-white border-2 border-amber-600 p-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
                       <div className="w-5 h-5 flex items-center justify-center">
@@ -536,17 +656,30 @@ export default function App() {
                       <span className="truncate max-w-[60px]">{item.name}</span>
                     </div>
                  ))}
+
+                 {/* Farmer Sprite */}
                  <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
                    <FarmerSprite />
                    {heldItem && (
                      <div className="absolute -top-8 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1">
-                        <div className="w-4 h-4">{heldItem.id === 'ex_w' ? <WateringCanSprite/> : heldItem.id === 'ex_a' ? <PitchforkSprite/> : <span>{heldItem.sprite}</span>}</div>
-                        <span>{heldItem.name}</span>
+                        <div className="w-4 h-4">
+                          {heldItem.id === 'ex_w' ? <WateringCanSprite/> : heldItem.id === 'ex_a' ? <PitchforkSprite/> : <span>{heldItem.sprite}</span>}
+                        </div>
+                        <span className="max-w-[50px] truncate">{heldItem.name}</span>
                      </div>
                    )}
                  </div>
               </div>
-              <DialogBox name="Wallace" text="Gather the Nitrogen materials, Carbon materials, Watering Can, and Pitchfork! Take them to the correct colored bins!" hideNext emotion={wallaceEmotion} />
+
+              {/* Instructions based on Phase */}
+              <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b]">
+                 {matchPhase === 0 && "Step 1: Fill the Green Bin and Brown Bin with scraps!"}
+                 {matchPhase === 1 && "Step 2: Carry the full bins (SPACE) and empty them (E) into the center pile!"}
+                 {matchPhase === 2 && "Step 3: Find the Watering Can and moisten the pile (E)!"}
+                 {matchPhase === 3 && "Step 4: Use the Pitchfork to stir and add air (E)!"}
+              </div>
+
+              <DialogBox name="Wallace" text="We're makin' real compost now! Follow the steps to layer, water, and air out your pile." hideNext emotion={wallaceEmotion} />
             </div>
           )}
 
@@ -638,7 +771,7 @@ export default function App() {
               <li key="learned-3">Optimal soil pairings for your garden</li>
             </ul>
           </div>
-          <button onClick={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setPlantedBeds({}); setAudioDismissed(false); }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
+          <button onClick={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
         </PixelBox>
       </div>
     );
@@ -660,6 +793,22 @@ export default function App() {
       <style>{`
         @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
         .animate-stir { animation: stir-animation 0.3s infinite linear; }
+        
+        @keyframes pour-animation {
+          0% { transform: rotate(0deg); }
+          20% { transform: rotate(-45deg); }
+          80% { transform: rotate(-45deg); }
+          100% { transform: rotate(0deg); }
+        }
+        .animate-pour { animation: pour-animation 3s forwards; }
+
+        @keyframes droplet-animation {
+          0% { transform: translateY(0); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(20px); opacity: 0; }
+        }
+        .animate-droplet { animation: droplet-animation 0.5s infinite; }
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
       {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && (
