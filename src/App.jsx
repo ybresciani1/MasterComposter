@@ -104,6 +104,29 @@ const WateringCanSprite = () => (
   </svg>
 );
 
+const CornSprite = () => (
+  <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,0 h2 v8 h-2 z" fill="#ffeb3b" />
+    <path d="M3,4 h1 v4 h-1 z M6,4 h1 v4 h-1 z" fill="#4caf50" />
+    <path d="M2,8 h6 v4 h-6 z" fill="#388e3c" />
+  </svg>
+);
+
+const CarrotSprite = () => (
+  <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,0 h2 v3 h-2 z" fill="#4caf50" />
+    <path d="M3,3 h4 v6 h-4 z M4,9 h2 v3 h-2 z" fill="#ff9800" />
+  </svg>
+);
+
+const MelonSprite = () => (
+  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,2 h8 v8 h-8 z" fill="#4caf50" />
+    <path d="M4,2 v8 M8,2 v8" fill="#1b5e20" />
+    <path d="M5,0 h2 v2 h-2 z" fill="#8b5a2b" />
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -539,7 +562,7 @@ export default function App() {
       if (newFixed.length === 3) {
         const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
         setGroundItems(seeds); setHeldItem(null); farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
-        setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 }); setPlantedBeds({}); setDreamStage('PLANT_SEEDS');
+        setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 }); setPlantedBeds({}); setDreamStage('END_DIALOG'); // Go to thriving farm scene
       }
     } else showToast("Wallace: Try a different tool.", 'sad');
   };
@@ -730,6 +753,26 @@ export default function App() {
             </div>
           )}
 
+          {/* New End Scene: Thriving Farm */}
+          {dreamStage === 'END_DIALOG' && (
+            <div className="text-center animate-fade-in flex flex-col items-center">
+              <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4">
+                 {[...Array(9)].map((_, i) => {
+                   const Sprites = [CornSprite, CarrotSprite, MelonSprite];
+                   const Sprite = Sprites[i % 3];
+                   return (
+                     <div key={`crop-${i}`} className="w-16 h-16 animate-grow" style={{ animationDelay: `${i * 0.1}s` }}>
+                       <Sprite />
+                     </div>
+                   );
+                 })}
+                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12">
+                    <FarmerSprite />
+                 </div>
+              </div>
+            </div>
+          )}
+
           {dreamStage === 'INTRO_DIALOG' && <DialogBox key="intro-dialog" name="Wallace" text={wormIntro[dialogIndex]} onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} emotion={wallaceEmotion} />}
           {dreamStage === 'END_DIALOG' && <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />}
         </div>
@@ -809,6 +852,14 @@ export default function App() {
           100% { transform: translateY(20px); opacity: 0; }
         }
         .animate-droplet { animation: droplet-animation 0.5s infinite; }
+
+        @keyframes grow-in {
+          from { transform: scale(0); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-grow {
+          animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
       {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && (
