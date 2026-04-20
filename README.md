@@ -1,16 +1,31 @@
-# React + Vite
+# Master Composter Valley
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive educational web game about composting and soil science. You fall asleep during a Master Composter class and wake up in a dream world guided by Wallace the worm. Work through composting challenges to earn your way back to the waking world.
 
-Currently, two official plugins are available:
+**Gameplay phases:**
+1. Gather soil components (Nitrogen, Carbon, Water, Air)
+2. Sort compost materials into the correct bins
+3. Diagnose and fix soil problems (compaction, erosion, drainage)
+4. Plant seeds in the right soil types
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local Setup
 
-## React Compiler
+**Prerequisites:** Node.js 24.15.0 (use `nvm use` if you have nvm installed)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Install dependencies
+npm install
 
-## Expanding the ESLint configuration
+# Start the dev server
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Open [http://localhost:5173](http://localhost:5173) in your browser. The game runs entirely in the browser with no backend required.
+
+## Other Commands
+
+```bash
+npm run build    # Production build → dist/
+npm run preview  # Preview the production build locally
+npm run lint     # Run ESLint
+```
