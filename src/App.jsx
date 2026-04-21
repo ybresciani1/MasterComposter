@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -722,7 +723,6 @@ export default function App() {
           <div className="flex justify-between items-center mb-8">
              <PixelBox className="py-2 px-4"><span className="text-amber-700">Day 1</span> | 9:00 AM</PixelBox>
              <PixelBox className="py-2 px-4 flex gap-4 items-center">
-                <span>Funds: 0g</span>
                 <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
              </PixelBox>
           </div>
@@ -843,7 +843,7 @@ export default function App() {
                </div>
 
                <DialogBox name="Wallace" text={
-                 dreamStage === 'CRAFT_SOIL' ? "Toss those components into the bin!" :
+                 dreamStage === 'CRAFT_SOIL' ? "Toss those components into the compost bin!" :
                  dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
                  dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
                  "Final stretch! Get those seeds in the right dirt."
@@ -1001,7 +1001,7 @@ export default function App() {
          </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" className="hidden" crossOrigin="anonymous" />
+      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
     </div>
   );
 }
