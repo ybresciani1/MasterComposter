@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
+import wowSound from './assets/anime-wow-sound-effect.mp3';
+import endCreditsVideo from './assets/End Credits.mov';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -13,7 +15,7 @@ const EXAMPLE_ITEMS = [
   { id: 'ex_c2', name: 'Cardboard', sprite: '📦', comp: '🍂 Carbon (Browns)' },
   { id: 'ex_c3', name: 'Twigs', sprite: '🪵', comp: '🍂 Carbon (Browns)' },
   { id: 'ex_w', name: 'Watering Can', type: 'tool', sprite: '🚿', comp: '💧 Water' },
-  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '🔱', comp: '💨 Air' }
+  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '', comp: '💨 Air' }
 ];
 
 const EXAMPLE_BINS = [
@@ -269,6 +271,7 @@ export default function App() {
   const audioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
+  const [isChapterSelectOpen, setIsChapterSelectOpen] = useState(false);
 
   const [cauldron, setCauldron] = useState([]);
   const [completedExamples, setCompletedExamples] = useState([]);
@@ -354,12 +357,32 @@ export default function App() {
 
   const handleStartDream = () => { setGameState('DREAM'); playAudio(); };
 
+  const jumpToChapter = (stage) => {
+    setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
+    setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
+    setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
+    setAudioDismissed(true); setIsChapterSelectOpen(false);
+    setGameState('DREAM'); playAudio();
+  };
+
   useEffect(() => {
     if (gameState === 'SLEEP_TRANSITION') {
       const timer = setTimeout(() => handleStartDream(), 4000);
       return () => clearTimeout(timer);
     }
   }, [gameState]);
+
+  useEffect(() => {
+    if (dreamStage === 'END_DIALOG') {
+      const sfx = new Audio(wowSound);
+      sfx.volume = 0.7;
+      sfx.play().catch(() => {});
+    }
+    if (dreamStage === 'WAKE_UP') {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
+      setIsMusicPlaying(false);
+    }
+  }, [dreamStage]);
 
   const initializeGroundItems = () => {
     const items = [...SOIL_COMPONENTS, ...FALSE_COMPONENTS]
@@ -393,6 +416,11 @@ export default function App() {
        farmerPosRef.current = { x: 150, y: 220, bounceY: 0 };
        setFarmerRenderPos({ ...farmerPosRef.current });
        setGroundItems([]); setHeldItem(null); setAppliedItems([]);
+     } else if (dreamStage === 'PLANT_SEEDS') {
+       const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
+       setGroundItems(seeds); setHeldItem(null);
+       farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
+       setFarmerRenderPos({ ...farmerPosRef.current });
      }
   }, [dreamStage]);
 
@@ -666,7 +694,8 @@ export default function App() {
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-16 h-16"><WormSprite /></div>
         </div>
-        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">New Game</button>
+        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3">New Game</button>
+        <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full">Chapter Select</button>
       </PixelBox>
     </div>
   );
@@ -721,7 +750,7 @@ export default function App() {
         <div className="absolute top-20 right-20 text-4xl opacity-50">🌲</div>
         <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
           <div className="flex justify-between items-center mb-8">
-             <PixelBox className="py-2 px-4"><span className="text-amber-700">Day 1</span> | 9:00 AM</PixelBox>
+             <PixelBox className="py-2 px-4"><span className="text-amber-700">Day {({'INTRO_DIALOG':1,'CRAFT_SOIL':1,'MATCH_EXAMPLES':2,'FIX_PLOTS':3,'PLANT_SEEDS':4,'END_DIALOG':5})[dreamStage] ?? 1}</span> | 9:00 AM</PixelBox>
              <PixelBox className="py-2 px-4 flex gap-4 items-center">
                 <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
              </PixelBox>
@@ -797,9 +826,9 @@ export default function App() {
                            <span className="text-[6px] font-bold bg-white/80 px-0.5 rounded leading-none">{item.name}</span>
                         </div>
                       ))}
-                      {isStirring && activePlot && <div className="absolute z-40 animate-stir" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-14"><PitchforkSprite/></div></div>}
+                      {isStirring && activePlot && <div className="absolute z-40" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="animate-stir w-10 h-14"><PitchforkSprite/></div></div>}
                       {isWorking && activePlot?.id === 'drainage' && (
-                          <div className="absolute z-40 animate-hammer" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-10"><HammerSprite/></div></div>
+                          <div className="absolute z-40" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="animate-hammer w-10 h-10"><HammerSprite/></div></div>
                       )}
                     </>
                   )}
@@ -843,7 +872,7 @@ export default function App() {
                </div>
 
                <DialogBox name="Wallace" text={
-                 dreamStage === 'CRAFT_SOIL' ? "Toss those components into the compost bin!" :
+                 dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
                  dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
                  dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
                  "Final stretch! Get those seeds in the right dirt."
@@ -931,9 +960,7 @@ export default function App() {
               <li key="learned-3">Optimal soil pairings for your garden</li>
             </ul>
           </div>
-          <button onClick={() => { 
-            setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); 
-          }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
+          <button onClick={() => setGameState('END_CREDITS')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Continue</button>
         </PixelBox>
       </div>
     );
@@ -946,6 +973,12 @@ export default function App() {
       case 'CLASS': return renderClassroomIntro();
       case 'SLEEP_TRANSITION': return renderSleepTransition();
       case 'DREAM': return dreamStage === 'WAKE_UP' ? renderWakeUp() : renderDream();
+      case 'END_CREDITS': return (
+        <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
+          <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
+            onEnded={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); }} />
+        </div>
+      );
       default: return renderTitle();
     }
   };
@@ -999,6 +1032,27 @@ export default function App() {
                <button onClick={() => { setAudioDismissed(true); toggleMusic(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg">Let's Go! 🧑‍🌾</button>
             </PixelBox>
          </div>
+      )}
+      {isChapterSelectOpen && (
+        <div key="chapter-select-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
+          <PixelBox className="text-center max-w-sm mx-4 w-full">
+            <h3 className="text-2xl mb-6 font-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
+            <div className="flex flex-col gap-2 mb-4">
+              {[
+                { label: '🌙 The Dream',      stage: 'INTRO_DIALOG'  },
+                { label: '🪣 Craft Soil',      stage: 'CRAFT_SOIL'    },
+                { label: '🔄 Match Examples',  stage: 'MATCH_EXAMPLES'},
+                { label: '🛠️ Fix Plots',       stage: 'FIX_PLOTS'     },
+                { label: '🌱 Plant Seeds',     stage: 'PLANT_SEEDS'   },
+              ].map(({ label, stage }) => (
+                <button key={stage} onClick={() => jumpToChapter(stage)} className="bg-[#fff8e1] text-[#3e2723] px-4 py-3 font-bold text-sm text-left hover:bg-[#ffe082] border-2 border-[#8b5a2b] active:translate-y-0.5 w-full font-mono">
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setIsChapterSelectOpen(false)} className="text-xs text-[#8b5a2b] font-mono hover:text-[#5d4037]">[ cancel ]</button>
+          </PixelBox>
+        </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
       <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
