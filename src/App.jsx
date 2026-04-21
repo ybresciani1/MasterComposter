@@ -3,6 +3,9 @@ import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
 import wowSound from './assets/anime-wow-sound-effect.mp3';
 import endCreditsVideo from './assets/End Credits.mov';
 import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
+import hammerSound from './assets/Hammer Sound Final.mp3';
+import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
+import questSound from './assets/Quest sound.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -335,7 +338,7 @@ export default function App() {
 
   const playAudio = () => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.21;
+      audioRef.current.volume = 0.15;
       audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
     }
   };
@@ -419,6 +422,12 @@ export default function App() {
        setHeldItem(null);
     }
   }, [lives, gameState, dreamStage]);
+
+  useEffect(() => {
+    if (dreamStage === 'WAKE_UP' && dialogIndex >= wakeUpStory.length && lives > 0) {
+      const sfx = new Audio(questSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    }
+  }, [dreamStage, dialogIndex, lives]);
 
   useEffect(() => {
     if (dreamStage === 'END_DIALOG' && lives > 0) {
@@ -736,7 +745,8 @@ export default function App() {
      showToast(`Fixing the ${activePlot.name}...`, 'surprised');
      
      if (activePlot.id === 'compaction') { setIsStirring(true); const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
-     if (activePlot.id === 'drainage') setIsWorking(true); // Using working animation for hammer/grading
+     if (activePlot.id === 'erosion') { const sfx = new Audio(patDirtSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
+     if (activePlot.id === 'drainage') { setIsWorking(true); const sfx = new Audio(hammerSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
      
      setTimeout(() => {
         setIsWorking(false); setIsStirring(false); setIsWatering(false);
