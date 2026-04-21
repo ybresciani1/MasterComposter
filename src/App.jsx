@@ -875,9 +875,9 @@ useEffect(() => {
                        dreamStage === 'PLANT_SEEDS' ? 'Day 4' : 'Day 5';
 
     return (
-      <div key="scene-dream" className="min-h-screen bg-[#7ec850] relative overflow-hidden font-mono p-4 flex flex-col items-center">
-          <div className="absolute top-10 left-10 text-4xl opacity-50">🌲</div>
-          <div className="absolute top-20 right-20 text-4xl opacity-50">🌲</div>
+      <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
+          <div className={`absolute top-10 left-10 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
+          <div className={`absolute top-20 right-20 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
           <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
             <div className="flex justify-between items-center mb-8">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
