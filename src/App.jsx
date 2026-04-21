@@ -7,6 +7,7 @@ import hammerSound from './assets/Hammer Sound Final.mp3';
 import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
 import magicSound from './assets/Magic Sound Final.mp3';
 import wakeUpSound from './assets/Wake up Sound Final.mp3';
+import nightmareSound from './assets/Nightmare sound.mp3';
 import tossBinSound from './assets/Toss Bin Final Sound.mp3';
 import questSound from './assets/Quest sound.mp3';
 
@@ -417,12 +418,13 @@ export default function App() {
   };
 
   // Watch for game over / lives empty
-  useEffect(() => {
+useEffect(() => {
     if (lives <= 0 && gameState === 'DREAM' && !['NIGHTMARE_END', 'WAKE_UP'].includes(dreamStage)) {
        setDreamStage('NIGHTMARE_END');
        setDialogIndex(0);
        setIsFixModalOpen(false);
        setHeldItem(null);
+       const sfx = new Audio(nightmareSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
   }, [lives, gameState, dreamStage]);
 
@@ -438,6 +440,10 @@ export default function App() {
         wowAudioRef.current.volume = 0.6;
         wowAudioRef.current.play().catch(() => {});
       }
+    }
+    if (dreamStage === 'NIGHTMARE_END') {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
+      setIsMusicPlaying(false);
     }
     if (dreamStage === 'WAKE_UP') {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
