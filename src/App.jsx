@@ -167,14 +167,14 @@ const PixelBox = ({ children, className = "" }) => (
 
 const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' }) => {
   let imgSrc = wallaceNormal;
-  let fbSrc = wallaceNormal;
+  let fbSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
 
   if (emotion === 'sad') {
     imgSrc = wallaceSad;
-    fbSrc = wallaceSad;
+    fbSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
   } else if (emotion === 'surprised') {
     imgSrc = wallaceSurprised;
-    fbSrc = wallaceSurprised;
+    fbSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
   }
 
   return (
