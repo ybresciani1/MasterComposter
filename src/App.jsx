@@ -223,25 +223,60 @@ const StudentPortrait = () => {
 };
 
 const CornSprite = () => (
-  <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M4,0 h2 v8 h-2 z" fill="#ffeb3b" />
-    <path d="M3,4 h1 v4 h-1 z M6,4 h1 v4 h-1 z" fill="#4caf50" />
-    <path d="M2,8 h6 v4 h-6 z" fill="#388e3c" />
+  <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Stalk */}
+    <path d="M5,10 h2 v6 h-2 z" fill="#8b5a2b" />
+    {/* Leaves wrapping */}
+    <path d="M2,6 h2 v6 h-2 z" fill="#4caf50" />
+    <path d="M8,6 h2 v6 h-2 z" fill="#388e3c" />
+    <path d="M3,4 h1 v5 h-1 z M8,5 h1 v4 h-1 z" fill="#66bb6a" />
+    {/* Cob body */}
+    <path d="M4,1 h4 v9 h-4 z" fill="#ffeb3b" />
+    {/* Kernel rows */}
+    <path d="M4,2 h1 v1 h-1 z M6,2 h1 v1 h-1 z M4,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M4,8 h1 v1 h-1 z M6,8 h1 v1 h-1 z" fill="#f9a825" />
+    <path d="M5,3 h1 v1 h-1 z M5,5 h1 v1 h-1 z M5,7 h1 v1 h-1 z" fill="#fdd835" />
+    {/* Silk top */}
+    <path d="M5,0 h1 v1 h-1 z M4,0 h1 v2 h-1 z M6,0 h1 v2 h-1 z" fill="#ffe082" />
+    {/* Highlight */}
+    <path d="M4,1 h1 v4 h-1 z" fill="#fff176" opacity="0.4" />
   </svg>
 );
 
 const CarrotSprite = () => (
-  <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M4,0 h2 v3 h-2 z" fill="#4caf50" />
-    <path d="M3,3 h4 v6 h-4 z M4,9 h2 v3 h-2 z" fill="#ff9800" />
+  <svg viewBox="0 0 10 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Leafy tops */}
+    <path d="M4,0 h1 v3 h-1 z" fill="#4caf50" />
+    <path d="M5,0 h1 v4 h-1 z" fill="#388e3c" />
+    <path d="M3,1 h1 v2 h-1 z M6,1 h1 v2 h-1 z" fill="#66bb6a" />
+    <path d="M2,2 h1 v1 h-1 z M7,2 h1 v1 h-1 z" fill="#4caf50" />
+    {/* Carrot body */}
+    <path d="M3,4 h4 v2 h-4 z M3,6 h3 v2 h-3 z M3,8 h2 v2 h-2 z M3,10 h1 v2 h-1 z" fill="#ff9800" />
+    {/* Highlight stripe */}
+    <path d="M3,4 h1 v8 h-1 z" fill="#ffb74d" opacity="0.6" />
+    {/* Ridge lines */}
+    <path d="M3,6 h3 v1 h-3 z M3,9 h2 v1 h-2 z" fill="#e65100" opacity="0.4" />
+    {/* Tip */}
+    <path d="M3,12 h1 v2 h-1 z" fill="#ef6c00" />
   </svg>
 );
 
 const MelonSprite = () => (
-  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M2,2 h8 v8 h-8 z" fill="#4caf50" />
-    <path d="M4,2 v8 M8,2 v8" fill="#1b5e20" />
-    <path d="M5,0 h2 v2 h-2 z" fill="#8b5a2b" />
+  <svg viewBox="0 0 14 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Stem */}
+    <path d="M6,0 h2 v2 h-2 z" fill="#8b5a2b" />
+    <path d="M5,1 h1 v1 h-1 z M8,1 h1 v1 h-1 z" fill="#6d4c41" />
+    {/* Melon body */}
+    <path d="M2,2 h10 v10 h-10 z" fill="#4caf50" />
+    {/* Rounded corners */}
+    <path d="M3,2 h8 v1 h-8 z M2,3 h1 v8 h-1 z M11,3 h1 v8 h-1 z M3,11 h8 v1 h-8 z" fill="#43a047" />
+    {/* Stripe pattern */}
+    <path d="M4,2 h1 v10 h-1 z M7,2 h1 v10 h-1 z M10,2 h1 v10 h-1 z" fill="#2e7d32" />
+    {/* Light stripes between */}
+    <path d="M5,2 h2 v10 h-2 z M8,2 h2 v10 h-2 z" fill="#66bb6a" />
+    {/* Highlight */}
+    <path d="M3,3 h2 v3 h-2 z" fill="#a5d6a7" opacity="0.5" />
+    {/* Inner flesh peek at bottom */}
+    <path d="M4,11 h6 v1 h-6 z" fill="#ff8f00" opacity="0.3" />
   </svg>
 );
 
