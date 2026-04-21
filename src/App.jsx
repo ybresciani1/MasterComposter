@@ -5,6 +5,9 @@ import endCreditsVideo from './assets/End Credits.mov';
 import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
 import hammerSound from './assets/Hammer Sound Final.mp3';
 import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
+import magicSound from './assets/Magic Sound Final.mp3';
+import wakeUpSound from './assets/Wake up Sound Final.mp3';
+import tossBinSound from './assets/Toss Bin Final Sound.mp3';
 import questSound from './assets/Quest sound.mp3';
 
 // --- GAME DATA ---
@@ -439,6 +442,7 @@ export default function App() {
     if (dreamStage === 'WAKE_UP') {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
       setIsMusicPlaying(false);
+      const sfx = new Audio(wakeUpSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
   }, [dreamStage]);
 
@@ -636,6 +640,8 @@ export default function App() {
              const binCenter = { x: 170, y: 50 };
              if (Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y) < 110) {
                 setCauldron(prev => [...prev, heldItem.name || heldItem]); setHeldItem(null);
+                if ((heldItem.name || heldItem) === '✨ Magic') { const sfx = new Audio(magicSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
+                else { const sfx = new Audio(tossBinSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
              } else showToast("Get closer to the mixing bin!");
          } else if (dreamStage === 'MATCH_EXAMPLES') {
              const pileCenter = { x: 170, y: 150 };
