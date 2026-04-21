@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
-import wowSound from './assets/anime-wow-sound-effect.mp3';
-import endCreditsVideo from './assets/End Credits.mov';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -15,7 +12,7 @@ const EXAMPLE_ITEMS = [
   { id: 'ex_c2', name: 'Cardboard', sprite: '📦', comp: '🍂 Carbon (Browns)' },
   { id: 'ex_c3', name: 'Twigs', sprite: '🪵', comp: '🍂 Carbon (Browns)' },
   { id: 'ex_w', name: 'Watering Can', type: 'tool', sprite: '🚿', comp: '💧 Water' },
-  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '', comp: '💨 Air' }
+  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '🔱', comp: '💨 Air' }
 ];
 
 const EXAMPLE_BINS = [
@@ -87,6 +84,30 @@ const WormSprite = () => (
     <path d="M4,9 h1 v2 h-1 z M7,11 h1 v1 h-1 z M10,8 h1 v3 h-1 z M13,9 h1 v1 h-1 z" fill="#d81b60" />
     <path d="M12,6 h4 v4 h-4 z" fill="#f48fb1" />
     <path d="M13,7 h1 v1 h-1 z M15,7 h1 v1 h-1 z" fill="#3e2723" />
+  </svg>
+);
+
+const LightningSprite = ({ color = "#ab47bc" }) => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" shapeRendering="crispEdges">
+    <path d="M9,0 h3 v4 h-2 v3 h3 v2 h-5 v7 h-3 v-6 h2 v-2 h-3 v-4 h3 z" fill={color} />
+    <path d="M10,1 h1 v3 h-2 v2 h1 v1 h-2 v4 h-1 v-3 h2 v-2 h-2 v-2 h1 z" fill="#ffffff" opacity="0.8"/>
+  </svg>
+);
+
+const TumbleweedSprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M6,1 h4 v1 h-4 z M4,2 h8 v1 h-8 z M2,3 h12 v1 h-12 z M2,4 h12 v8 h-12 z M3,12 h10 v1 h-10 z M5,13 h6 v1 h-6 z" fill="#a1887f" />
+    <path d="M7,2 h2 v1 h-2 z M5,4 h2 v1 h-2 z M9,5 h3 v1 h-3 z M3,7 h4 v1 h-4 z M10,8 h2 v1 h-2 z M6,10 h3 v1 h-3 z" fill="#5d4037" />
+  </svg>
+);
+
+const FireSprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M3,13 h10 v2 h-10 z M2,14 h12 v1 h-12 z" fill="#4e342e" />
+    <path d="M4,13 h8 v1 h-8 z" fill="#795548" />
+    <path d="M6,3 h4 v2 h-4 z M5,5 h6 v4 h-6 z M4,9 h8 v4 h-8 z" fill="#d32f2f" />
+    <path d="M7,5 h2 v2 h-2 z M6,7 h4 v5 h-4 z" fill="#f57c00" />
+    <path d="M7,8 h2 v4 h-2 z" fill="#fbc02d" />
   </svg>
 );
 
@@ -223,7 +244,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
   let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
   let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
 
-  if (emotion === 'sad') {
+  if (emotion === 'sad' || emotion === 'angry') {
     imgSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
     fbSrc = 'https://i.ibb.co/zHNFQdVb.png';
   } else if (emotion === 'surprised') {
@@ -237,9 +258,12 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
         {(portrait || name === 'Wallace') && (
           <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
             {name === 'Wallace' ? (
-              <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
+              <>
+                <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
+                {emotion === 'angry' && <div className="absolute top-1 right-1 text-2xl animate-bounce drop-shadow-md">💢</div>}
+              </>
             ) : (
-              <div className={`w-full h-full flex items-center justify-center ${name === 'You' || name === 'Instructor' ? '' : 'p-2'}`}>{portrait}</div>
+              <div className={`w-full h-full flex items-center justify-center ${name === 'You' ? '' : 'p-2'}`}>{portrait}</div>
             )}
           </div>
         )}
@@ -267,11 +291,12 @@ export default function App() {
   const [matchPhase, setMatchPhase] = useState(0); 
   const [combinedBins, setCombinedBins] = useState([]); 
   const [dialogIndex, setDialogIndex] = useState(0);
+  const [lives, setLives] = useState(3);
   
   const audioRef = useRef(null);
+  const wowAudioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
-  const [isChapterSelectOpen, setIsChapterSelectOpen] = useState(false);
 
   const [cauldron, setCauldron] = useState([]);
   const [completedExamples, setCompletedExamples] = useState([]);
@@ -343,12 +368,27 @@ export default function App() {
     "I reckon you're ready to go back to the surface now. Wake up, Master Composter!"
   ];
 
+  const nightmareStory = [
+    "WHAT DID YOU DO?! The soil is completely dead! *sniff* I'm so angry and sad...",
+    "Nothing will grow here now. It's a barren wasteland on fire! You've ruined the farm!",
+    "Wake up! You need to study more before you try farming!"
+  ];
+
   const wakeUpStory = [
     { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "...and that concludes our section on soil properties and compost components!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
     { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
   ];
+
+  const badWakeUpStory = [
+    { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center, sweating." },
+    { name: "Instructor", portrait: <InstructorPortrait />, text: "Hey! Are you sleeping in my class? Soil properties are NOT nap material!" },
+    { name: "You", portrait: <StudentPortrait />, text: "(Oh no... I got caught... and that nightmare was awful. I didn't learn a thing.)" },
+    { name: "You", portrait: <StudentPortrait />, text: "(I need to pay better attention next time...)" }
+  ];
+
+  const activeWakeUpStory = lives > 0 ? wakeUpStory : badWakeUpStory;
 
   const handleDialogNext = (script, nextStage) => {
     if (dialogIndex < script.length - 1) { setDialogIndex(dialogIndex + 1); }
@@ -357,13 +397,25 @@ export default function App() {
 
   const handleStartDream = () => { setGameState('DREAM'); playAudio(); };
 
-  const jumpToChapter = (stage) => {
-    setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
-    setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
-    setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
-    setAudioDismissed(true); setIsChapterSelectOpen(false);
-    setGameState('DREAM'); playAudio();
-  };
+  // Watch for game over / lives empty
+  useEffect(() => {
+    if (lives <= 0 && gameState === 'DREAM' && !['NIGHTMARE_END', 'WAKE_UP'].includes(dreamStage)) {
+       setDreamStage('NIGHTMARE_END');
+       setDialogIndex(0);
+       setIsFixModalOpen(false);
+       setHeldItem(null);
+    }
+  }, [lives, gameState, dreamStage]);
+
+  // Trigger WOW sound for the good ending only
+  useEffect(() => {
+    if (gameState === 'DREAM' && dreamStage === 'WAKE_UP' && dialogIndex >= activeWakeUpStory.length && lives > 0) {
+      if (wowAudioRef.current) {
+        wowAudioRef.current.volume = 0.6;
+        wowAudioRef.current.play().catch(e => console.log('WOW sound blocked:', e));
+      }
+    }
+  }, [gameState, dreamStage, dialogIndex, lives, activeWakeUpStory.length]);
 
   useEffect(() => {
     if (gameState === 'SLEEP_TRANSITION') {
@@ -371,18 +423,6 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [gameState]);
-
-  useEffect(() => {
-    if (dreamStage === 'END_DIALOG') {
-      const sfx = new Audio(wowSound);
-      sfx.volume = 0.7;
-      sfx.play().catch(() => {});
-    }
-    if (dreamStage === 'WAKE_UP') {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
-      setIsMusicPlaying(false);
-    }
-  }, [dreamStage]);
 
   const initializeGroundItems = () => {
     const items = [...SOIL_COMPONENTS, ...FALSE_COMPONENTS]
@@ -416,11 +456,6 @@ export default function App() {
        farmerPosRef.current = { x: 150, y: 220, bounceY: 0 };
        setFarmerRenderPos({ ...farmerPosRef.current });
        setGroundItems([]); setHeldItem(null); setAppliedItems([]);
-     } else if (dreamStage === 'PLANT_SEEDS') {
-       const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
-       setGroundItems(seeds); setHeldItem(null);
-       farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
-       setFarmerRenderPos({ ...farmerPosRef.current });
      }
   }, [dreamStage]);
 
@@ -431,7 +466,11 @@ export default function App() {
         setIsStirring(true); showToast("Stirring it all together...", 'surprised');
         setTimeout(() => { setIsStirring(false); showToast("Perfect! Compost is made!", 'surprised'); setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 2000); }, 2000);
       } else {
-        setTimeout(() => { showToast("Wallace: That ain't soil! Try again.", 'sad'); initializeGroundItems(); }, 2000);
+        setTimeout(() => { 
+           setLives(l => l - 1);
+           showToast("Wallace: That ain't soil! Try again.", 'sad'); 
+           initializeGroundItems(); 
+        }, 2000);
       }
     }
   }, [cauldron, dreamStage]);
@@ -449,7 +488,7 @@ export default function App() {
   }, [completedExamples, combinedBins, matchPhase, dreamStage]);
 
   useEffect(() => {
-    if (!['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) || isFixModalOpen || isWorking) return;
+    if (!['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) || isFixModalOpen || isWorking || lives <= 0) return;
 
     let animationFrameId;
     const speed = 2.5;
@@ -457,10 +496,11 @@ export default function App() {
 
     const loop = () => {
        let moved = false;
-       if (keys.current['w'] || keys.current['W'] || keys.current['ArrowUp']) { farmerPosRef.current.y -= speed; moved = true; }
-       if (keys.current['s'] || keys.current['S'] || keys.current['ArrowDown']) { farmerPosRef.current.y += speed; moved = true; }
-       if (keys.current['a'] || keys.current['A'] || keys.current['ArrowLeft']) { farmerPosRef.current.x -= speed; moved = true; }
-       if (keys.current['d'] || keys.current['D'] || keys.current['ArrowRight']) { farmerPosRef.current.x += speed; moved = true; }
+       const k = keys.current;
+       if (k['w'] || k['W'] || k['ArrowUp'] || k['arrowup']) { farmerPosRef.current.y -= speed; moved = true; }
+       if (k['s'] || k['S'] || k['ArrowDown'] || k['arrowdown']) { farmerPosRef.current.y += speed; moved = true; }
+       if (k['a'] || k['A'] || k['ArrowLeft'] || k['arrowleft']) { farmerPosRef.current.x -= speed; moved = true; }
+       if (k['d'] || k['D'] || k['ArrowRight'] || k['arrowright']) { farmerPosRef.current.x += speed; moved = true; }
 
        if (moved) {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
@@ -476,7 +516,10 @@ export default function App() {
     animationFrameId = requestAnimationFrame(loop);
 
     const handleKeyDown = (e) => {
+      const keyStr = e.key ? e.key.toLowerCase() : '';
       keys.current[e.key] = true;
+      if (keyStr) keys.current[keyStr] = true;
+
       if (['w','a','s','d','W','A','S','D',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
 
       if (e.key === ' ' || e.code === 'Space') {
@@ -573,8 +616,15 @@ export default function App() {
                   if (Math.hypot(farmerCenter.x - (bin.x + 40), farmerCenter.y - (bin.y + 40)) < 75) closestBin = bin;
                });
                if (closestBin) {
-                  if (heldItem.comp === closestBin.comp) { setCompletedExamples(prev => [...prev, heldItem.id]); setHeldItem(null); showToast(`Correct! Added ${heldItem.name}.`, 'surprised'); }
-                  else showToast("Wallace: Wrong bin!", 'sad');
+                  if (heldItem.comp === closestBin.comp) { 
+                     setCompletedExamples(prev => [...prev, heldItem.id]); 
+                     setHeldItem(null); 
+                     showToast(`Correct! Added ${heldItem.name}.`, 'surprised'); 
+                  }
+                  else {
+                     setLives(l => l - 1);
+                     showToast("Wallace: Wrong bin!", 'sad');
+                  }
                } else showToast("Get closer to a station!");
              } else if (matchPhase === 1 && heldItem.isBin && distToPile < 80) {
                setCombinedBins(prev => [...prev, heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c']);
@@ -592,17 +642,41 @@ export default function App() {
              beds.forEach(bed => { if (Math.hypot(farmerCenter.x - (bed.x + 32), farmerCenter.y - (bed.y + 32)) < 70) closestBed = bed; });
              if (closestBed) {
                 if (plantedBeds[closestBed.id]) { showToast("Already planted!"); return; }
-                if (heldItem.soil === closestBed.soil) { setPlantedBeds(prev => ({ ...prev, [closestBed.id]: heldItem })); setHeldItem(null); showToast(`Planted!`, 'surprised'); if (Object.keys(plantedBeds).length === 2) setTimeout(() => setDreamStage('END_DIALOG'), 1500); }
-                else showToast("Wallace: Wrong soil!", 'sad');
+                if (heldItem.soil === closestBed.soil) { 
+                   setPlantedBeds(prev => ({ ...prev, [closestBed.id]: heldItem })); 
+                   setHeldItem(null); 
+                   showToast(`Planted!`, 'surprised'); 
+                   if (Object.keys(plantedBeds).length === 2) setTimeout(() => setDreamStage('END_DIALOG'), 1500); 
+                }
+                else {
+                   setLives(l => l - 1);
+                   showToast("Wallace: Wrong soil!", 'sad');
+                }
              }
          }
       }
     };
 
-    const handleKeyUp = (e) => keys.current[e.key] = false;
-    window.addEventListener('keydown', handleKeyDown, { passive: false }); window.addEventListener('keyup', handleKeyUp);
-    return () => { cancelAnimationFrame(animationFrameId); window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
-  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, plantedBeds]);
+    const handleKeyUp = (e) => {
+      const keyStr = e.key ? e.key.toLowerCase() : '';
+      keys.current[e.key] = false;
+      if (keyStr) keys.current[keyStr] = false;
+      if (e.key) keys.current[e.key.toUpperCase()] = false;
+    };
+
+    const handleBlur = () => { keys.current = {}; }; // Prevent sticky keys on window focus loss
+
+    window.addEventListener('keydown', handleKeyDown, { passive: false }); 
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+    
+    return () => { 
+        cancelAnimationFrame(animationFrameId); 
+        window.removeEventListener('keydown', handleKeyDown); 
+        window.removeEventListener('keyup', handleKeyUp); 
+        window.removeEventListener('blur', handleBlur);
+    };
+  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, plantedBeds, lives]);
 
   const handleApplyItemToPlot = () => {
     // Check if the held item is correct for the active plot
@@ -612,6 +686,7 @@ export default function App() {
     if (activePlot.id === 'drainage' && (heldItem.id === 'tool_h' || heldItem.id === 'item_om2')) isCorrectTool = true;
 
     if (!isCorrectTool) {
+        setLives(l => l - 1);
         showToast("Wallace: That ain't the right material for this problem!", 'sad');
         return;
     }
@@ -681,7 +756,10 @@ export default function App() {
       setPlotItems(items);
       setAppliedItems([]);
       showToast("Correct! Bring BOTH materials to the plot one by one.", 'surprised');
-    } else { showToast("Wallace: That'll make it worse!", 'sad'); }
+    } else { 
+      setLives(l => l - 1);
+      showToast("Wallace: That'll make it worse!", 'sad'); 
+    }
   };
 
   // --- RENDERERS ---
@@ -694,8 +772,7 @@ export default function App() {
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-16 h-16"><WormSprite /></div>
         </div>
-        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3">New Game</button>
-        <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full">Chapter Select</button>
+        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">New Game</button>
       </PixelBox>
     </div>
   );
@@ -744,190 +821,249 @@ export default function App() {
     </div>
   );
 
-  const renderDream = () => (
-    <div key="scene-dream" className="min-h-screen bg-[#7ec850] relative overflow-hidden font-mono p-4 flex flex-col items-center">
-        <div className="absolute top-10 left-10 text-4xl opacity-50">🌲</div>
-        <div className="absolute top-20 right-20 text-4xl opacity-50">🌲</div>
-        <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
-          <div className="flex justify-between items-center mb-8">
-             <PixelBox className="py-2 px-4"><span className="text-amber-700">Day {({'INTRO_DIALOG':1,'CRAFT_SOIL':1,'MATCH_EXAMPLES':2,'FIX_PLOTS':3,'PLANT_SEEDS':4,'END_DIALOG':5})[dreamStage] ?? 1}</span> | 9:00 AM</PixelBox>
-             <PixelBox className="py-2 px-4 flex gap-4 items-center">
-                <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
-             </PixelBox>
-          </div>
+  const renderDream = () => {
+    const currentDay = dreamStage === 'CRAFT_SOIL' ? 'Day 1' :
+                       dreamStage === 'MATCH_EXAMPLES' ? 'Day 2' :
+                       dreamStage === 'FIX_PLOTS' ? 'Day 3' :
+                       dreamStage === 'PLANT_SEEDS' ? 'Day 4' : 'Day 5';
 
-          {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
-            <div className="text-center animate-fade-in relative flex flex-col items-center">
-               <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
-                  <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
-               </div>
-               
-               <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid">
-                  
-                  {dreamStage === 'CRAFT_SOIL' && (
-                    <div className={`absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow border-transparent' : 'border-[#3e2723]'}`}>
-                       {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
-                       {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] p-0.5 m-0.5 font-bold rounded relative z-30">{item}</span>)}
-                       
-                       {cauldron.includes('✨ Magic') && (
-                          <>
-                            <div className="absolute top-2 left-4 text-xs animate-sparkle" style={{animationDelay: '0s'}}>✨</div>
-                            <div className="absolute bottom-4 right-6 text-sm animate-sparkle" style={{animationDelay: '0.3s'}}>✨</div>
-                            <div className="absolute top-6 right-2 text-xs animate-sparkle" style={{animationDelay: '0.6s'}}>✨</div>
-                            <div className="absolute bottom-2 left-6 text-sm animate-sparkle" style={{animationDelay: '0.9s'}}>✨</div>
-                          </>
-                       )}
+    return (
+      <div key="scene-dream" className="min-h-screen bg-[#7ec850] relative overflow-hidden font-mono p-4 flex flex-col items-center">
+          <div className="absolute top-10 left-10 text-4xl opacity-50">🌲</div>
+          <div className="absolute top-20 right-20 text-4xl opacity-50">🌲</div>
+          <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
+            <div className="flex justify-between items-center mb-8">
+               <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
+               <PixelBox className="py-2 px-4 flex gap-4 items-center">
+                  <span className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md">
+                     {'❤️'.repeat(Math.max(0, lives))}{'🖤'.repeat(Math.max(0, 3 - lives))}
+                  </span>
+                  <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
+               </PixelBox>
+            </div>
 
-                       {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-40 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
-                    </div>
-                  )}
-
-                  {dreamStage === 'MATCH_EXAMPLES' && (
-                    <>
-                      {EXAMPLE_BINS.map(bin => {
-                         const isCombined = combinedBins.includes(bin.id);
-                         return (
-                            <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md transition-opacity duration-500 ${bin.color} ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
-                              <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
-                            </div>
-                         );
-                      })}
-                      <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-[#4e342e] border-4 border-[#3e2723] rounded-full transition-all duration-700 flex items-center justify-center z-5 shadow-inner ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
-                         {isWatering && (
-                           <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                             <div className="w-12 h-10 animate-pour origin-right"><WateringCanSprite /></div>
-                             <div className="flex justify-center gap-1 mt-2">{[1,2,3,4].map(i => <div key={i} className="w-1 h-2 bg-blue-400 animate-droplet" style={{ animationDelay: `${i * 0.1}s` }}></div>)}</div>
-                           </div>
+            {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+              <div className="text-center animate-fade-in relative flex flex-col items-center">
+                 <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
+                    <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
+                 </div>
+                 
+                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid">
+                    
+                    {dreamStage === 'CRAFT_SOIL' && (
+                      <div className={`absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow border-transparent' : 'border-[#3e2723]'}`}>
+                         {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
+                         {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] p-0.5 m-0.5 font-bold rounded relative z-30">{item}</span>)}
+                         
+                         {cauldron.includes('✨ Magic') && (
+                            <>
+                              <div className="absolute top-2 left-4 text-xs animate-sparkle" style={{animationDelay: '0s'}}>✨</div>
+                              <div className="absolute bottom-4 right-6 text-sm animate-sparkle" style={{animationDelay: '0.3s'}}>✨</div>
+                              <div className="absolute top-6 right-2 text-xs animate-sparkle" style={{animationDelay: '0.6s'}}>✨</div>
+                              <div className="absolute bottom-2 left-6 text-sm animate-sparkle" style={{animationDelay: '0.9s'}}>✨</div>
+                            </>
                          )}
-                         {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
+
+                         {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-40 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
                       </div>
-                    </>
-                  )}
+                    )}
 
-                  {dreamStage === 'FIX_PLOTS' && (
-                    <>
-                      {SOIL_PROBLEMS.map(plot => {
-                         const isFixed = fixedPlots.includes(plot.id);
-                         return (
-                           <div key={plot.id} className={`absolute w-16 h-16 border-4 border-[#3e2723] flex items-center justify-center z-10 transition-colors ${isFixed ? 'bg-[#5d4037] border-green-600' : 'bg-[#795548] animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
-                              {isFixed ? '🌱' : plot.sprite}
-                              {(!isFixed && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
-                                  <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
-                              )}
-                              {activePlot?.id === plot.id && appliedItems.length > 0 && (
-                                  <div className="absolute -bottom-6 text-[8px] bg-amber-100 px-1 rounded border border-amber-600 font-bold whitespace-nowrap">{appliedItems.length}/2 Ready</div>
-                              )}
-                           </div>
-                         );
-                      })}
-                      {plotItems.map(item => (
-                        <div key={item.id} className="absolute z-20 flex flex-col items-center" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
-                           <div className="w-6 h-6">{item.component ? <item.component /> : <span className="text-lg">{item.sprite}</span>}</div>
-                           <span className="text-[6px] font-bold bg-white/80 px-0.5 rounded leading-none">{item.name}</span>
+                    {dreamStage === 'MATCH_EXAMPLES' && (
+                      <>
+                        {EXAMPLE_BINS.map(bin => {
+                           const isCombined = combinedBins.includes(bin.id);
+                           return (
+                              <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md transition-opacity duration-500 ${bin.color} ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
+                                <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
+                              </div>
+                           );
+                        })}
+                        <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-[#4e342e] border-4 border-[#3e2723] rounded-full transition-all duration-700 flex items-center justify-center z-5 shadow-inner ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                           {isWatering && (
+                             <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                               <div className="w-12 h-10 animate-pour origin-right"><WateringCanSprite /></div>
+                               <div className="flex justify-center gap-1 mt-2">{[1,2,3,4].map(i => <div key={i} className="w-1 h-2 bg-blue-400 animate-droplet" style={{ animationDelay: `${i * 0.1}s` }}></div>)}</div>
+                             </div>
+                           )}
+                           {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
                         </div>
-                      ))}
-                      {isStirring && activePlot && <div className="absolute z-40" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="animate-stir w-10 h-14"><PitchforkSprite/></div></div>}
-                      {isWorking && activePlot?.id === 'drainage' && (
-                          <div className="absolute z-40" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="animate-hammer w-10 h-10"><HammerSprite/></div></div>
-                      )}
-                    </>
-                  )}
+                      </>
+                    )}
 
-                  {dreamStage === 'PLANT_SEEDS' && (
-                    PLANTS.slice(0, 3).map((p, index) => {
-                      const bed = { 0: { x: 25, y: 30 }, 1: { x: 135, y: 30 }, 2: { x: 245, y: 30 } }[index];
-                      const planted = plantedBeds[index];
-                      return (
-                        <React.Fragment key={`bed-fragment-${index}`}>
-                          <div className="absolute w-16 h-16 bg-[#5d4037] border-4 border-[#3e2723] flex items-center justify-center z-10" style={{ transform: `translate(${bed.x}px, ${bed.y}px)` }}>{planted ? <span className="text-3xl">{planted.sprite}</span> : <span className="text-[#8d6e63] text-[9px] font-bold">SOIL</span>}</div>
-                          <div className="absolute w-[80px] bg-white border border-[#388e3c] text-[8px] leading-tight text-center font-bold p-1 rounded z-20 shadow-sm" style={{ transform: `translate(${bed.x - 8}px, ${bed.y + 70}px)` }}>{PLANTS[index].soil}</div>
-                        </React.Fragment>
-                      )
-                    })
-                  )}
+                    {dreamStage === 'FIX_PLOTS' && (
+                      <>
+                        {SOIL_PROBLEMS.map(plot => {
+                           const isFixed = fixedPlots.includes(plot.id);
+                           return (
+                             <div key={plot.id} className={`absolute w-16 h-16 border-4 border-[#3e2723] flex items-center justify-center z-10 transition-colors ${isFixed ? 'bg-[#5d4037] border-green-600' : 'bg-[#795548] animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
+                                {isFixed ? '🌱' : plot.sprite}
+                                {(!isFixed && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
+                                    <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
+                                )}
+                                {activePlot?.id === plot.id && appliedItems.length > 0 && (
+                                    <div className="absolute -bottom-6 text-[8px] bg-amber-100 px-1 rounded border border-amber-600 font-bold whitespace-nowrap">{appliedItems.length}/2 Ready</div>
+                                )}
+                             </div>
+                           );
+                        })}
+                        {plotItems.map(item => (
+                          <div key={item.id} className="absolute z-20 flex flex-col items-center" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
+                             <div className="w-6 h-6">{item.component ? <item.component /> : <span className="text-lg">{item.sprite}</span>}</div>
+                             <span className="text-[6px] font-bold bg-white/80 px-0.5 rounded leading-none">{item.name}</span>
+                          </div>
+                        ))}
+                        {isStirring && activePlot && <div className="absolute z-40 animate-stir" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-14"><PitchforkSprite/></div></div>}
+                        {isWorking && activePlot?.id === 'drainage' && (
+                            <div className="absolute z-40 animate-hammer" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-10"><HammerSprite/></div></div>
+                        )}
+                      </>
+                    )}
 
-                  {groundItems.map((item) => (
-                    <div key={item.id || item.name} className="absolute bg-white border-2 border-amber-600 px-2 py-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
-                      {item.sprite && <span className="text-sm">{item.sprite}</span>}
-                      <span>{item.name}</span>
+                    {dreamStage === 'PLANT_SEEDS' && (
+                      PLANTS.slice(0, 3).map((p, index) => {
+                        const bed = { 0: { x: 25, y: 30 }, 1: { x: 135, y: 30 }, 2: { x: 245, y: 30 } }[index];
+                        const planted = plantedBeds[index];
+                        return (
+                          <React.Fragment key={`bed-fragment-${index}`}>
+                            <div className="absolute w-16 h-16 bg-[#5d4037] border-4 border-[#3e2723] flex items-center justify-center z-10" style={{ transform: `translate(${bed.x}px, ${bed.y}px)` }}>{planted ? <span className="text-3xl">{planted.sprite}</span> : <span className="text-[#8d6e63] text-[9px] font-bold">SOIL</span>}</div>
+                            <div className="absolute w-[80px] bg-white border border-[#388e3c] text-[8px] leading-tight text-center font-bold p-1 rounded z-20 shadow-sm" style={{ transform: `translate(${bed.x - 8}px, ${bed.y + 70}px)` }}>{PLANTS[index].soil}</div>
+                          </React.Fragment>
+                        )
+                      })
+                    )}
+
+                    {groundItems.map((item) => (
+                      <div key={item.id || item.name} className="absolute bg-white border-2 border-amber-600 px-2 py-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
+                        {item.sprite && <span className="text-sm">{item.sprite}</span>}
+                        <span>{item.name}</span>
+                      </div>
+                    ))}
+
+                    <div className="absolute w-10 h-10 z-30 transition-all duration-75" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
+                       <FarmerSprite />
+                       {heldItem && (
+                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
+                            <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
+                            <span>{heldItem.name}</span>
+                         </div>
+                       )}
                     </div>
-                  ))}
+                 </div>
 
-                  <div className="absolute w-10 h-10 z-30 transition-all duration-75" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
-                     <FarmerSprite />
-                     {heldItem && (
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
-                          <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
-                          <span>{heldItem.name}</span>
-                       </div>
-                     )}
-                  </div>
-               </div>
+                 <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse">
+                    {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
+                    {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
+                    {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
+                    {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
+                 </div>
 
-               <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse">
-                  {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
-                  {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
-                  {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
-                  {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
-               </div>
-
-               <DialogBox name="Wallace" text={
-                 dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
-                 dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
-                 dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
-                 "Final stretch! Get those seeds in the right dirt."
-               } hideNext emotion={wallaceEmotion} />
-            </div>
-          )}
-
-          {dreamStage === 'FIX_PLOTS' && isFixModalOpen && activePlot && (
-            <div className="absolute inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-              <PixelBox className="w-full max-w-lg animate-fade-in">
-                <div className="flex justify-between items-center mb-4">
-                   <h2 className="text-xl font-bold">{activePlot.name}</h2>
-                   <button onClick={() => { setIsFixModalOpen(false); setActivePlot(null); }} className="text-red-500 font-bold">X</button>
-                </div>
-                <p className="mb-6 text-sm">{activePlot.description}</p>
-                <div className="space-y-3">
-                  {activePlot.options.map((opt, i) => (
-                    <button 
-                      key={`opt-${i}`} 
-                      onClick={() => handleFixPlotChoice(activePlot.id, opt.correct)} 
-                      className="w-full text-left bg-white p-3 border-2 border-stone-300 hover:border-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs"
-                    >
-                      ▶ {opt.text}
-                    </button>
-                  ))}
-                </div>
-              </PixelBox>
-            </div>
-          )}
-
-          {dreamStage === 'INTRO_DIALOG' && <DialogBox key="intro-dialog" name="Wallace" text={wormIntro[dialogIndex]} onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} emotion={wallaceEmotion} />}
-          {dreamStage === 'END_DIALOG' && (
-            <div className="text-center animate-fade-in flex flex-col items-center">
-              <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4">
-                 {[...Array(9)].map((_, i) => {
-                   const Sprites = [CornSprite, CarrotSprite, MelonSprite];
-                   const Sprite = Sprites[i % 3];
-                   return (
-                     <div key={`crop-${i}`} className="w-16 h-16 animate-grow" style={{ animationDelay: `${i * 0.1}s` }}>
-                       <Sprite />
-                     </div>
-                   );
-                 })}
-                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12"><FarmerSprite /></div>
+                 <DialogBox name="Wallace" text={
+                   dreamStage === 'CRAFT_SOIL' ? "Toss those components into the bin!" :
+                   dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
+                   dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
+                   "Final stretch! Get those seeds in the right dirt."
+                 } hideNext emotion={wallaceEmotion} />
               </div>
-              <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />
-            </div>
-          )}
+            )}
+
+            {dreamStage === 'FIX_PLOTS' && isFixModalOpen && activePlot && (
+              <div className="absolute inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+                <PixelBox className="w-full max-w-lg animate-fade-in">
+                  <div className="flex justify-between items-center mb-4">
+                     <h2 className="text-xl font-bold">{activePlot.name}</h2>
+                     <button onClick={() => { setIsFixModalOpen(false); setActivePlot(null); }} className="text-red-500 font-bold">X</button>
+                  </div>
+                  <p className="mb-6 text-sm">{activePlot.description}</p>
+                  <div className="space-y-3">
+                    {activePlot.options.map((opt, i) => (
+                      <button 
+                        key={`opt-${i}`} 
+                        onClick={() => handleFixPlotChoice(activePlot.id, opt.correct)} 
+                        className="w-full text-left bg-white p-3 border-2 border-stone-300 hover:border-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs"
+                      >
+                        ▶ {opt.text}
+                      </button>
+                    ))}
+                  </div>
+                </PixelBox>
+              </div>
+            )}
+
+            {dreamStage === 'INTRO_DIALOG' && <DialogBox key="intro-dialog" name="Wallace" text={wormIntro[dialogIndex]} onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} emotion={wallaceEmotion} />}
+            
+            {dreamStage === 'NIGHTMARE_END' && (
+              <div className="text-center animate-fade-in flex flex-col items-center">
+                <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake">
+                   <div className="absolute top-10 w-full h-full garden-grid opacity-10 pointer-events-none grayscale"></div>
+                   
+                   {/* Atmospheric Effects */}
+                   <div className="absolute inset-0 bg-purple-900/30 animate-lightning mix-blend-color-dodge pointer-events-none z-30"></div>
+                   <div className="absolute inset-0 bg-blue-900/30 animate-lightning-delayed mix-blend-color-dodge pointer-events-none z-30"></div>
+
+                   {/* Lightning Bolts */}
+                   <div className="absolute top-0 left-8 w-16 h-24 animate-lightning z-10"><LightningSprite color="#ab47bc" /></div>
+                   <div className="absolute top-8 right-16 w-12 h-20 animate-lightning-delayed z-10"><LightningSprite color="#42a5f5" /></div>
+                   <div className="absolute -top-4 left-2/3 w-20 h-28 animate-lightning z-10" style={{ animationDuration: '5s' }}><LightningSprite color="#7e57c2" /></div>
+
+                   {/* Border Fires */}
+                   <div className="absolute -bottom-4 -left-4 w-16 h-16 animate-flicker z-20"><FireSprite /></div>
+                   <div className="absolute -bottom-4 left-1/4 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.1s'}}><FireSprite /></div>
+                   <div className="absolute -bottom-4 left-2/4 w-14 h-14 animate-flicker z-20" style={{animationDelay: '0.2s'}}><FireSprite /></div>
+                   <div className="absolute -bottom-4 left-3/4 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.3s'}}><FireSprite /></div>
+                   <div className="absolute -bottom-4 -right-4 w-16 h-16 animate-flicker z-20"><FireSprite /></div>
+
+                   <div className="absolute top-1/4 -left-4 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.1s'}}><FireSprite /></div>
+                   <div className="absolute top-2/3 -left-4 w-14 h-14 animate-flicker z-20" style={{animationDelay: '0.2s'}}><FireSprite /></div>
+
+                   <div className="absolute top-1/3 -right-4 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.2s'}}><FireSprite /></div>
+                   <div className="absolute top-3/4 -right-4 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.1s'}}><FireSprite /></div>
+
+                   <div className="absolute -top-4 left-10 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.1s'}}><FireSprite /></div>
+                   <div className="absolute -top-4 right-10 w-12 h-12 animate-flicker z-20" style={{animationDelay: '0.2s'}}><FireSprite /></div>
+
+                   {/* Original Fire Elements */}
+                   <div className="absolute bottom-12 left-12 w-10 h-10 animate-flicker origin-bottom z-20"><FireSprite /></div>
+                   <div className="absolute top-24 right-16 w-16 h-16 animate-flicker origin-bottom z-20" style={{animationDelay: '0.1s'}}><FireSprite /></div>
+                   <div className="absolute top-32 left-20 w-12 h-12 animate-flicker origin-bottom z-20" style={{animationDelay: '0.2s'}}><FireSprite /></div>
+
+                   {/* Moving Tumbleweed */}
+                   <div className="absolute bottom-12 left-0 z-20 w-16 h-16 animate-tumbleweed">
+                     <TumbleweedSprite />
+                   </div>
+                   
+                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 grayscale z-10"><FarmerSprite /></div>
+                </div>
+                <DialogBox key="nightmare-dialog" name="Wallace" text={nightmareStory[dialogIndex]} onNext={() => handleDialogNext(nightmareStory, 'WAKE_UP')} emotion={dialogIndex < 2 ? "angry" : "sad"} />
+              </div>
+            )}
+
+            {dreamStage === 'END_DIALOG' && (
+              <div className="text-center animate-fade-in flex flex-col items-center">
+                <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4">
+                   {[...Array(9)].map((_, i) => {
+                     const Sprites = [CornSprite, CarrotSprite, MelonSprite];
+                     const Sprite = Sprites[i % 3];
+                     return (
+                       <div key={`crop-${i}`} className="w-16 h-16 animate-grow" style={{ animationDelay: `${i * 0.1}s` }}>
+                         <Sprite />
+                       </div>
+                     );
+                   })}
+                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12"><FarmerSprite /></div>
+                </div>
+                <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-  );
+    );
+  };
 
   const renderWakeUp = () => {
-    if (dialogIndex < wakeUpStory.length) {
-      const current = wakeUpStory[dialogIndex];
+    if (dialogIndex < activeWakeUpStory.length) {
+      const current = activeWakeUpStory[dialogIndex];
+      const isBadEnding = lives <= 0;
+
       return (
         <div key="scene-wakeup-classroom" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
            <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
@@ -936,9 +1072,12 @@ export default function App() {
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
               </div>
-              <div className="absolute top-[100px] left-1/4 w-10 h-12"><InstructorSprite /></div>
+              <div className="absolute top-[100px] left-1/4 w-10 h-12 relative">
+                  <InstructorSprite />
+                  {isBadEnding && dialogIndex >= 1 && <div className="absolute -top-6 -right-6 text-2xl animate-bounce text-red-500 font-bold">💢</div>}
+              </div>
               <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                 <div className={`w-14 h-14 relative z-10 ${dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}><FarmerSprite />{dialogIndex === 0 && <div key="alert-bubble" className="absolute -top-4 -right-4 text-xl animate-pulse text-red-600 font-bold">❗</div>}</div>
+                 <div className={`w-14 h-14 relative z-10 ${!isBadEnding && dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}><FarmerSprite />{!isBadEnding && dialogIndex === 0 && <div key="alert-bubble" className="absolute -top-4 -right-4 text-xl animate-pulse text-red-600 font-bold">❗</div>}</div>
                  <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4"><div className="absolute left-4 top-2 w-6 h-8 bg-white opacity-80 rotate-12"></div></div>
               </div>
            </div>
@@ -947,9 +1086,37 @@ export default function App() {
       );
     }
 
+    if (lives <= 0) {
+      return (
+        <div key="scene-wakeup-complete-bad" className="min-h-screen bg-[#8d6e63] flex flex-col items-center justify-center p-4 font-mono text-stone-800 relative overflow-hidden">
+          <PixelBox className="text-center max-w-2xl w-full shadow-2xl relative z-10">
+            <div className="text-6xl mb-4 animate-bounce grayscale">🥀</div>
+            <h2 className="text-4xl font-extrabold text-[#3e2723] mb-6 border-b-4 border-[#5d4037] pb-4">Quest Failed...</h2>
+            <div className="text-lg bg-[#a1887f] p-6 border-4 border-[#5d4037] text-left leading-relaxed shadow-inner mb-8">
+              <p className="font-bold mb-4 text-[#3e2723]">You fell asleep and dreamt of a barren wasteland.</p>
+              <p className="text-[#3e2723] font-medium">Try again to learn the true secrets of Master Composting!</p>
+            </div>
+            <button onClick={() => { 
+               setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3);
+            }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
+          </PixelBox>
+        </div>
+      );
+    }
+
     return (
-      <div key="scene-wakeup-complete" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800">
-        <PixelBox className="text-center max-w-2xl w-full shadow-2xl">
+      <div key="scene-wakeup-complete" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800 relative overflow-hidden">
+        {/* Celebratory Background Sparkles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[15%] left-[20%] text-6xl animate-sparkle" style={{animationDelay: '0.1s'}}>✨</div>
+          <div className="absolute top-[30%] right-[15%] text-5xl animate-sparkle" style={{animationDelay: '0.4s'}}>✨</div>
+          <div className="absolute bottom-[20%] left-[25%] text-7xl animate-sparkle" style={{animationDelay: '0.7s'}}>✨</div>
+          <div className="absolute top-[60%] right-[25%] text-4xl animate-sparkle" style={{animationDelay: '0.2s'}}>✨</div>
+          <div className="absolute top-[45%] left-[10%] text-5xl animate-sparkle" style={{animationDelay: '0.8s'}}>✨</div>
+          <div className="absolute bottom-[35%] right-[15%] text-6xl animate-sparkle" style={{animationDelay: '0.5s'}}>✨</div>
+        </div>
+
+        <PixelBox className="text-center max-w-2xl w-full shadow-2xl relative z-10">
           <div className="text-6xl mb-4 animate-bounce">🌱</div>
           <h2 className="text-4xl font-extrabold text-[#5d4037] mb-6 border-b-4 border-[#8b5a2b] pb-4">Quest Complete!</h2>
           <div className="text-lg bg-[#d7ccc8] p-6 border-4 border-[#8b5a2b] text-left leading-relaxed shadow-inner mb-8">
@@ -960,7 +1127,9 @@ export default function App() {
               <li key="learned-3">Optimal soil pairings for your garden</li>
             </ul>
           </div>
-          <button onClick={() => setGameState('END_CREDITS')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Continue</button>
+          <button onClick={() => { 
+            setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3);
+          }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
         </PixelBox>
       </div>
     );
@@ -973,12 +1142,6 @@ export default function App() {
       case 'CLASS': return renderClassroomIntro();
       case 'SLEEP_TRANSITION': return renderSleepTransition();
       case 'DREAM': return dreamStage === 'WAKE_UP' ? renderWakeUp() : renderDream();
-      case 'END_CREDITS': return (
-        <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
-          <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
-            onEnded={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); }} />
-        </div>
-      );
       default: return renderTitle();
     }
   };
@@ -1022,9 +1185,44 @@ export default function App() {
           100% { transform: scale(0) rotate(360deg); opacity: 0; }
         }
         .animate-sparkle { animation: sparkle-anim 1.5s ease-in-out infinite; pointer-events: none; }
+
+        @keyframes tumbleweed-anim {
+          0% { transform: translateX(-100px) translateY(0px) rotate(0deg); }
+          20% { transform: translateX(0px) translateY(-40px) rotate(180deg); }
+          40% { transform: translateX(100px) translateY(0px) rotate(360deg); }
+          60% { transform: translateX(200px) translateY(-40px) rotate(540deg); }
+          80% { transform: translateX(300px) translateY(0px) rotate(720deg); }
+          100% { transform: translateX(400px) translateY(-40px) rotate(900deg); }
+        }
+        .animate-tumbleweed { animation: tumbleweed-anim 4s linear infinite; }
+
+        @keyframes flicker {
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-flicker { animation: flicker 0.2s infinite alternate; }
+
+        @keyframes shake-anim {
+          0%, 100% { transform: translate(0, 0); }
+          20% { transform: translate(-2px, 1px); }
+          40% { transform: translate(2px, -1px); }
+          60% { transform: translate(-1px, 2px); }
+          80% { transform: translate(1px, -2px); }
+        }
+        .animate-shake { animation: shake-anim 0.2s infinite linear; }
+
+        @keyframes lightning-flash {
+          0%, 90%, 100% { opacity: 0; }
+          92%, 96% { opacity: 1; }
+          94% { opacity: 0; }
+        }
+        .animate-lightning { animation: lightning-flash 3s infinite; }
+        .animate-lightning-delayed { animation: lightning-flash 4.5s infinite 2s; }
+
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
-      {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && (
+      {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && dreamStage !== 'NIGHTMARE_END' && (
          <div key="audio-prompt-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
             <PixelBox className="text-center animate-bounce max-w-sm mx-4">
                <h3 className="text-2xl mb-4 font-bold text-amber-900">Start Dream?</h3>
@@ -1033,32 +1231,9 @@ export default function App() {
             </PixelBox>
          </div>
       )}
-      {isChapterSelectOpen && (
-        <div key="chapter-select-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
-          <PixelBox className="text-center max-w-sm mx-4 w-full">
-            <h3 className="text-2xl mb-6 font-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
-            <div className="flex flex-col gap-2 mb-4">
-              {[
-                { label: '🌙 The Dream',      stage: 'INTRO_DIALOG'  },
-                { label: '🪣 Craft Soil',      stage: 'CRAFT_SOIL'    },
-                { label: '🔄 Match Examples',  stage: 'MATCH_EXAMPLES'},
-                { label: '🛠️ Fix Plots',       stage: 'FIX_PLOTS'     },
-                { label: '🌱 Plant Seeds',     stage: 'PLANT_SEEDS'   },
-              ].map(({ label, stage }) => (
-                <button key={stage} onClick={() => jumpToChapter(stage)} className="bg-[#fff8e1] text-[#3e2723] px-4 py-3 font-bold text-sm text-left hover:bg-[#ffe082] border-2 border-[#8b5a2b] active:translate-y-0.5 w-full font-mono">
-                  {label}
-                </button>
-              ))}
-              <button onClick={() => { setIsChapterSelectOpen(false); setGameState('END_CREDITS'); }} className="bg-[#fff8e1] text-[#3e2723] px-4 py-3 font-bold text-sm text-left hover:bg-[#ffe082] border-2 border-[#8b5a2b] active:translate-y-0.5 w-full font-mono">
-                🎬 End Credits
-              </button>
-            </div>
-            <button onClick={() => setIsChapterSelectOpen(false)} className="text-xs text-[#8b5a2b] font-mono hover:text-[#5d4037]">[ cancel ]</button>
-          </PixelBox>
-        </div>
-      )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
+      <audio ref={audioRef} key="background-audio-element" loop src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" className="hidden" crossOrigin="anonymous" />
+      <audio ref={wowAudioRef} key="wow-audio-element" src="https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3" className="hidden" crossOrigin="anonymous" />
     </div>
   );
 }
