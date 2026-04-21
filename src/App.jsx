@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
+import wallaceNormal from './assets/wallace.png';
+import wallaceSad from './assets/sad.png';
+import wallaceSurprised from './assets/surprised.png';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -163,15 +166,15 @@ const PixelBox = ({ children, className = "" }) => (
 );
 
 const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' }) => {
-  let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
-  let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
+  let imgSrc = wallaceNormal;
+  let fbSrc = wallaceNormal;
 
   if (emotion === 'sad') {
-    imgSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
-    fbSrc = 'https://i.ibb.co/zHNFQdVb.png';
+    imgSrc = wallaceSad;
+    fbSrc = wallaceSad;
   } else if (emotion === 'surprised') {
-    imgSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
-    fbSrc = 'https://i.ibb.co/r2PcZQvP.png';
+    imgSrc = wallaceSurprised;
+    fbSrc = wallaceSurprised;
   }
 
   return (
