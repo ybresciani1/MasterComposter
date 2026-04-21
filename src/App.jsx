@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
 import wowSound from './assets/anime-wow-sound-effect.mp3';
 import endCreditsVideo from './assets/End Credits.mov';
+import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -334,7 +335,7 @@ export default function App() {
 
   const playAudio = () => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.3;
+      audioRef.current.volume = 0.21;
       audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
     }
   };
@@ -484,6 +485,7 @@ export default function App() {
       const isCorrect = cauldron.every(c => SOIL_COMPONENTS.includes(c));
       if (isCorrect) {
         setIsStirring(true); showToast("Stirring it all together...", 'surprised');
+        const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {});
         setTimeout(() => { setIsStirring(false); showToast("Perfect! Compost is made!", 'surprised'); setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 2000); }, 2000);
       } else {
         setTimeout(() => { 
@@ -654,6 +656,7 @@ export default function App() {
                setTimeout(() => { setIsWatering(false); setMatchPhase(3); initializeExamplesItems(3); showToast("Now add air!", 'surprised'); }, 3000);
              } else if (matchPhase === 3 && heldItem.id === 'ex_a' && distToPile < 80) {
                setIsStirring(true); setHeldItem(null); showToast("Aerating...", 'surprised');
+               const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {});
                setTimeout(() => { setIsStirring(false); showToast("Compost complete!", 'surprised'); setTimeout(() => setDreamStage('FIX_PLOTS'), 2000); }, 2500);
              }
          } else if (dreamStage === 'PLANT_SEEDS') {
@@ -732,7 +735,7 @@ export default function App() {
      setIsWorking(true);
      showToast(`Fixing the ${activePlot.name}...`, 'surprised');
      
-     if (activePlot.id === 'compaction') setIsStirring(true);
+     if (activePlot.id === 'compaction') { setIsStirring(true); const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
      if (activePlot.id === 'drainage') setIsWorking(true); // Using working animation for hammer/grading
      
      setTimeout(() => {
