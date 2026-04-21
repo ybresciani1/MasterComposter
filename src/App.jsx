@@ -1,8 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
-import wallaceNormal from './assets/wallace.png';
-import wallaceSad from './assets/sad.png';
-import wallaceSurprised from './assets/surprised.png';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -166,15 +162,15 @@ const PixelBox = ({ children, className = "" }) => (
 );
 
 const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' }) => {
-  let imgSrc = wallaceNormal;
-  let fbSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
+  let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
+  let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
 
   if (emotion === 'sad') {
-    imgSrc = wallaceSad;
-    fbSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
+    imgSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
+    fbSrc = 'https://i.ibb.co/zHNFQdVb.png';
   } else if (emotion === 'surprised') {
-    imgSrc = wallaceSurprised;
-    fbSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
+    imgSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
+    fbSrc = 'https://i.ibb.co/r2PcZQvP.png';
   }
 
   return (
@@ -254,20 +250,10 @@ export default function App() {
   };
 
   const toggleMusic = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isMusicPlaying) { audio.pause(); setIsMusicPlaying(false); return; }
-    if (audio.error) {
-      showToast("Music file failed to load — check your connection");
-      return;
+    if (audioRef.current) {
+      if (isMusicPlaying) { audioRef.current.pause(); setIsMusicPlaying(false); }
+      else { if (audioRef.current.readyState === 0) audioRef.current.load(); audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => showToast("Audio blocked!")); }
     }
-    audio.play().then(() => setIsMusicPlaying(true)).catch((e) => {
-      if (e.name === 'NotAllowedError') {
-        showToast("Allow audio: click the 🔇 icon in your address bar");
-      } else {
-        showToast("Could not play audio (" + e.name + ")");
-      }
-    });
   };
 
   const introStory = [
@@ -664,10 +650,20 @@ export default function App() {
                <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid">
                   
                   {dreamStage === 'CRAFT_SOIL' && (
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 border-[#3e2723] flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden">
+                    <div className={`absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow border-transparent' : 'border-[#3e2723]'}`}>
                        {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
-                       {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] p-0.5 m-0.5 font-bold rounded">{item}</span>)}
-                       {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
+                       {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] p-0.5 m-0.5 font-bold rounded relative z-30">{item}</span>)}
+                       
+                       {cauldron.includes('✨ Magic') && (
+                          <>
+                            <div className="absolute top-2 left-4 text-xs animate-sparkle" style={{animationDelay: '0s'}}>✨</div>
+                            <div className="absolute bottom-4 right-6 text-sm animate-sparkle" style={{animationDelay: '0.3s'}}>✨</div>
+                            <div className="absolute top-6 right-2 text-xs animate-sparkle" style={{animationDelay: '0.6s'}}>✨</div>
+                            <div className="absolute bottom-2 left-6 text-sm animate-sparkle" style={{animationDelay: '0.9s'}}>✨</div>
+                          </>
+                       )}
+
+                       {isStirring && <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-40 rounded-full animate-stir"><div className="w-10 h-14"><PitchforkSprite/></div></div>}
                     </div>
                   )}
 
@@ -881,6 +877,24 @@ export default function App() {
         @keyframes grow-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .animate-grow { animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .text-shadow { text-shadow: 2px 2px #3e2723; }
+
+        @keyframes rainbow-glow {
+          0% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
+          16% { box-shadow: 0 0 15px 5px #ff7f00, inset 0 0 15px 5px #ff7f00; }
+          33% { box-shadow: 0 0 15px 5px #ffff00, inset 0 0 15px 5px #ffff00; }
+          50% { box-shadow: 0 0 15px 5px #00ff00, inset 0 0 15px 5px #00ff00; }
+          66% { box-shadow: 0 0 15px 5px #0000ff, inset 0 0 15px 5px #0000ff; }
+          83% { box-shadow: 0 0 15px 5px #4b0082, inset 0 0 15px 5px #4b0082; }
+          100% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
+        }
+        .animate-rainbow-glow { animation: rainbow-glow 2s linear infinite; }
+
+        @keyframes sparkle-anim {
+          0% { transform: scale(0) rotate(0deg); opacity: 0; }
+          50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+          100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+        .animate-sparkle { animation: sparkle-anim 1.5s ease-in-out infinite; pointer-events: none; }
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
       {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && (
@@ -893,7 +907,7 @@ export default function App() {
          </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
+      <audio ref={audioRef} key="background-audio-element" loop src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" className="hidden" crossOrigin="anonymous" />
     </div>
   );
 }
