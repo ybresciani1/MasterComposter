@@ -231,15 +231,17 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50 animate-fade-in-up">
       <PixelBox className="flex gap-4 items-start relative shadow-2xl">
-        <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
-          {name === 'Wallace' ? (
-            <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
-          ) : (
-            <div className={`w-full h-full flex items-center justify-center ${name === 'You' ? '' : 'p-2'}`}>{portrait}</div>
-          )}
-        </div>
+        {(portrait || name === 'Wallace') && (
+          <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
+            {name === 'Wallace' ? (
+              <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
+            ) : (
+              <div className={`w-full h-full flex items-center justify-center ${name === 'You' ? '' : 'p-2'}`}>{portrait}</div>
+            )}
+          </div>
+        )}
         <div className="flex-1">
-          <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>
+          {name && <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>}
           <p className="text-sm md:text-base leading-relaxed">{text}</p>
         </div>
         {!hideNext && (
@@ -677,6 +679,35 @@ export default function App() {
     </div>
   );
 
+  const renderClassroomIntro = () => {
+    const currentText = classStory[dialogIndex];
+    return (
+      <div key="scene-class-intro" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
+         <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
+            <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
+              <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
+              <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
+            </div>
+            <div className="absolute top-[100px] left-1/4 w-10 h-12"><InstructorSprite /></div>
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+               <div className="w-14 h-14 relative z-10"><FarmerSprite /></div>
+               <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4"><div className="absolute left-4 top-2 w-6 h-8 bg-white opacity-80 rotate-12"></div></div>
+            </div>
+         </div>
+         <DialogBox 
+           name="" 
+           portrait={null} 
+           text={currentText} 
+           onNext={() => { 
+             if (dialogIndex < classStory.length - 1) setDialogIndex(dialogIndex + 1); 
+             else { setDialogIndex(0); setGameState('SLEEP_TRANSITION'); } 
+           }} 
+         />
+      </div>
+    );
+  };
+
   const renderSleepTransition = () => (
     <div key="scene-sleep" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
       <p className="text-white font-mono text-3xl md:text-4xl tracking-[0.5em] animate-pulse">Z z z . . .</p>
@@ -912,7 +943,7 @@ export default function App() {
     switch (gameState) {
       case 'TITLE': return renderTitle();
       case 'INTRO': return renderCutscene(introStory, () => setGameState('CLASS'));
-      case 'CLASS': return renderCutscene(classStory, () => setGameState('SLEEP_TRANSITION'));
+      case 'CLASS': return renderClassroomIntro();
       case 'SLEEP_TRANSITION': return renderSleepTransition();
       case 'DREAM': return dreamStage === 'WAKE_UP' ? renderWakeUp() : renderDream();
       default: return renderTitle();
