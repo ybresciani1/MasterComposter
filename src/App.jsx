@@ -239,7 +239,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
             {name === 'Wallace' ? (
               <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
             ) : (
-              <div className={`w-full h-full flex items-center justify-center ${name === 'You' ? '' : 'p-2'}`}>{portrait}</div>
+              <div className={`w-full h-full flex items-center justify-center ${name === 'You' || name === 'Instructor' ? '' : 'p-2'}`}>{portrait}</div>
             )}
           </div>
         )}
