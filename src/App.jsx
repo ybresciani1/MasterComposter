@@ -132,6 +132,61 @@ const HammerSprite = () => (
   </svg>
 );
 
+const InstructorSprite = () => (
+  <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Hair */}
+    <path d="M2,1 h6 v2 h-6 z M1,2 h1 v2 h-1 z M8,2 h1 v2 h-1 z" fill="#616161" />
+    {/* Face */}
+    <path d="M3,3 h4 v3 h-4 z M2,4 h1 v2 h-1 z M7,4 h1 v2 h-1 z" fill="#ffccaa" />
+    {/* Glasses/Eyes */}
+    <path d="M3,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill="#000000" />
+    {/* Suit Jacket */}
+    <path d="M2,6 h6 v4 h-6 z" fill="#3949ab" />
+    {/* Shirt */}
+    <path d="M4,6 h2 v3 h-2 z" fill="#ffffff" />
+    {/* Tie */}
+    <path d="M4,7 h1 v2 h-1 z" fill="#d32f2f" />
+    {/* Legs */}
+    <path d="M3,10 h1 v2 h-1 z M6,10 h1 v2 h-1 z" fill="#212121" />
+  </svg>
+);
+
+const InstructorPortrait = () => {
+  const [imgIdx, setImgIdx] = useState(0);
+  const urls = [
+    "https://i.ibb.co/Xx4QcHxX/image.jpg",
+    "https://i.ibb.co/Xx4QcHxX/image.png",
+    "https://i.ibb.co/Xx4QcHxX/image.jpeg"
+  ];
+  
+  return (
+    <img 
+      src={urls[imgIdx]} 
+      alt="Instructor" 
+      className="w-full h-full object-cover" 
+      onError={() => { if(imgIdx < urls.length - 1) setImgIdx(imgIdx + 1); }} 
+    />
+  );
+};
+
+const StudentPortrait = () => {
+  const [imgIdx, setImgIdx] = useState(0);
+  const urls = [
+    "https://i.ibb.co/qM8HXR6n/image.jpg",
+    "https://i.ibb.co/qM8HXR6n/image.png",
+    "https://i.ibb.co/qM8HXR6n/image.jpeg"
+  ];
+  
+  return (
+    <img 
+      src={urls[imgIdx]} 
+      alt="Student" 
+      className="w-full h-full object-cover" 
+      onError={() => { if(imgIdx < urls.length - 1) setImgIdx(imgIdx + 1); }} 
+    />
+  );
+};
+
 const CornSprite = () => (
   <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M4,0 h2 v8 h-2 z" fill="#ffeb3b" />
@@ -176,11 +231,11 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50 animate-fade-in-up">
       <PixelBox className="flex gap-4 items-start relative shadow-2xl">
-        <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden">
+        <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
           {name === 'Wallace' ? (
             <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
           ) : (
-            <div className="w-full h-full p-2">{portrait}</div>
+            <div className={`w-full h-full flex items-center justify-center ${name === 'You' ? '' : 'p-2'}`}>{portrait}</div>
           )}
         </div>
         <div className="flex-1">
@@ -284,9 +339,9 @@ export default function App() {
 
   const wakeUpStory = [
     { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center." },
-    { name: "Instructor", portrait: "🧑‍🏫", text: "...and that concludes our section on soil properties and compost components!" },
-    { name: "You", portrait: <FarmerSprite />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
-    { name: "You", portrait: <FarmerSprite />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
+    { name: "Instructor", portrait: <InstructorPortrait />, text: "...and that concludes our section on soil properties and compost components!" },
+    { name: "You", portrait: <StudentPortrait />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
+    { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
   ];
 
   const handleDialogNext = (script, nextStage) => {
@@ -713,7 +768,7 @@ export default function App() {
                       ))}
                       {isStirring && activePlot && <div className="absolute z-40 animate-stir" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-14"><PitchforkSprite/></div></div>}
                       {isWorking && activePlot?.id === 'drainage' && (
-                          <div className="absolute z-40 animate-bounce" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-10"><HammerSprite/></div></div>
+                          <div className="absolute z-40 animate-hammer" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-10"><HammerSprite/></div></div>
                       )}
                     </>
                   )}
@@ -821,7 +876,7 @@ export default function App() {
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
               </div>
-              <div className="absolute top-[100px] left-1/4 text-5xl">🧑‍🏫</div>
+              <div className="absolute top-[100px] left-1/4 w-10 h-12"><InstructorSprite /></div>
               <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
                  <div className={`w-14 h-14 relative z-10 ${dialogIndex === 0 ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`}><FarmerSprite />{dialogIndex === 0 && <div key="alert-bubble" className="absolute -top-4 -right-4 text-xl animate-pulse text-red-600 font-bold">❗</div>}</div>
                  <div className="w-28 h-12 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-4"><div className="absolute left-4 top-2 w-6 h-8 bg-white opacity-80 rotate-12"></div></div>
@@ -877,6 +932,14 @@ export default function App() {
         @keyframes grow-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .animate-grow { animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .text-shadow { text-shadow: 2px 2px #3e2723; }
+
+        @keyframes hammer-animation {
+          0% { transform: rotate(0deg); }
+          40% { transform: rotate(45deg); }
+          60% { transform: rotate(-25deg); }
+          100% { transform: rotate(0deg); }
+        }
+        .animate-hammer { animation: hammer-animation 0.4s infinite ease-in-out; transform-origin: center bottom; }
 
         @keyframes rainbow-glow {
           0% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
