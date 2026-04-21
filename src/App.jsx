@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -889,7 +890,7 @@ export default function App() {
          </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src="/nastelbom-background-music-486996.mp3" className="hidden" />
+      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
     </div>
   );
 }
