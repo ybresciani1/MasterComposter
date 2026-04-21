@@ -250,10 +250,20 @@ export default function App() {
   };
 
   const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isMusicPlaying) { audioRef.current.pause(); setIsMusicPlaying(false); }
-      else { if (audioRef.current.readyState === 0) audioRef.current.load(); audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => showToast("Audio blocked!")); }
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isMusicPlaying) { audio.pause(); setIsMusicPlaying(false); return; }
+    if (audio.error) {
+      showToast("Music file failed to load — check your connection");
+      return;
     }
+    audio.play().then(() => setIsMusicPlaying(true)).catch((e) => {
+      if (e.name === 'NotAllowedError') {
+        showToast("Allow audio: click the 🔇 icon in your address bar");
+      } else {
+        showToast("Could not play audio (" + e.name + ")");
+      }
+    });
   };
 
   const introStory = [
@@ -879,7 +889,7 @@ export default function App() {
          </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop src="https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3" className="hidden" crossOrigin="anonymous" />
+      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src="/nastelbom-background-music-486996.mp3" className="hidden" />
     </div>
   );
 }
