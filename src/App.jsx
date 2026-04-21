@@ -690,10 +690,11 @@ export default function App() {
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('blur', handleBlur);
     
-    return () => { 
-        cancelAnimationFrame(animationFrameId); 
-        window.removeEventListener('keydown', handleKeyDown); 
-        window.removeEventListener('keyup', handleKeyUp); 
+    return () => {
+        keys.current = {};
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('blur', handleBlur);
     };
   }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, plantedBeds, lives]);
