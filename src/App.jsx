@@ -1712,6 +1712,10 @@ useEffect(() => {
 
   return (
     <div className="app-container">
+      <div className="portrait-lock">
+        <div style={{ fontSize: '3rem' }}>🔄</div>
+        <p>Please rotate your device to portrait mode to play.</p>
+      </div>
       <style>{`
         .garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
         @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }

@@ -111,3 +111,26 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.portrait-lock {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #1b5e20;
+  color: white;
+  font-family: monospace;
+  font-size: 1.25rem;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+@media (orientation: landscape) and (max-width: 768px) {
+  .portrait-lock {
+    display: flex;
+  }
+}
