@@ -1362,12 +1362,13 @@ useEffect(() => {
 
                  <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
+                   if (isFixModalOpen || isWorking || lives <= 0) return;
                    const rect = e.currentTarget.getBoundingClientRect();
                    const x = (e.clientX - rect.left) / gameScale - 20;
                    const y = (e.clientY - rect.top) / gameScale - 20;
                    targetPosRef.current = {
-                     x: Math.max(0, Math.min(x, 300)),
-                     y: Math.max(0, Math.min(y, 260)),
+                     x: Math.max(0, Math.min(x, 340 - 40)),
+                     y: Math.max(0, Math.min(y, 300 - 40)),
                    };
                  }}>
                     
