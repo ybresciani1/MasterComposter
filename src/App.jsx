@@ -654,6 +654,7 @@ export default function App() {
   const [cauldron, setCauldron] = useState([]);
   const [completedExamples, setCompletedExamples] = useState([]);
   const [fixedPlots, setFixedPlots] = useState([]);
+  const [answeredPlots, setAnsweredPlots] = useState([]);
   const [activePlot, setActivePlot] = useState(null);
   const [isFixModalOpen, setIsFixModalOpen] = useState(false);
   const [plotItems, setPlotItems] = useState([]); 
@@ -772,7 +773,6 @@ useEffect(() => {
        setDialogIndex(0);
        setIsFixModalOpen(false);
        setHeldItem(null);
-       const sfx = new Audio(nightmareSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
   }, [lives, gameState, dreamStage]);
 
@@ -792,6 +792,7 @@ useEffect(() => {
     if (dreamStage === 'NIGHTMARE_END') {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
       setIsMusicPlaying(false);
+      const sfx = new Audio(nightmareSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
     if (dreamStage === 'WAKE_UP') {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
@@ -1026,7 +1027,7 @@ useEffect(() => {
             if (!isFixModalOpen) {
               let nearbyPlot = null;
               SOIL_PROBLEMS.forEach(plot => {
-                 if (fixedPlots.includes(plot.id)) return;
+                 if (fixedPlots.includes(plot.id) || answeredPlots.includes(plot.id)) return;
                  const dist = Math.hypot(farmerCenter.x - (plot.x + 32), farmerCenter.y - (plot.y + 32));
                  if (dist < 80) nearbyPlot = plot;
               });
@@ -1120,7 +1121,7 @@ useEffect(() => {
         window.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('blur', handleBlur);
     };
-  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, plantedBeds, lives]);
+  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, answeredPlots, plantedBeds, lives]);
 
   const handleApplyItemToPlot = () => {
     // Check if the held item is correct for the active plot
@@ -1182,6 +1183,7 @@ useEffect(() => {
     if (isCorrect) {
       setWallaceEmotion('surprised');
       setIsFixModalOpen(false);
+      setAnsweredPlots(prev => [...prev, plotId]);
       let items = [];
       if (plotId === 'compaction') {
         items = [
@@ -1426,7 +1428,7 @@ useEffect(() => {
                            return (
                              <div key={plot.id} className={`absolute w-16 h-16 border-4 border-[#3e2723] flex items-center justify-center z-10 transition-colors ${isFixed ? 'bg-[#5d4037] border-green-600' : 'bg-[#795548] animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
                                 {isFixed ? '🌱' : plot.sprite}
-                                {(!isFixed && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
+                                {(!isFixed && !answeredPlots.includes(plot.id) && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
                                     <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
                                 )}
                                 {activePlot?.id === plot.id && appliedItems.length > 0 && (
