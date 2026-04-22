@@ -962,7 +962,7 @@ useEffect(() => {
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
           <div className={`absolute bottom-48 left-36 w-10 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><SiloSprite /></div>
           <div className={`absolute bottom-44 right-28 text-3xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐄</div>
-          <div className={`absolute bottom-14 right-28 text-2xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐖</div>
+          <div className={`absolute bottom-56 right-16 text-2xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐖</div>
           <div className={`absolute top-32 left-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
           <div className={`absolute top-40 right-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
           {/* Fence line */}
