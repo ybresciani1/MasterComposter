@@ -280,6 +280,51 @@ const MelonSprite = () => (
   </svg>
 );
 
+const BarnSprite = () => (
+  <svg viewBox="0 0 24 22" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
+    {/* Roof */}
+    <path d="M12,0 L24,9 h-24 z" fill="#8b1a1a" />
+    <path d="M12,0 L24,9 h-2 L12,2 L2,9 H0 z" fill="#c0392b" />
+    {/* Loft window */}
+    <path d="M10,3 h4 v4 h-4 z" fill="#87ceeb" />
+    <path d="M11,3 h2 v4 h-2 z" fill="#b3e5fc" />
+    {/* Body */}
+    <path d="M2,9 h20 v13 h-20 z" fill="#c0392b" />
+    {/* Side shadow */}
+    <path d="M18,9 h4 v13 h-4 z" fill="#922b21" />
+    {/* Main doors */}
+    <path d="M8,14 h8 v8 h-8 z" fill="#6d4c41" />
+    <path d="M8,14 h4 v8 h-4 z" fill="#795548" />
+    {/* Door X braces */}
+    <path d="M8,14 h1 v1 h1 v1 h1 v1 h-1 v1 h-1 v1 h-1 z" fill="#5d4037" opacity="0.6"/>
+    <path d="M15,14 h1 v3 h-1 z M14,17 h1 v1 h-1 z M13,18 h1 v1 h-1 z M12,19 h1 v1 h-1 z" fill="#5d4037" opacity="0.6"/>
+    {/* Side windows */}
+    <path d="M3,11 h3 v3 h-3 z M18,11 h3 v3 h-3 z" fill="#87ceeb" />
+    <path d="M3,11 h1 v3 h-1 z M18,11 h1 v3 h-1 z" fill="#b3e5fc" />
+    {/* Ground strip */}
+    <path d="M2,21 h20 v1 h-20 z" fill="#5d4037" />
+  </svg>
+);
+
+const SiloSprite = () => (
+  <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Dome cap */}
+    <path d="M1,0 h8 v1 h-8 z M0,1 h10 v2 h-10 z" fill="#9e9e9e" />
+    <path d="M1,0 h4 v3 h-4 z" fill="#bdbdbd" />
+    {/* Body */}
+    <path d="M1,3 h8 v17 h-8 z" fill="#e0e0e0" />
+    {/* Side shadow */}
+    <path d="M7,3 h2 v17 h-2 z" fill="#bdbdbd" />
+    {/* Highlight */}
+    <path d="M1,3 h2 v17 h-2 z" fill="#f5f5f5" />
+    {/* Bands */}
+    <path d="M1,7 h8 v1 h-8 z M1,12 h8 v1 h-8 z M1,17 h8 v1 h-8 z" fill="#9e9e9e" />
+    {/* Door */}
+    <path d="M3,15 h4 v5 h-4 z" fill="#8d6e63" />
+    <path d="M4,15 h2 v5 h-2 z" fill="#a1887f" />
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -911,8 +956,27 @@ useEffect(() => {
 
     return (
       <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
+          {/* Background farm scenery */}
           <div className={`absolute top-10 left-10 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
           <div className={`absolute top-20 right-20 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
+          <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
+          <div className={`absolute bottom-48 left-36 w-10 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><SiloSprite /></div>
+          <div className={`absolute bottom-44 right-28 text-3xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐄</div>
+          <div className={`absolute bottom-14 right-28 text-2xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐖</div>
+          <div className={`absolute top-32 left-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
+          <div className={`absolute top-40 right-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
+          {/* Fence line */}
+          <div className={`absolute bottom-10 left-40 right-36 h-6 flex items-center opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex-1 flex gap-0.5 items-center">
+                <div className="w-2 h-6 bg-[#d7ccc8] border border-[#bcaaa4]"></div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <div className="h-1 bg-[#d7ccc8]"></div>
+                  <div className="h-1 bg-[#d7ccc8]"></div>
+                </div>
+              </div>
+            ))}
+          </div>
           <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
             <div className="flex justify-between items-center mb-8">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
