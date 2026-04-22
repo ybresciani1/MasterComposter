@@ -407,9 +407,138 @@ const SunflowerSprite = () => (
   </svg>
 );
 
+const ZinniaSprite = () => (
+  <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,6 h2 v10 h-2 z" fill="#4caf50" />
+    <path d="M2,2 h8 v4 h-8 z M4,0 h4 v8 h-4 z" fill="#e91e63" />
+    <path d="M3,3 h6 v2 h-6 z M5,1 h2 v6 h-2 z" fill="#f06292" />
+    <path d="M5,3 h2 v2 h-2 z" fill="#ffeb3b" />
+  </svg>
+);
+
+const MarigoldSprite = () => (
+  <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,6 h2 v10 h-2 z" fill="#4caf50" />
+    <path d="M3,2 h6 v4 h-6 z M4,1 h4 v6 h-4 z" fill="#ff9800" />
+    <path d="M4,3 h4 v2 h-4 z M5,2 h2 v4 h-2 z" fill="#ffeb3b" />
+  </svg>
+);
+
+const LavenderSprite = () => (
+  <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,8 h2 v12 h-2 z" fill="#4caf50" />
+    <path d="M3,2 h4 v6 h-4 z M4,1 h2 v8 h-2 z" fill="#ab47bc" />
+    <path d="M2,12 h2 v1 h-2 z M6,14 h2 v1 h-2 z" fill="#81c784" /> {/* Leaves */}
+  </svg>
+);
+
 const GrassSprite = () => (
   <svg viewBox="0 0 10 8" className="w-full h-full opacity-60 drop-shadow-sm" shapeRendering="crispEdges">
      <path d="M2,4 h1 v4 h-1 z M5,2 h1 v6 h-1 z M8,5 h1 v3 h-1 z" fill="#66bb6a" />
+  </svg>
+);
+
+const ChickenSprite = () => (
+  <svg viewBox="0 0 10 10" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,8 h1 v2 h-1 z M7,8 h1 v2 h-1 z" fill="#fbc02d" />
+    <path d="M2,4 h6 v4 h-6 z" fill="#ffffff" />
+    <path d="M7,2 h2 v2 h-2 z" fill="#ffffff" />
+    <path d="M8,1 h1 v1 h-1 z M7,0 h1 v1 h-1 z" fill="#e53935" /> {/* Comb */}
+    <path d="M9,3 h1 v1 h-1 z" fill="#fbc02d" /> {/* Beak */}
+    <path d="M1,3 h1 v2 h-1 z" fill="#ffffff" /> {/* Tail */}
+  </svg>
+);
+
+const RoosterSprite = () => (
+  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,10 h1 v2 h-1 z M8,10 h1 v2 h-1 z" fill="#fbc02d" />
+    <path d="M3,5 h6 v5 h-6 z" fill="#8d6e63" />
+    <path d="M8,3 h2 v3 h-2 z" fill="#a1887f" />
+    <path d="M8,0 h2 v2 h-2 z M10,1 h1 v2 h-1 z" fill="#e53935" /> {/* Comb */}
+    <path d="M9,6 h1 v2 h-1 z" fill="#e53935" /> {/* Wattle */}
+    <path d="M10,4 h1 v1 h-1 z" fill="#fbc02d" /> {/* Beak */}
+    <path d="M1,3 h2 v6 h-2 z M0,4 h1 v4 h-1 z" fill="#1e88e5" /> {/* Tail */}
+    <path d="M2,5 h1 v2 h-1 z" fill="#43a047" /> {/* Tail accent */}
+  </svg>
+);
+
+const ChickSprite = () => (
+  <svg viewBox="0 0 6 6" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M1,2 h4 v3 h-4 z" fill="#ffeb3b" />
+    <path d="M5,3 h1 v1 h-1 z" fill="#f57f17" /> {/* Beak */}
+    <path d="M2,5 h1 v1 h-1 z M4,5 h1 v1 h-1 z" fill="#f57f17" /> {/* Legs */}
+  </svg>
+);
+
+const BeeSprite = () => (
+  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M2,4 h4 v2 h-4 z" fill="#ffeb3b" />
+    <path d="M3,4 h1 v2 h-1 z M5,4 h1 v2 h-1 z" fill="#212121" />
+    <path d="M3,2 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/> {/* Wings */}
+  </svg>
+);
+
+const SheepSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z" fill="#212121" /> {/* Legs */}
+    <path d="M1,2 h12 v8 h-12 z M0,4 h14 v4 h-14 z" fill="#f5f5f5" /> {/* Wool */}
+    <path d="M12,3 h3 v3 h-3 z" fill="#212121" /> {/* Face */}
+    <path d="M13,3 h1 v1 h-1 z" fill="#ffffff" /> {/* Eye */}
+  </svg>
+);
+
+const GoatSprite = () => (
+  <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z M14,8 h2 v4 h-2 z" fill="#9e9e9e" /> {/* Legs */}
+    <path d="M3,10 h1 v4 h-1 z M6,10 h1 v4 h-1 z M10,10 h1 v4 h-1 z M13,10 h1 v4 h-1 z" fill="#757575" />
+    <path d="M2,5 h10 v5 h-10 z" fill="#e0e0e0" /> {/* Body */}
+    <path d="M11,3 h3 v4 h-3 z" fill="#e0e0e0" /> {/* Head */}
+    <path d="M14,4 h2 v2 h-2 z" fill="#e0e0e0" /> {/* Snout */}
+    <path d="M12,1 h1 v2 h-1 z M14,1 h1 v2 h-1 z" fill="#9e9e9e" /> {/* Horns */}
+    <path d="M13,7 h1 v2 h-1 z" fill="#bdbdbd" /> {/* Beard */}
+  </svg>
+);
+
+const PondSprite = () => (
+  <svg viewBox="0 0 40 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,4 h32 v12 h-32 z" fill="#4fc3f7" opacity="0.8"/>
+    <path d="M2,6 h36 v8 h-36 z" fill="#4fc3f7" opacity="0.8"/>
+    <path d="M6,2 h28 v16 h-28 z" fill="#4fc3f7" opacity="0.8"/>
+    {/* Lilypad */}
+    <path d="M10,8 h4 v2 h-4 z M11,7 h2 v4 h-2 z" fill="#4caf50" />
+    <path d="M12,8 h1 v1 h-1 z" fill="#4fc3f7" /> {/* Lilypad cut */}
+    {/* Water lines */}
+    <path d="M16,10 h6 v1 h-6 z M24,14 h4 v1 h-4 z" fill="#81d4fa" />
+  </svg>
+);
+
+const FrogSprite = () => (
+  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,4 h8 v3 h-8 z" fill="#4caf50" />
+    <path d="M2,2 h2 v2 h-2 z M6,2 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes */}
+    <path d="M3,3 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#212121" /> {/* Pupils */}
+    <path d="M0,6 h2 v2 h-2 z M8,6 h2 v2 h-2 z" fill="#388e3c" /> {/* Legs */}
+  </svg>
+);
+
+const CatSprite = () => (
+  <svg viewBox="0 0 14 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M3,8 h1 v4 h-1 z M10,8 h1 v4 h-1 z" fill="#fb8c00" />
+    <path d="M2,5 h10 v4 h-10 z" fill="#ffb74d" />
+    <path d="M10,2 h3 v3 h-3 z" fill="#ffb74d" />
+    <path d="M10,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z" fill="#fb8c00" /> {/* Ears */}
+    <path d="M1,6 h1 v4 h-1 z M0,9 h1 v2 h-1 z" fill="#fb8c00" /> {/* Tail */}
+  </svg>
+);
+
+const DogSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M3,8 h2 v4 h-2 z M11,8 h2 v4 h-2 z" fill="#5d4037" />
+    <path d="M2,4 h11 v5 h-11 z" fill="#8d6e63" />
+    <path d="M11,1 h4 v4 h-4 z" fill="#8d6e63" />
+    <path d="M11,2 h1 v3 h-1 z" fill="#5d4037" /> {/* Ear */}
+    <path d="M15,3 h1 v1 h-1 z M14,2 h1 v1 h-1 z" fill="#212121" /> {/* Nose/Eye */}
+    <path d="M1,4 h1 v4 h-1 z M0,5 h1 v2 h-1 z" fill="#5d4037" /> {/* Tail */}
   </svg>
 );
 
@@ -1126,15 +1255,46 @@ useEffect(() => {
           <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
           <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
 
+          {/* Pond & Frog */}
+          <div className={`absolute top-24 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
+          <div className={`absolute top-36 left-[55%] w-6 h-5 opacity-90 z-20 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><FrogSprite /></div>
+
+          {/* Barn & Silo */}
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
           <div className={`absolute bottom-48 left-36 w-10 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><SiloSprite /></div>
           
+          {/* Farm Animals */}
           <div className={`absolute bottom-40 right-28 w-16 h-12 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><CowSprite /></div>
           <div className={`absolute bottom-52 right-12 w-12 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><PigSprite /></div>
           
+          <div className={`absolute bottom-56 right-36 w-12 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SheepSprite /></div>
+          <div className={`absolute bottom-44 right-44 w-10 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><GoatSprite /></div>
+          
+          <div className={`absolute bottom-48 left-20 w-6 h-6 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickenSprite /></div>
+          <div className={`absolute bottom-52 left-28 w-8 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><RoosterSprite /></div>
+          <div className={`absolute bottom-46 left-24 w-3 h-3 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickSprite /></div>
+          <div className={`absolute bottom-45 left-26 w-3 h-3 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickSprite /></div>
+
+          {/* Pets */}
+          <div className={`absolute bottom-36 left-48 w-8 h-6 opacity-90 z-10 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><CatSprite /></div>
+          <div className={`absolute bottom-32 left-64 w-10 h-8 opacity-90 z-10 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><DogSprite /></div>
+
+          {/* Flowers */}
           <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
           <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
           <div className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
+
+          <div className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ZinniaSprite /></div>
+          <div className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><MarigoldSprite /></div>
+          <div className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><LavenderSprite /></div>
+          <div className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><LavenderSprite /></div>
+          <div className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ZinniaSprite /></div>
+
+          {/* Bees */}
+          <div className={`absolute top-1/4 left-1/4 w-3 h-3 z-50 animate-fly ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
+          <div className={`absolute top-1/3 right-1/3 w-3 h-3 z-50 animate-fly-delayed ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
+          <div className={`absolute top-2/3 left-1/3 w-3 h-3 z-50 animate-fly-fast ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
+          <div className={`absolute top-1/2 right-1/4 w-3 h-3 z-50 animate-fly ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
 
           {/* Grass details */}
           <div className={`absolute top-60 left-12 w-4 h-3 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
@@ -1558,6 +1718,17 @@ useEffect(() => {
           100% { transform: translateY(-4px); }
         }
         .animate-wallace-wobble { animation: wallace-wobble 0.4s ease-in-out infinite alternate; }
+
+        @keyframes fly-around {
+          0% { transform: translate(0, 0) rotate(0deg); }
+          25% { transform: translate(10px, -15px) rotate(10deg); }
+          50% { transform: translate(20px, 5px) rotate(-5deg); }
+          75% { transform: translate(5px, 15px) rotate(5deg); }
+          100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .animate-fly { animation: fly-around 8s infinite ease-in-out; }
+        .animate-fly-delayed { animation: fly-around 10s infinite ease-in-out 2s reverse; }
+        .animate-fly-fast { animation: fly-around 6s infinite ease-in-out 1s; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
