@@ -882,7 +882,7 @@ useEffect(() => {
     const rootEl = document.getElementById('root');
     const update = () => {
       const available = rootEl ? rootEl.clientWidth : window.innerWidth;
-      setGameScale(Math.min(available / 340, 1.5));
+      setGameScale(Math.min((available - 32) / 340, 1.5));
     };
     update();
     const ro = new ResizeObserver(update);
@@ -1522,9 +1522,10 @@ useEffect(() => {
             {dreamStage === 'INTRO_DIALOG' && <DialogBox key="intro-dialog" name="Wallace" text={wormIntro[dialogIndex]} onNext={() => handleDialogNext(wormIntro, 'CRAFT_SOIL')} emotion={wallaceEmotion} />}
             
             {dreamStage === 'NIGHTMARE_END' && (
-              <div className="text-center animate-fade-in flex flex-col items-center">
-                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
-                <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
+              <div className="animate-fade-in relative pt-4" style={{ height: 300 * gameScale + 16 }}>
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', left: '50%', transform: 'translateX(-50%)', overflow: 'hidden' }}>
+                <div style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0, width: '340px', height: '300px' }}>
+                <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake">
                    <div className="absolute top-10 w-full h-full garden-grid opacity-10 pointer-events-none grayscale"></div>
                    
                    {/* Atmospheric Effects */}
@@ -1565,13 +1566,14 @@ useEffect(() => {
                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 grayscale z-10"><FarmerSprite /></div>
                 </div>
                 </div>
+                </div>
                 <DialogBox key="nightmare-dialog" name="Wallace" text={nightmareStory[dialogIndex]} onNext={() => handleDialogNext(nightmareStory, 'WAKE_UP')} emotion={dialogIndex < 2 ? "angry" : "sad"} />
               </div>
             )}
 
             {dreamStage === 'END_DIALOG' && (
-              <div className="text-center animate-fade-in flex flex-col items-center">
-                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
+              <div className="animate-fade-in relative" style={{ height: 300 * gameScale }}>
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', left: '50%', transform: 'translateX(-50%)', overflow: 'hidden' }}>
                 <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    {[...Array(9)].map((_, i) => {
                      const Sprites = [CornSprite, CarrotSprite, MelonSprite];
@@ -1838,6 +1840,7 @@ useEffect(() => {
                 { label: '🔄 Match Examples',  stage: 'MATCH_EXAMPLES'},
                 { label: '🛠️ Fix Plots',       stage: 'FIX_PLOTS'     },
                 { label: '🌱 Plant Seeds',     stage: 'PLANT_SEEDS'   },
+                { label: '💀 Nightmare',       stage: 'NIGHTMARE_END' },
               ].map(({ label, stage }) => (
                 <button key={stage} onClick={() => jumpToChapter(stage)} className="bg-[#fff8e1] text-[#3e2723] px-4 py-3 font-bold text-sm text-left hover:bg-[#ffe082] border-2 border-[#8b5a2b] active:translate-y-0.5 w-full font-mono">
                   {label}
