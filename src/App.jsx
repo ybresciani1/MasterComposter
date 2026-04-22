@@ -592,7 +592,7 @@ const PixelBox = ({ children, className = "" }) => (
   </div>
 );
 
-const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' }) => {
+const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal', bottomClass = 'bottom-4' }) => {
   let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
   let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
 
@@ -605,7 +605,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up">
+    <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up`}>
       <PixelBox className="flex gap-4 items-start relative shadow-2xl">
         {(portrait || name === 'Wallace') && (
           <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
@@ -882,7 +882,7 @@ useEffect(() => {
     const rootEl = document.getElementById('root');
     const update = () => {
       const available = rootEl ? rootEl.clientWidth : window.innerWidth;
-      setGameScale(Math.min(available / 340, 2));
+      setGameScale(Math.min(available / 340, 1.75));
     };
     update();
     const ro = new ResizeObserver(update);
@@ -1344,9 +1344,17 @@ useEffect(() => {
               </div>
             ))}
           </div>
-          <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
-            <div className="flex justify-between items-center mb-8">
+          <div className="max-w-3xl w-full mt-2 relative z-10 pb-48">
+            <div className="flex justify-between items-center mb-3">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
+               {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+                 <div className="text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse text-center">
+                   {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
+                   {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
+                   {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
+                   {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
+                 </div>
+               )}
                <PixelBox className="py-2 px-4 flex gap-4 items-center">
                   <span className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md">
                      {'❤️'.repeat(Math.max(0, lives))}{'🖤'.repeat(Math.max(0, 3 - lives))}
@@ -1357,9 +1365,7 @@ useEffect(() => {
 
             {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
               <div className="text-center animate-fade-in relative flex flex-col items-center">
-                 <div className="flex justify-between mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded" style={{ width: 340 * gameScale }}>
-                    <span>WASD/Tap: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
-                 </div>
+
 
                  <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
@@ -1480,41 +1486,8 @@ useEffect(() => {
                  </div>
                  </div>
 
-                 <div className="flex gap-3 mt-3" style={{ width: 340 * gameScale }}>
-                   <button
-                     type="button"
-                     disabled={isFixModalOpen || isWorking || lives <= 0}
-                     className="flex-1 bg-[#1565c0] text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1] active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none"
-                     onPointerDown={(e) => {
-                       e.preventDefault();
-                       window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
-                       window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
-                     }}
-                   >
-                     Pick Up / Drop
-                   </button>
-                   <button
-                     type="button"
-                     disabled={isFixModalOpen || isWorking || lives <= 0}
-                     className="flex-1 bg-[#f57f17] text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100] active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none"
-                     onPointerDown={(e) => {
-                       e.preventDefault();
-                       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', bubbles: true }));
-                       window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e', code: 'KeyE', bubbles: true }));
-                     }}
-                   >
-                     Interact
-                   </button>
-                 </div>
 
-                 <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse">
-                    {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
-                    {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
-                    {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
-                    {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
-                 </div>
-
-                 <DialogBox name="Wallace" text={
+<DialogBox name="Wallace" text={
                    dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
                    dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
                    dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
@@ -1613,6 +1586,43 @@ useEffect(() => {
                 </div>
                 </div>
                 <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />
+              </div>
+            )}
+
+            {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+              <div className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-40">
+                <div className="flex gap-3">
+                  <div className="flex-1 bg-[#5d4037]/80 text-[#f4e2b8] font-bold py-3 rounded-lg border-b-4 border-[#3e2723]/80 text-sm text-center leading-tight flex flex-col items-center justify-center pointer-events-none">
+                    <span>Move</span>
+                    <span className="text-xs font-normal opacity-80">WASD / Tap</span>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={isFixModalOpen || isWorking || lives <= 0}
+                    className="flex-1 bg-[#1565c0]/80 text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1]/80 active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
+                      window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
+                    }}
+                  >
+                    <span>Pick Up / Drop</span>
+                    <span className="text-xs font-normal opacity-80">Space</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isFixModalOpen || isWorking || lives <= 0}
+                    className="flex-1 bg-[#f57f17]/80 text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100]/80 active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', bubbles: true }));
+                      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e', code: 'KeyE', bubbles: true }));
+                    }}
+                  >
+                    <span>Interact</span>
+                    <span className="text-xs font-normal opacity-80">E</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
