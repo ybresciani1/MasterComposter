@@ -1114,6 +1114,7 @@ useEffect(() => {
     
     return () => {
         keys.current = {};
+        targetPosRef.current = null;
         cancelAnimationFrame(animationFrameId);
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);
