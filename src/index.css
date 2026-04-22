@@ -129,7 +129,7 @@ code {
   padding: 2rem;
 }
 
-@media (orientation: landscape) and (max-width: 768px) {
+@media (orientation: landscape) and (max-height: 500px) {
   .portrait-lock {
     display: flex;
   }
