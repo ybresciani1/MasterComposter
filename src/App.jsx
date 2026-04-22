@@ -605,7 +605,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50 animate-fade-in-up">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up">
       <PixelBox className="flex gap-4 items-start relative shadow-2xl">
         {(portrait || name === 'Wallace') && (
           <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
@@ -621,7 +621,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal' 
         )}
         <div className="flex-1">
           {name && <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>}
-          <p className="text-sm md:text-base leading-relaxed">{text}</p>
+          <p className="text-sm md:text-base leading-relaxed break-words">{text}</p>
         </div>
         {!hideNext && (
           <button 
@@ -1211,8 +1211,8 @@ useEffect(() => {
   const renderTitle = () => (
     <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4">
       <PixelBox className="text-center max-w-lg w-full">
-        <h1 className="text-4xl font-extrabold text-[#5d4037] mb-2 text-shadow text-white">Master Composter</h1>
-        <h2 className="text-xl text-[#8b5a2b] mb-8 tracking-widest text-white drop-shadow-sm">VALLEY</h2>
+        <h1 className="text-2xl md:text-4xl font-extrabold text-[#5d4037] mb-2 text-shadow text-white">Master Composter</h1>
+        <h2 className="text-base md:text-xl text-[#8b5a2b] mb-8 tracking-widest text-white drop-shadow-sm">VALLEY</h2>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite /></div>
@@ -1226,7 +1226,7 @@ useEffect(() => {
   const renderCutscene = (script, onComplete) => (
     <div key="scene-cutscene" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <p className="text-white font-mono text-xl md:text-2xl leading-loose mb-12 animate-pulse">{script[dialogIndex]}</p>
+        <p className="text-white font-mono text-base md:text-xl leading-loose mb-8 md:mb-12 animate-pulse">{script[dialogIndex]}</p>
         <button onClick={() => { if (dialogIndex < script.length - 1) setDialogIndex(dialogIndex + 1); else { setDialogIndex(0); onComplete(); } }} className="text-amber-500 font-mono text-lg hover:text-amber-300">[ Click to continue ]</button>
       </div>
     </div>
@@ -1236,7 +1236,7 @@ useEffect(() => {
     const currentText = classStory[dialogIndex];
     return (
       <div key="scene-class-intro" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
-         <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
+         <div className="w-full max-w-[500px] h-[220px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
             <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
             <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
               <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
@@ -1626,7 +1626,7 @@ useEffect(() => {
 
       return (
         <div key="scene-wakeup-classroom" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
-           <div className="w-full max-w-[500px] h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
+           <div className="w-full max-w-[500px] h-[220px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-24">
               <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
               <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
                 <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
