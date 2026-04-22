@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
-import wowSound from './assets/anime-wow-sound-effect.mp3';
-import endCreditsVideo from './assets/End Credits.mov';
-import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
-import hammerSound from './assets/Hammer Sound Final.mp3';
-import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
-import magicSound from './assets/Magic Sound Final.mp3';
-import wakeUpSound from './assets/Wake up Sound Final.mp3';
-import nightmareSound from './assets/Nightmare sound.mp3';
-import tossBinSound from './assets/Toss Bin Final Sound.mp3';
-import questSound from './assets/Quest sound.mp3';
+
+const backgroundMusic = "https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3";
+const wowSound = "https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3";
+const endCreditsVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; // Placeholder video URL
+const pitchforkSound = "https://actions.google.com/sounds/v1/water/water_slosh.ogg";
+const hammerSound = "https://actions.google.com/sounds/v1/tools/hammering_nails.ogg";
+const patDirtSound = "https://actions.google.com/sounds/v1/impacts/wood_impact.ogg";
+const magicSound = "https://actions.google.com/sounds/v1/cartoon/magic_chime.ogg";
+const wakeUpSound = "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg";
+const nightmareSound = "https://actions.google.com/sounds/v1/horror/monster_zombie_growl.ogg";
+const tossBinSound = "https://actions.google.com/sounds/v1/impacts/plastic_drop.ogg";
+const questSound = "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg";
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -79,13 +80,61 @@ const PLANTS = [
 
 // --- REUSABLE UI COMPONENTS ---
 const FarmerSprite = () => (
-  <svg viewBox="0 0 10 11" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M2,1 h6 v1 h-6 z M1,2 h8 v1 h-8 z" fill="#8b5a2b" />
-    <path d="M3,3 h4 v3 h-4 z M2,4 h1 v1 h-1 z M7,4 h1 v1 h-1 z" fill="#ffccaa" />
-    <path d="M3,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M2,6 h6 v3 h-6 z M1,6 h1 v2 h-1 z M8,6 h1 v2 h-1 z" fill="#e53935" />
-    <path d="M3,6 h1 v2 h-1 z M6,6 h1 v2 h-1 z M3,8 h4 v1 h-4 z M3,9 h1 v2 h-1 z M6,9 h1 v2 h-1 z" fill="#1e88e5" />
-    <path d="M2,10 h2 v1 h-2 z M6,10 h2 v1 h-2 z" fill="#8b5a2b" />
+  <svg viewBox="0 0 16 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Back hair */}
+    <path d="M5,5 h6 v3 h-6 z" fill="#bf360c" />
+
+    {/* Arms */}
+    <path d="M2,9 h3 v3 h-3 z M11,9 h3 v3 h-3 z" fill="#e53935" />
+    {/* Hands */}
+    <path d="M2,12 h2 v2 h-2 z M12,12 h2 v2 h-2 z" fill="#ffccaa" />
+
+    {/* Overalls - back layer */}
+    <path d="M5,9 h6 v6 h-6 z" fill="#1e88e5" />
+    
+    {/* Legs */}
+    <path d="M5,15 h2 v2 h-2 z M9,15 h2 v2 h-2 z" fill="#1e88e5" />
+    {/* Boots */}
+    <path d="M4,17 h3 v1 h-3 z M9,17 h3 v1 h-3 z" fill="#8b5a2b" />
+    {/* Boot detail */}
+    <path d="M4,16 h1 v1 h-1 z M11,16 h1 v1 h-1 z" fill="#5d4037" />
+
+    {/* Overall Straps & Chest */}
+    <path d="M5,11 h6 v4 h-6 z" fill="#1e88e5" />
+    <path d="M5,9 h1 v2 h-1 z M10,9 h1 v2 h-1 z" fill="#1565c0" />
+    <path d="M5,10 h1 v1 h-1 z M10,10 h1 v1 h-1 z" fill="#fdd835" />
+    {/* Pocket */}
+    <path d="M7,12 h2 v2 h-2 z" fill="#1565c0" />
+
+    {/* Face */}
+    <path d="M5,5 h6 v4 h-6 z" fill="#ffccaa" />
+    {/* Eyes */}
+    <path d="M6,6 h1 v1 h-1 z M9,6 h1 v1 h-1 z" fill="#3e2723" />
+    {/* Blush */}
+    <path d="M5,7 h1 v1 h-1 z M10,7 h1 v1 h-1 z" fill="#ff8a80" />
+
+    {/* Hat Crown (Pink like Wallace) */}
+    <path d="M4,1 h8 v3 h-8 z" fill="#f48fb1" />
+    {/* Hat Band */}
+    <path d="M4,3 h8 v1 h-8 z" fill="#d81b60" />
+    {/* Hat Brim */}
+    <path d="M2,4 h12 v1 h-12 z" fill="#f48fb1" />
+    
+    {/* Pink Flower */}
+    <path d="M3,2 h1 v1 h-1 z M5,2 h1 v1 h-1 z M4,1 h1 v1 h-1 z M4,3 h1 v1 h-1 z" fill="#ff4081" />
+    <path d="M4,2 h1 v1 h-1 z" fill="#fdd835" />
+
+    {/* Hair - Bangs */}
+    <path d="M5,4 h6 v1 h-6 z" fill="#d84315" />
+    
+    {/* Redhead Braids (Left & Right) */}
+    <path d="M4,5 h1 v8 h-1 z M11,5 h1 v8 h-1 z" fill="#d84315" />
+    {/* Braid Textures */}
+    <path d="M4,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M4,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M4,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z" fill="#bf360c" />
+    {/* Hair Ties */}
+    <path d="M3,12 h3 v1 h-3 z M10,12 h3 v1 h-3 z" fill="#4caf50" />
+    {/* Braid Ends */}
+    <path d="M4,13 h1 v2 h-1 z M11,13 h1 v2 h-1 z" fill="#d84315" />
   </svg>
 );
 
@@ -299,6 +348,71 @@ const MelonSprite = () => (
   </svg>
 );
 
+const TreeSprite = () => (
+  <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Trunk */}
+    <path d="M7,16 h2 v4 h-2 z" fill="#5d4037" />
+    {/* Leaves layers */}
+    <path d="M7,1 h2 v2 h-2 z M5,3 h6 v3 h-6 z M3,6 h10 v4 h-10 z M1,10 h14 v6 h-14 z" fill="#2e7d32" />
+    <path d="M6,1 h1 v2 h-1 z M4,3 h2 v3 h-2 z M2,6 h2 v4 h-2 z M0,10 h2 v6 h-2 z" fill="#388e3c" />
+  </svg>
+);
+
+const CowSprite = () => (
+  <svg viewBox="0 0 24 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Legs */}
+    <path d="M4,12 h2 v4 h-2 z M8,12 h2 v4 h-2 z M16,12 h2 v4 h-2 z M20,12 h2 v4 h-2 z" fill="#e0e0e0" />
+    <path d="M4,15 h2 v1 h-2 z M8,15 h2 v1 h-2 z M16,15 h2 v1 h-2 z M20,15 h2 v1 h-2 z" fill="#212121" />
+    {/* Body */}
+    <path d="M3,4 h19 v8 h-19 z" fill="#ffffff" />
+    {/* Spots */}
+    <path d="M8,4 h4 v3 h-4 z M10,7 h3 v3 h-3 z M16,5 h4 v4 h-4 z M5,9 h2 v2 h-2 z" fill="#212121" />
+    {/* Tail */}
+    <path d="M22,5 h1 v4 h-1 z M22,9 h1 v2 h-1 z" fill="#e0e0e0" />
+    <path d="M22,11 h1 v1 h-1 z" fill="#212121" />
+    {/* Head */}
+    <path d="M1,2 h5 v6 h-5 z" fill="#ffffff" />
+    <path d="M1,6 h5 v2 h-5 z" fill="#f48fb1" /> {/* Snout */}
+    <path d="M2,3 h1 v1 h-1 z M4,3 h1 v1 h-1 z" fill="#212121" /> {/* Eyes */}
+    <path d="M2,1 h1 v1 h-1 z M4,1 h1 v1 h-1 z" fill="#9e9e9e" /> {/* Horns */}
+  </svg>
+);
+
+const PigSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Legs */}
+    <path d="M2,8 h2 v4 h-2 z M5,8 h2 v4 h-2 z M9,8 h2 v4 h-2 z M12,8 h2 v4 h-2 z" fill="#f06292" />
+    {/* Body */}
+    <path d="M1,4 h13 v6 h-13 z" fill="#f48fb1" />
+    {/* Head */}
+    <path d="M13,3 h3 v5 h-3 z" fill="#f48fb1" />
+    <path d="M14,5 h2 v2 h-2 z" fill="#ec407a" /> {/* Snout */}
+    <path d="M14,4 h1 v1 h-1 z" fill="#212121" /> {/* Eye */}
+    <path d="M13,2 h1 v1 h-1 z M15,2 h1 v1 h-1 z" fill="#f06292" /> {/* Ears */}
+    {/* Tail */}
+    <path d="M0,5 h1 v1 h-1 z" fill="#f06292" />
+  </svg>
+);
+
+const SunflowerSprite = () => (
+  <svg viewBox="0 0 12 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Stem */}
+    <path d="M5,10 h2 v14 h-2 z" fill="#4caf50" />
+    {/* Leaves */}
+    <path d="M3,14 h2 v1 h-2 z M7,17 h2 v1 h-2 z" fill="#388e3c" />
+    {/* Petals */}
+    <path d="M4,1 h4 v8 h-4 z M1,4 h10 v2 h-10 z M2,2 h8 v6 h-8 z" fill="#ffeb3b" />
+    {/* Center */}
+    <path d="M4,4 h4 v2 h-4 z M5,3 h2 v4 h-2 z" fill="#5d4037" />
+  </svg>
+);
+
+const GrassSprite = () => (
+  <svg viewBox="0 0 10 8" className="w-full h-full opacity-60 drop-shadow-sm" shapeRendering="crispEdges">
+     <path d="M2,4 h1 v4 h-1 z M5,2 h1 v6 h-1 z M8,5 h1 v3 h-1 z" fill="#66bb6a" />
+  </svg>
+);
+
 const BarnSprite = () => (
   <svg viewBox="0 0 24 22" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
     {/* Roof */}
@@ -491,14 +605,14 @@ export default function App() {
   ];
 
   const wakeUpStory = [
-    { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center." },
+    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Living Coast Discovery Center." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "...and that concludes our section on soil properties and compost components!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
     { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
   ];
 
   const badWakeUpStory = [
-    { name: "Reality", portrait: "💭", text: "You jolt awake in your chair at the Living Coast Discovery Center, sweating." },
+    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Living Coast Discovery Center, sweating." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "Hey! Are you sleeping in my class? Soil properties are NOT nap material!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Oh no... I got caught... and that nightmare was awful. I didn't learn a thing.)" },
     { name: "You", portrait: <StudentPortrait />, text: "(I need to pay better attention next time...)" }
@@ -943,7 +1057,7 @@ useEffect(() => {
         <h2 className="text-xl text-[#8b5a2b] mb-8 tracking-widest text-white drop-shadow-sm">VALLEY</h2>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
-          <div className="w-16 h-16"><WormSprite /></div>
+          <div className="w-12 h-16"><WallaceFollowerSprite /></div>
         </div>
         <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3">New Game</button>
         <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full">Chapter Select</button>
@@ -1004,14 +1118,30 @@ useEffect(() => {
     return (
       <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
           {/* Background farm scenery */}
-          <div className={`absolute top-10 left-10 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
-          <div className={`absolute top-20 right-20 text-4xl opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>🌲</div>
+          <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-2 left-40 w-10 h-14 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          
+          <div className={`absolute top-6 right-10 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
           <div className={`absolute bottom-48 left-36 w-10 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><SiloSprite /></div>
-          <div className={`absolute bottom-44 right-28 text-3xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐄</div>
-          <div className={`absolute bottom-56 right-16 text-2xl opacity-60 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🐖</div>
-          <div className={`absolute top-32 left-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
-          <div className={`absolute top-40 right-6 text-2xl opacity-40 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>🌻</div>
+          
+          <div className={`absolute bottom-40 right-28 w-16 h-12 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><CowSprite /></div>
+          <div className={`absolute bottom-52 right-12 w-12 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><PigSprite /></div>
+          
+          <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
+          <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
+          <div className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
+
+          {/* Grass details */}
+          <div className={`absolute top-60 left-12 w-4 h-3 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
+          <div className={`absolute top-72 right-20 w-5 h-4 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
+          <div className={`absolute bottom-32 left-8 w-6 h-5 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
+          <div className={`absolute bottom-60 right-32 w-4 h-3 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
+
           {/* Fence line */}
           <div className={`absolute bottom-10 left-40 right-36 h-6 flex items-center opacity-50 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>
             {[...Array(8)].map((_, i) => (
@@ -1446,8 +1576,8 @@ useEffect(() => {
             <h3 className="text-2xl mb-6 font-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
             <div className="flex flex-col gap-2 mb-4">
               {[
-                { label: '🌙 The Dream',      stage: 'INTRO_DIALOG'  },
-                { label: '🪣 Craft Soil',      stage: 'CRAFT_SOIL'    },
+                { label: '🌙 The Dream',     stage: 'INTRO_DIALOG'  },
+                { label: '🪣 Craft Soil',     stage: 'CRAFT_SOIL'    },
                 { label: '🔄 Match Examples',  stage: 'MATCH_EXAMPLES'},
                 { label: '🛠️ Fix Plots',       stage: 'FIX_PLOTS'     },
                 { label: '🌱 Plant Seeds',     stage: 'PLANT_SEEDS'   },
