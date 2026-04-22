@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-const backgroundMusic = '/assets/nastelbom-background-music-486996.mp3';
-const wowSound = '/assets/anime-wow-sound-effect.mp3';
-const endCreditsVideo = '/assets/End Credits.mov';
-const pitchforkSound = '/assets/Pitchfork Sound Final.mp3';
-const hammerSound = '/assets/Hammer Sound Final.mp3';
-const patDirtSound = '/assets/Pat Dirt Final Sound.mp3';
-const magicSound = '/assets/Magic Sound Final.mp3';
-const wakeUpSound = '/assets/Wake up Sound Final.mp3';
-const nightmareSound = '/assets/Nightmare sound.mp3';
-const tossBinSound = '/assets/Toss Bin Final Sound.mp3';
-const questSound = '/assets/Quest sound.mp3';
+const BASE = 'https://master-composter.vercel.app/assets';
+const backgroundMusic = `${BASE}/nastelbom-background-music-486996.mp3`;
+const wowSound = `${BASE}/anime-wow-sound-effect.mp3`;
+const endCreditsVideo = `${BASE}/End Credits.mov`;
+const pitchforkSound = `${BASE}/Pitchfork Sound Final.mp3`;
+const hammerSound = `${BASE}/Hammer Sound Final.mp3`;
+const patDirtSound = `${BASE}/Pat Dirt Final Sound.mp3`;
+const magicSound = `${BASE}/Magic Sound Final.mp3`;
+const wakeUpSound = `${BASE}/Wake up Sound Final.mp3`;
+const nightmareSound = `${BASE}/Nightmare sound.mp3`;
+const tossBinSound = `${BASE}/Toss Bin Final Sound.mp3`;
+const questSound = `${BASE}/Quest sound.mp3`;
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -254,14 +255,14 @@ const InstructorSprite = () => (
 );
 
 const InstructorPortrait = () => (
-  <img src="/assets/Teacher.png" alt="Instructor" className="w-full h-full object-cover" />
+  <img src={`${BASE}/Teacher.png`} alt="Instructor" className="w-full h-full object-cover" />
 );
 
 const StudentPortrait = () => {
   const [imgIdx, setImgIdx] = useState(0);
   const urls = [
-    "/assets/farmgirl.png",
-    "/assets/hero.png"
+    `${BASE}/farmgirl.png`,
+    `${BASE}/hero.png`
   ];
   
   return (
@@ -578,15 +579,15 @@ const PixelBox = ({ children, className = "" }) => (
 );
 
 const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal', bottomClass = 'bottom-4' }) => {
-  let imgSrc = '/assets/wallace.png';
-  let fbSrc = '/assets/wallace.png';
+  let imgSrc = `${BASE}/wallace.png`;
+  let fbSrc = `${BASE}/wallace.png`;
 
   if (emotion === 'sad' || emotion === 'angry') {
-    imgSrc = '/assets/sad.png';
-    fbSrc = '/assets/sad.png';
+    imgSrc = `${BASE}/sad.png`;
+    fbSrc = `${BASE}/sad.png`;
   } else if (emotion === 'surprised') {
-    imgSrc = '/assets/surprised.png';
-    fbSrc = '/assets/surprised.png';
+    imgSrc = `${BASE}/surprised.png`;
+    fbSrc = `${BASE}/surprised.png`;
   }
 
   return (
