@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
-import wowSound from './assets/anime-wow-sound-effect.mp3';
-import endCreditsVideo from './assets/End Credits.mov';
-import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
-import hammerSound from './assets/Hammer Sound Final.mp3';
-import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
-import magicSound from './assets/Magic Sound Final.mp3';
-import wakeUpSound from './assets/Wake up Sound Final.mp3';
-import nightmareSound from './assets/Nightmare sound.mp3';
-import tossBinSound from './assets/Toss Bin Final Sound.mp3';
-import questSound from './assets/Quest sound.mp3';
+const backgroundMusic = '/assets/nastelbom-background-music-486996.mp3';
+const wowSound = '/assets/anime-wow-sound-effect.mp3';
+const endCreditsVideo = '/assets/End Credits.mov';
+const pitchforkSound = '/assets/Pitchfork Sound Final.mp3';
+const hammerSound = '/assets/Hammer Sound Final.mp3';
+const patDirtSound = '/assets/Pat Dirt Final Sound.mp3';
+const magicSound = '/assets/Magic Sound Final.mp3';
+const wakeUpSound = '/assets/Wake up Sound Final.mp3';
+const nightmareSound = '/assets/Nightmare sound.mp3';
+const tossBinSound = '/assets/Toss Bin Final Sound.mp3';
+const questSound = '/assets/Quest sound.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -253,30 +253,15 @@ const InstructorSprite = () => (
   </svg>
 );
 
-const InstructorPortrait = () => {
-  const [imgIdx, setImgIdx] = useState(0);
-  const urls = [
-    "https://i.ibb.co/Xx4QcHxX/image.jpg",
-    "https://i.ibb.co/Xx4QcHxX/image.png",
-    "https://i.ibb.co/Xx4QcHxX/image.jpeg"
-  ];
-  
-  return (
-    <img 
-      src={urls[imgIdx]} 
-      alt="Instructor" 
-      className="w-full h-full object-cover" 
-      onError={() => { if(imgIdx < urls.length - 1) setImgIdx(imgIdx + 1); }} 
-    />
-  );
-};
+const InstructorPortrait = () => (
+  <img src="/assets/Teacher.png" alt="Instructor" className="w-full h-full object-cover" />
+);
 
 const StudentPortrait = () => {
   const [imgIdx, setImgIdx] = useState(0);
   const urls = [
-    "https://i.ibb.co/qM8HXR6n/image.jpg",
-    "https://i.ibb.co/qM8HXR6n/image.png",
-    "https://i.ibb.co/qM8HXR6n/image.jpeg"
+    "/assets/farmgirl.png",
+    "/assets/hero.png"
   ];
   
   return (
@@ -593,15 +578,15 @@ const PixelBox = ({ children, className = "" }) => (
 );
 
 const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal', bottomClass = 'bottom-4' }) => {
-  let imgSrc = 'https://i.ibb.co/WLG8Tt3/wallace.png';
-  let fbSrc = 'https://i.ibb.co/WLG8Tt3.png';
+  let imgSrc = '/assets/wallace.png';
+  let fbSrc = '/assets/wallace.png';
 
   if (emotion === 'sad' || emotion === 'angry') {
-    imgSrc = 'https://i.ibb.co/zHNFQdVb/sad.png';
-    fbSrc = 'https://i.ibb.co/zHNFQdVb.png';
+    imgSrc = '/assets/sad.png';
+    fbSrc = '/assets/sad.png';
   } else if (emotion === 'surprised') {
-    imgSrc = 'https://i.ibb.co/r2PcZQvP/surprised.png';
-    fbSrc = 'https://i.ibb.co/r2PcZQvP.png';
+    imgSrc = '/assets/surprised.png';
+    fbSrc = '/assets/surprised.png';
   }
 
   return (
@@ -1025,15 +1010,18 @@ useEffect(() => {
             }
             
             if (!isFixModalOpen) {
-              let nearbyPlot = null;
-              SOIL_PROBLEMS.forEach(plot => {
-                 if (fixedPlots.includes(plot.id) || answeredPlots.includes(plot.id)) return;
-                 const dist = Math.hypot(farmerCenter.x - (plot.x + 32), farmerCenter.y - (plot.y + 32));
-                 if (dist < 80) nearbyPlot = plot;
-              });
-              if (nearbyPlot) {
-                setActivePlot(nearbyPlot);
-                setIsFixModalOpen(true);
+              const isWorkingOnPlot = activePlot?.id && answeredPlots.includes(activePlot.id) && !fixedPlots.includes(activePlot.id);
+              if (!isWorkingOnPlot) {
+                let nearbyPlot = null;
+                SOIL_PROBLEMS.forEach(plot => {
+                   if (fixedPlots.includes(plot.id) || answeredPlots.includes(plot.id)) return;
+                   const dist = Math.hypot(farmerCenter.x - (plot.x + 32), farmerCenter.y - (plot.y + 32));
+                   if (dist < 80) nearbyPlot = plot;
+                });
+                if (nearbyPlot) {
+                  setActivePlot(nearbyPlot);
+                  setIsFixModalOpen(true);
+                }
               }
             }
             return;
@@ -1425,10 +1413,11 @@ useEffect(() => {
                       <>
                         {SOIL_PROBLEMS.map(plot => {
                            const isFixed = fixedPlots.includes(plot.id);
+                           const isWorkingOnPlot = activePlot?.id && answeredPlots.includes(activePlot.id) && !fixedPlots.includes(activePlot.id);
                            return (
                              <div key={plot.id} className={`absolute w-16 h-16 border-4 border-[#3e2723] flex items-center justify-center z-10 transition-colors ${isFixed ? 'bg-[#5d4037] border-green-600' : 'bg-[#795548] animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
                                 {isFixed ? '🌱' : plot.sprite}
-                                {(!isFixed && !answeredPlots.includes(plot.id) && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
+                                {(!isFixed && !answeredPlots.includes(plot.id) && !isWorkingOnPlot && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
                                     <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
                                 )}
                                 {activePlot?.id === plot.id && appliedItems.length > 0 && (
