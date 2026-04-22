@@ -99,30 +99,21 @@ const WormSprite = () => (
 );
 
 const WallaceFollowerSprite = () => (
-  <svg viewBox="0 0 10 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Cowboy hat brim */}
-    <path d="M1,2 h8 v1 h-8 z" fill="#8b5a2b" />
-    {/* Hat crown */}
-    <path d="M3,0 h4 v2 h-4 z" fill="#6d4c41" />
+  <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Straw hat crown */}
+    <path d="M12,6 h4 v4 h-4 z" fill="#c8960c" />
     {/* Hat band */}
-    <path d="M3,1 h4 v1 h-4 z" fill="#d32f2f" />
-    {/* Head */}
-    <path d="M2,3 h6 v3 h-6 z" fill="#f48fb1" />
-    {/* Eyes */}
-    <path d="M3,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Smile */}
-    <path d="M3,5 h1 v1 h-1 z M4,5 h3 v1 h-3 z M7,5 h0 v0 h0 z" fill="#d81b60" />
-    {/* Body segment 1 */}
-    <path d="M3,6 h5 v2 h-5 z" fill="#f48fb1" />
-    <path d="M3,7 h5 v1 h-5 z" fill="#d81b60" />
-    {/* Body segment 2 */}
-    <path d="M3,8 h4 v2 h-4 z" fill="#f48fb1" />
-    <path d="M3,9 h4 v1 h-4 z" fill="#d81b60" />
-    {/* Tail taper */}
-    <path d="M4,10 h3 v1 h-3 z" fill="#f48fb1" />
-    <path d="M5,11 h2 v1 h-2 z" fill="#d81b60" />
-    {/* Side nubs */}
-    <path d="M2,6 h1 v1 h-1 z M7,7 h1 v1 h-1 z" fill="#f48fb1" />
+    <path d="M12,9 h4 v1 h-4 z" fill="#5d4037" />
+    {/* Straw hat brim */}
+    <path d="M10,10 h6 v1 h-6 z" fill="#e8c44a" />
+    {/* Head — same as WormSprite, shifted down 4 */}
+    <path d="M12,10 h4 v4 h-4 z" fill="#f48fb1" />
+    {/* Eyes: white sclera + dark pupils, clearly two distinct dots */}
+    <path d="M12,11 h2 v2 h-2 z M14,11 h2 v2 h-2 z" fill="white" />
+    <path d="M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z" fill="#3e2723" />
+    {/* Body humps — same as WormSprite, shifted down 4 */}
+    <path d="M2,15 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
+    <path d="M4,13 h1 v2 h-1 z M7,15 h1 v1 h-1 z M10,12 h1 v3 h-1 z M13,13 h1 v1 h-1 z" fill="#d81b60" />
   </svg>
 );
 
@@ -436,6 +427,8 @@ export default function App() {
   const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, bounceY: 0 });
   const wallacePosRef = useRef({ x: 100, y: 165 });
   const [wallaceRenderPos, setWallaceRenderPos] = useState({ x: 100, y: 165 });
+  const wallaceDirRef = useRef('right');
+  const [wallaceDir, setWallaceDir] = useState('right');
   const farmerHistoryRef = useRef(Array(45).fill({ x: 100, y: 165 }));
   const keys = useRef({});
   
@@ -672,8 +665,17 @@ useEffect(() => {
        }
        if (farmerHistoryRef.current.length > 0) {
          const trailPos = farmerHistoryRef.current[0];
+         const prevWX = wallacePosRef.current.x;
          wallacePosRef.current.x += (trailPos.x - wallacePosRef.current.x) * 0.07;
          wallacePosRef.current.y += (trailPos.y - wallacePosRef.current.y) * 0.07;
+         const deltaX = wallacePosRef.current.x - prevWX;
+         if (Math.abs(deltaX) > 0.05) {
+           const newDir = deltaX > 0 ? 'right' : 'left';
+           if (newDir !== wallaceDirRef.current) {
+             wallaceDirRef.current = newDir;
+             setWallaceDir(newDir);
+           }
+         }
          setWallaceRenderPos({ x: wallacePosRef.current.x, y: wallacePosRef.current.y });
        }
        animationFrameId = requestAnimationFrame(loop);
@@ -1131,7 +1133,9 @@ useEffect(() => {
                     ))}
 
                     <div className="absolute w-8 h-10 z-[29]" style={{ transform: `translate(${wallaceRenderPos.x}px, ${wallaceRenderPos.y}px)` }}>
-                       <div className="w-full h-full animate-wallace-wobble"><WallaceFollowerSprite /></div>
+                       <div className="w-full h-full animate-wallace-wobble">
+                         <div className="w-full h-full" style={{ transform: wallaceDir === 'left' ? 'scaleX(-1)' : undefined }}><WallaceFollowerSprite /></div>
+                       </div>
                     </div>
 
                     <div className="absolute w-10 h-10 z-30 transition-all duration-75" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
