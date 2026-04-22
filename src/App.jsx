@@ -98,6 +98,34 @@ const WormSprite = () => (
   </svg>
 );
 
+const WallaceFollowerSprite = () => (
+  <svg viewBox="0 0 10 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Cowboy hat brim */}
+    <path d="M1,2 h8 v1 h-8 z" fill="#8b5a2b" />
+    {/* Hat crown */}
+    <path d="M3,0 h4 v2 h-4 z" fill="#6d4c41" />
+    {/* Hat band */}
+    <path d="M3,1 h4 v1 h-4 z" fill="#d32f2f" />
+    {/* Head */}
+    <path d="M2,3 h6 v3 h-6 z" fill="#f48fb1" />
+    {/* Eyes */}
+    <path d="M3,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill="#3e2723" />
+    {/* Smile */}
+    <path d="M3,5 h1 v1 h-1 z M4,5 h3 v1 h-3 z M7,5 h0 v0 h0 z" fill="#d81b60" />
+    {/* Body segment 1 */}
+    <path d="M3,6 h5 v2 h-5 z" fill="#f48fb1" />
+    <path d="M3,7 h5 v1 h-5 z" fill="#d81b60" />
+    {/* Body segment 2 */}
+    <path d="M3,8 h4 v2 h-4 z" fill="#f48fb1" />
+    <path d="M3,9 h4 v1 h-4 z" fill="#d81b60" />
+    {/* Tail taper */}
+    <path d="M4,10 h3 v1 h-3 z" fill="#f48fb1" />
+    <path d="M5,11 h2 v1 h-2 z" fill="#d81b60" />
+    {/* Side nubs */}
+    <path d="M2,6 h1 v1 h-1 z M7,7 h1 v1 h-1 z" fill="#f48fb1" />
+  </svg>
+);
+
 const LightningSprite = ({ color = "#ab47bc" }) => (
   <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" shapeRendering="crispEdges">
     <path d="M9,0 h3 v4 h-2 v3 h3 v2 h-5 v7 h-3 v-6 h2 v-2 h-3 v-4 h3 z" fill={color} />
@@ -406,6 +434,9 @@ export default function App() {
   const [groundItems, setGroundItems] = useState([]);
   const farmerPosRef = useRef({ x: 150, y: 150, bounceY: 0 });
   const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, bounceY: 0 });
+  const wallacePosRef = useRef({ x: 100, y: 165 });
+  const [wallaceRenderPos, setWallaceRenderPos] = useState({ x: 100, y: 165 });
+  const farmerHistoryRef = useRef(Array(45).fill({ x: 100, y: 165 }));
   const keys = useRef({});
   
   const [toastMsg, setToastMsg] = useState(null);
@@ -570,12 +601,14 @@ useEffect(() => {
      else if (dreamStage === 'FIX_PLOTS') {
        farmerPosRef.current = { x: 150, y: 220, bounceY: 0 };
        setFarmerRenderPos({ ...farmerPosRef.current });
+       wallacePosRef.current = { x: 134, y: 228 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
        setGroundItems([]); setHeldItem(null); setAppliedItems([]);
      } else if (dreamStage === 'PLANT_SEEDS') {
        const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
        setGroundItems(seeds); setHeldItem(null);
        farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
        setFarmerRenderPos({ ...farmerPosRef.current });
+       wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
      }
   }, [dreamStage]);
 
@@ -631,6 +664,17 @@ useEffect(() => {
        } else if (farmerPosRef.current.bounceY !== 0) {
            farmerPosRef.current.bounceY = 0;
            setFarmerRenderPos({ ...farmerPosRef.current });
+       }
+       // Wallace trails the farmer's path — only update history when moving so Wallace holds position when farmer stops
+       if (moved) {
+         farmerHistoryRef.current.push({ x: farmerPosRef.current.x, y: farmerPosRef.current.y });
+         if (farmerHistoryRef.current.length > 45) farmerHistoryRef.current.shift();
+       }
+       if (farmerHistoryRef.current.length > 0) {
+         const trailPos = farmerHistoryRef.current[0];
+         wallacePosRef.current.x += (trailPos.x - wallacePosRef.current.x) * 0.07;
+         wallacePosRef.current.y += (trailPos.y - wallacePosRef.current.y) * 0.07;
+         setWallaceRenderPos({ x: wallacePosRef.current.x, y: wallacePosRef.current.y });
        }
        animationFrameId = requestAnimationFrame(loop);
     };
@@ -851,7 +895,8 @@ useEffect(() => {
           const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
           setGroundItems(seeds); setHeldItem(null); 
           farmerPosRef.current = { x: 150, y: 150, bounceY: 0 };
-          setFarmerRenderPos({ ...farmerPosRef.current }); 
+          setFarmerRenderPos({ ...farmerPosRef.current });
+          wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
           setPlantedBeds({}); 
           setDreamStage('PLANT_SEEDS');
         }
@@ -1084,6 +1129,10 @@ useEffect(() => {
                         <span>{item.name}</span>
                       </div>
                     ))}
+
+                    <div className="absolute w-8 h-10 z-[29]" style={{ transform: `translate(${wallaceRenderPos.x}px, ${wallaceRenderPos.y}px)` }}>
+                       <div className="w-full h-full animate-wallace-wobble"><WallaceFollowerSprite /></div>
+                    </div>
 
                     <div className="absolute w-10 h-10 z-30 transition-all duration-75" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
                        <FarmerSprite />
@@ -1369,6 +1418,12 @@ useEffect(() => {
         }
         .animate-lightning { animation: lightning-flash 3s infinite; }
         .animate-lightning-delayed { animation: lightning-flash 4.5s infinite 2s; }
+
+        @keyframes wallace-wobble {
+          0% { transform: translateY(0px); }
+          100% { transform: translateY(-4px); }
+        }
+        .animate-wallace-wobble { animation: wallace-wobble 0.4s ease-in-out infinite alternate; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
