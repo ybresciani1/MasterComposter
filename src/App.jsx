@@ -1479,6 +1479,21 @@ useEffect(() => {
                  </div>
                  </div>
 
+                 <div className="flex gap-3 mt-3" style={{ width: 340 * gameScale }}>
+                   <button
+                     className="flex-1 bg-[#1565c0] text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1] active:border-b-0 active:translate-y-1 text-sm"
+                     onPointerDown={(e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true })); }}
+                   >
+                     Pick Up / Drop
+                   </button>
+                   <button
+                     className="flex-1 bg-[#f57f17] text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100] active:border-b-0 active:translate-y-1 text-sm"
+                     onPointerDown={(e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', bubbles: true })); }}
+                   >
+                     Interact
+                   </button>
+                 </div>
+
                  <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse">
                     {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
                     {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
