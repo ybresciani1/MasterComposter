@@ -1339,11 +1339,12 @@ useEffect(() => {
 
             {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
               <div className="text-center animate-fade-in relative flex flex-col items-center">
-                 <div className="flex justify-between w-full max-w-[340px] mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded">
-                    <span>WASD: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
+                 <div className="flex justify-between mb-2 gap-2 text-[10px] text-white bg-[#5d4037] p-1 rounded" style={{ width: 340 * gameScale }}>
+                    <span>WASD/Tap: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
                  </div>
-                 
-                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid">
+
+                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                     
                     {dreamStage === 'CRAFT_SOIL' && (
                       <div className={`absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow border-transparent' : 'border-[#3e2723]'}`}>
@@ -1450,6 +1451,7 @@ useEffect(() => {
                        )}
                     </div>
                  </div>
+                 </div>
 
                  <div className="mt-4 text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse">
                     {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
@@ -1494,7 +1496,8 @@ useEffect(() => {
             
             {dreamStage === 'NIGHTMARE_END' && (
               <div className="text-center animate-fade-in flex flex-col items-center">
-                <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake">
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    <div className="absolute top-10 w-full h-full garden-grid opacity-10 pointer-events-none grayscale"></div>
                    
                    {/* Atmospheric Effects */}
@@ -1534,13 +1537,15 @@ useEffect(() => {
                    
                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 grayscale z-10"><FarmerSprite /></div>
                 </div>
+                </div>
                 <DialogBox key="nightmare-dialog" name="Wallace" text={nightmareStory[dialogIndex]} onNext={() => handleDialogNext(nightmareStory, 'WAKE_UP')} emotion={dialogIndex < 2 ? "angry" : "sad"} />
               </div>
             )}
 
             {dreamStage === 'END_DIALOG' && (
               <div className="text-center animate-fade-in flex flex-col items-center">
-                <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4">
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    {[...Array(9)].map((_, i) => {
                      const Sprites = [CornSprite, CarrotSprite, MelonSprite];
                      const Sprite = Sprites[i % 3];
@@ -1551,6 +1556,7 @@ useEffect(() => {
                      );
                    })}
                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12"><FarmerSprite /></div>
+                </div>
                 </div>
                 <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />
               </div>
