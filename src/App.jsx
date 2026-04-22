@@ -673,6 +673,7 @@ export default function App() {
   const [wallaceDir, setWallaceDir] = useState('right');
   const farmerHistoryRef = useRef(Array(45).fill({ x: 100, y: 165 }));
   const keys = useRef({});
+  const targetPosRef = useRef(null);
   const [gameScale, setGameScale] = useState(1);
 
   const [toastMsg, setToastMsg] = useState(null);
@@ -904,6 +905,19 @@ useEffect(() => {
        if (k['a'] || k['A'] || k['ArrowLeft'] || k['arrowleft']) { farmerPosRef.current.x -= speed; moved = true; }
        if (k['d'] || k['D'] || k['ArrowRight'] || k['arrowright']) { farmerPosRef.current.x += speed; moved = true; }
 
+       if (!moved && targetPosRef.current) {
+         const dx = targetPosRef.current.x - farmerPosRef.current.x;
+         const dy = targetPosRef.current.y - farmerPosRef.current.y;
+         const dist = Math.hypot(dx, dy);
+         if (dist > 5) {
+           farmerPosRef.current.x += (dx / dist) * speed;
+           farmerPosRef.current.y += (dy / dist) * speed;
+           moved = true;
+         } else {
+           targetPosRef.current = null;
+         }
+       }
+
        if (moved) {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
@@ -939,6 +953,9 @@ useEffect(() => {
 
     const handleKeyDown = (e) => {
       const keyStr = e.key ? e.key.toLowerCase() : '';
+      if (['w','a','s','d','W','A','S','D','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+        targetPosRef.current = null;
+      }
       keys.current[e.key] = true;
       if (keyStr) keys.current[keyStr] = true;
 
@@ -1344,7 +1361,15 @@ useEffect(() => {
                  </div>
 
                  <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
-                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
+                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
+                   const rect = e.currentTarget.getBoundingClientRect();
+                   const x = (e.clientX - rect.left) / gameScale - 20;
+                   const y = (e.clientY - rect.top) / gameScale - 20;
+                   targetPosRef.current = {
+                     x: Math.max(0, Math.min(x, 300)),
+                     y: Math.max(0, Math.min(y, 260)),
+                   };
+                 }}>
                     
                     {dreamStage === 'CRAFT_SOIL' && (
                       <div className={`absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#4e342e] rounded-full border-4 flex flex-wrap items-center justify-center p-2 z-10 overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow border-transparent' : 'border-[#3e2723]'}`}>
