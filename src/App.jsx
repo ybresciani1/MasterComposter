@@ -1481,14 +1481,26 @@ useEffect(() => {
 
                  <div className="flex gap-3 mt-3" style={{ width: 340 * gameScale }}>
                    <button
-                     className="flex-1 bg-[#1565c0] text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1] active:border-b-0 active:translate-y-1 text-sm"
-                     onPointerDown={(e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true })); }}
+                     type="button"
+                     disabled={isFixModalOpen || isWorking || lives <= 0}
+                     className="flex-1 bg-[#1565c0] text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1] active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none"
+                     onPointerDown={(e) => {
+                       e.preventDefault();
+                       window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
+                       window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
+                     }}
                    >
                      Pick Up / Drop
                    </button>
                    <button
-                     className="flex-1 bg-[#f57f17] text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100] active:border-b-0 active:translate-y-1 text-sm"
-                     onPointerDown={(e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', bubbles: true })); }}
+                     type="button"
+                     disabled={isFixModalOpen || isWorking || lives <= 0}
+                     className="flex-1 bg-[#f57f17] text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100] active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none"
+                     onPointerDown={(e) => {
+                       e.preventDefault();
+                       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', bubbles: true }));
+                       window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e', code: 'KeyE', bubbles: true }));
+                     }}
                    >
                      Interact
                    </button>
