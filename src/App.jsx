@@ -878,14 +878,14 @@ useEffect(() => {
   }, [completedExamples, combinedBins, matchPhase, dreamStage]);
 
   useEffect(() => {
+    const rootEl = document.getElementById('root');
     const update = () => {
-      const rootEl = document.getElementById('root');
       const available = rootEl ? rootEl.clientWidth : window.innerWidth;
       setGameScale(Math.min(available / 340, 2));
     };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(document.documentElement);
+    if (rootEl) ro.observe(rootEl);
     return () => ro.disconnect();
   }, []);
 
