@@ -673,7 +673,8 @@ export default function App() {
   const [wallaceDir, setWallaceDir] = useState('right');
   const farmerHistoryRef = useRef(Array(45).fill({ x: 100, y: 165 }));
   const keys = useRef({});
-  
+  const [gameScale, setGameScale] = useState(1);
+
   const [toastMsg, setToastMsg] = useState(null);
   const [wallaceEmotion, setWallaceEmotion] = useState('normal');
 
@@ -875,6 +876,18 @@ useEffect(() => {
       }
     }
   }, [completedExamples, combinedBins, matchPhase, dreamStage]);
+
+  useEffect(() => {
+    const update = () => {
+      const rootEl = document.getElementById('root');
+      const available = rootEl ? rootEl.clientWidth : window.innerWidth;
+      setGameScale(Math.min(available / 340, 2));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) || isFixModalOpen || isWorking || lives <= 0) return;
