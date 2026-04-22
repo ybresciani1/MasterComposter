@@ -883,7 +883,7 @@ useEffect(() => {
     const rootEl = document.getElementById('root');
     const update = () => {
       const available = rootEl ? rootEl.clientWidth : window.innerWidth;
-      setGameScale(Math.min((available - 32) / 340, 1.5));
+      setGameScale(Math.min((available - 32) / 340, 1.3));
     };
     update();
     const ro = new ResizeObserver(update);
@@ -1288,8 +1288,8 @@ useEffect(() => {
           <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
 
           {/* Pond & Frog */}
-          <div className={`absolute top-24 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
-          <div className={`absolute top-36 left-[55%] w-6 h-5 opacity-90 z-20 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><FrogSprite /></div>
+          <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
+          <div className={`absolute top-30 sm:top-22 left-[55%] w-6 h-5 opacity-90 z-20 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><FrogSprite /></div>
 
           {/* Barn & Silo */}
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
@@ -1346,7 +1346,7 @@ useEffect(() => {
               </div>
             ))}
           </div>
-          <div className="max-w-3xl w-full mt-2 relative z-10 pb-48">
+          <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
             <div className="flex justify-between items-center mb-3">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
                {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
