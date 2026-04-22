@@ -1595,15 +1595,15 @@ useEffect(() => {
 
             {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
               <div className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-40">
-                <div className="flex gap-3">
-                  <div className="flex-1 bg-[#5d4037]/80 text-[#f4e2b8] font-bold py-3 rounded-lg border-b-4 border-[#3e2723]/80 text-sm text-center leading-tight flex flex-col items-center justify-center pointer-events-none">
+                <div className="flex gap-2">
+                  <div className="flex-1 bg-[#5d4037]/80 text-[#f4e2b8] font-bold py-1.5 rounded-lg border-b-2 border-[#3e2723]/80 text-xs text-center leading-tight flex flex-col items-center justify-center pointer-events-none">
                     <span>Move</span>
-                    <span className="text-xs font-normal opacity-80">WASD / Tap</span>
+                    <span className="text-[10px] font-normal opacity-80">WASD / Tap</span>
                   </div>
                   <button
                     type="button"
                     disabled={isFixModalOpen || isWorking || lives <= 0}
-                    className="flex-1 bg-[#1565c0]/80 text-white font-bold py-3 rounded-lg border-b-4 border-[#0d47a1]/80 active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
+                    className="flex-1 bg-[#1565c0]/80 text-white font-bold py-1.5 rounded-lg border-b-2 border-[#0d47a1]/80 active:border-b-0 active:translate-y-0.5 text-xs disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
                     onPointerDown={(e) => {
                       e.preventDefault();
                       window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
@@ -1611,12 +1611,12 @@ useEffect(() => {
                     }}
                   >
                     <span>Pick Up / Drop</span>
-                    <span className="text-xs font-normal opacity-80">Space</span>
+                    <span className="text-[10px] font-normal opacity-80">Space</span>
                   </button>
                   <button
                     type="button"
                     disabled={isFixModalOpen || isWorking || lives <= 0}
-                    className="flex-1 bg-[#f57f17]/80 text-white font-bold py-3 rounded-lg border-b-4 border-[#e65100]/80 active:border-b-0 active:translate-y-1 text-sm disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
+                    className="flex-1 bg-[#f57f17]/80 text-white font-bold py-1.5 rounded-lg border-b-2 border-[#e65100]/80 active:border-b-0 active:translate-y-0.5 text-xs disabled:opacity-40 disabled:pointer-events-none leading-tight flex flex-col items-center justify-center"
                     onPointerDown={(e) => {
                       e.preventDefault();
                       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', bubbles: true }));
@@ -1624,7 +1624,7 @@ useEffect(() => {
                     }}
                   >
                     <span>Interact</span>
-                    <span className="text-xs font-normal opacity-80">E</span>
+                    <span className="text-[10px] font-normal opacity-80">E</span>
                   </button>
                 </div>
               </div>
