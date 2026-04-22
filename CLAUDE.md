@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Live Deployment
+
+**Production URL:** https://master-composter.vercel.app/
+
+Static assets (audio, images) are served from the same origin, e.g.:
+`https://master-composter.vercel.app/assets/Nightmare sound.mp3`
+
+Use this URL when testing the deployed build or taking browser screenshots via Playwright.
+
 ## Commands
 
 ```bash
