@@ -882,7 +882,7 @@ useEffect(() => {
     const rootEl = document.getElementById('root');
     const update = () => {
       const available = rootEl ? rootEl.clientWidth : window.innerWidth;
-      setGameScale(Math.min(available / 340, 1.75));
+      setGameScale(Math.min(available / 340, 1.5));
     };
     update();
     const ro = new ResizeObserver(update);
