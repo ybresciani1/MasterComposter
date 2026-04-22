@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-const backgroundMusic = "https://ia800504.us.archive.org/33/items/macLeod-autumn-day/Autumn_Day.mp3";
-const wowSound = "https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3";
-const endCreditsVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; // Placeholder video URL
-const pitchforkSound = "https://actions.google.com/sounds/v1/water/water_slosh.ogg";
-const hammerSound = "https://actions.google.com/sounds/v1/tools/hammering_nails.ogg";
-const patDirtSound = "https://actions.google.com/sounds/v1/impacts/wood_impact.ogg";
-const magicSound = "https://actions.google.com/sounds/v1/cartoon/magic_chime.ogg";
-const wakeUpSound = "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg";
-const nightmareSound = "https://actions.google.com/sounds/v1/horror/monster_zombie_growl.ogg";
-const tossBinSound = "https://actions.google.com/sounds/v1/impacts/plastic_drop.ogg";
-const questSound = "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg";
+import backgroundMusic from './assets/nastelbom-background-music-486996.mp3';
+import wowSound from './assets/anime-wow-sound-effect.mp3';
+import endCreditsVideo from './assets/End Credits.mov';
+import pitchforkSound from './assets/Pitchfork Sound Final.mp3';
+import hammerSound from './assets/Hammer Sound Final.mp3';
+import patDirtSound from './assets/Pat Dirt Final Sound.mp3';
+import magicSound from './assets/Magic Sound Final.mp3';
+import wakeUpSound from './assets/Wake up Sound Final.mp3';
+import nightmareSound from './assets/Nightmare sound.mp3';
+import tossBinSound from './assets/Toss Bin Final Sound.mp3';
+import questSound from './assets/Quest sound.mp3';
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
