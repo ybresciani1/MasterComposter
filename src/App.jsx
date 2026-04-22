@@ -1360,7 +1360,7 @@ useEffect(() => {
                     <span>WASD/Tap: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
                  </div>
 
-                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
+                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
                    if (isFixModalOpen || isWorking || lives <= 0) return;
                    const rect = e.currentTarget.getBoundingClientRect();
@@ -1523,7 +1523,7 @@ useEffect(() => {
             )}
 
             {dreamStage === 'FIX_PLOTS' && isFixModalOpen && activePlot && (
-              <div className="absolute inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+              <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
                 <PixelBox className="w-full max-w-lg animate-fade-in">
                   <div className="flex justify-between items-center mb-4">
                      <h2 className="text-xl font-bold">{activePlot.name}</h2>
