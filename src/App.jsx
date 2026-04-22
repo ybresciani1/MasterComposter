@@ -1343,7 +1343,7 @@ useEffect(() => {
                     <span>WASD/Tap: Move</span><span>SPACE: Pick/Drop</span><span>E: Use</span>
                  </div>
 
-                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                     
                     {dreamStage === 'CRAFT_SOIL' && (
@@ -1496,7 +1496,7 @@ useEffect(() => {
             
             {dreamStage === 'NIGHTMARE_END' && (
               <div className="text-center animate-fade-in flex flex-col items-center">
-                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
                 <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    <div className="absolute top-10 w-full h-full garden-grid opacity-10 pointer-events-none grayscale"></div>
                    
@@ -1544,7 +1544,7 @@ useEffect(() => {
 
             {dreamStage === 'END_DIALOG' && (
               <div className="text-center animate-fade-in flex flex-col items-center">
-                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0 }}>
+                <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
                 <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    {[...Array(9)].map((_, i) => {
                      const Sprites = [CornSprite, CarrotSprite, MelonSprite];
