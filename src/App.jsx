@@ -1075,6 +1075,7 @@ export default function App() {
   useEffect(() => {
     if (dreamStage === 'END_DIALOG' && lives > 0) {
       if (wowAudioRef.current) {
+        wowAudioRef.current.currentTime = 0;
         wowAudioRef.current.volume = 0.6;
         wowAudioRef.current.play().catch(() => {});
       }
@@ -1996,7 +1997,7 @@ export default function App() {
                    dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
                    dreamStage === 'FIX_PLOTS' ? (activePlot ? activePlot.hint : "Let's fix up this garden before we plant.") :
                    "Final stretch! Get those seeds in the right dirt."
-                 } hideNext emotion={wallaceEmotion} />
+                 } hideNext emotion={wallaceEmotion} bottomClass="bottom-16" />
               </div>
             )}
 
@@ -2117,7 +2118,7 @@ export default function App() {
             )}
 
             {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
-              <div className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-xl px-2 md:px-4 z-40">
+              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-xl px-2 md:px-4 z-40">
                 <div className="flex gap-2">
                   <div className="flex-1 bg-[#5d4037]/80 text-[#f4e2b8] font-bold py-1 rounded-md border-b-2 border-[#3e2723]/80 text-[10px] text-center leading-tight flex flex-col items-center justify-center pointer-events-none">
                     <span>Move</span>
@@ -2539,7 +2540,7 @@ export default function App() {
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
       <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
-      <audio ref={wowAudioRef} key="wow-audio-element" src={wowSound} className="hidden" />
+      <audio ref={wowAudioRef} key="wow-audio-element" src={wowSound} preload="auto" className="hidden" />
     </div>
   );
 }
