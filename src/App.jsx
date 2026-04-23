@@ -983,6 +983,7 @@ export default function App() {
       audioRef.current.volume = 0.15;
       audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
     }
+    if (wowAudioRef.current) wowAudioRef.current.load();
   };
 
   const toggleMusic = () => {
