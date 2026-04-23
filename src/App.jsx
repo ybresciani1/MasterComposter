@@ -1650,7 +1650,7 @@ export default function App() {
               COMPOSTER
             </span>
           </h1>
-          <h2 className="text-2xl mt-2 tracking-[0.4em] font-bold text-white drop-shadow-md">VALLEY</h2>
+          <h2 className="text-2xl mt-2 tracking-[0.4em] font-bold text-white drop-shadow-md">QUEST</h2>
         </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
