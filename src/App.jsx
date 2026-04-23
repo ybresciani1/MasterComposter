@@ -919,12 +919,13 @@ export default function App() {
     setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
     setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
     setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
-    setAudioDismissed(true); setIsChapterSelectOpen(false); setLives(3);
+    setAudioDismissed(true); setIsChapterSelectOpen(false); 
+    setLives(stage === 'NIGHTMARE_END' ? 0 : 3);
     setGameState('DREAM'); playAudio();
   };
 
   // Watch for game over / lives empty
-useEffect(() => {
+  useEffect(() => {
     if (lives <= 0 && gameState === 'DREAM' && !['NIGHTMARE_END', 'WAKE_UP'].includes(dreamStage)) {
        setDreamStage('NIGHTMARE_END');
        setDialogIndex(0);
