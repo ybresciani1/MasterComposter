@@ -137,6 +137,39 @@ const SakuraSprite = () => (
   </svg>
 );
 
+// --- BUTTERFLY SPRITES (CA NATIVES) ---
+const MonarchSprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M7,3 h2 v10 h-2 z" fill="#212121" />
+    <path d="M1,2 h6 v6 h-6 z M9,2 h6 v6 h-6 z" fill="#ff9800" />
+    <path d="M2,8 h5 v6 h-5 z M9,8 h5 v6 h-5 z" fill="#e65100" />
+    <path d="M1,2 h6 v1 h-6 z M9,2 h6 v1 h-6 z M1,2 h1 v6 h-1 z M14,2 h1 v6 h-1 z M2,13 h5 v1 h-5 z M9,13 h5 v1 h-5 z M2,8 h1 v6 h-1 z M13,8 h1 v6 h-1 z" fill="#212121" />
+    <path d="M1,3 h1 v1 h-1 z M14,3 h1 v1 h-1 z M2,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z" fill="#ffffff" />
+  </svg>
+);
+
+const PaintedLadySprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M7,4 h2 v8 h-2 z" fill="#3e2723" />
+    <path d="M2,3 h5 v5 h-5 z M9,3 h5 v5 h-5 z" fill="#ffb74d" />
+    <path d="M3,8 h4 v5 h-4 z M9,8 h4 v5 h-4 z" fill="#fb8c00" />
+    <path d="M2,3 h2 v2 h-2 z M12,3 h2 v2 h-2 z" fill="#000000" />
+    <path d="M2,4 h1 v1 h-1 z M13,4 h1 v1 h-1 z" fill="#ffffff" />
+    <path d="M4,5 h2 v1 h-2 z M10,5 h2 v1 h-2 z" fill="#000000" opacity="0.6"/>
+    <path d="M4,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M10,12 h1 v1 h-1 z" fill="#000000" opacity="0.8"/>
+  </svg>
+);
+
+const DogfaceSprite = () => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M7,5 h2 v6 h-2 z" fill="#4e342e" />
+    <path d="M2,3 h5 v5 h-5 z M9,3 h5 v5 h-5 z" fill="#ffeb3b" />
+    <path d="M4,8 h3 v4 h-3 z M9,8 h3 v4 h-3 z" fill="#fdd835" />
+    <path d="M2,3 h3 v2 h-3 z M11,3 h3 v2 h-3 z M2,5 h1 v2 h-1 z M13,5 h1 v2 h-1 z" fill="#000000" />
+    <path d="M4,4 h1 v1 h-1 z M11,4 h1 v1 h-1 z" fill="#ec407a" />
+  </svg>
+);
+
 const WoodlouseSprite = () => (
   <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
     <path d="M2,2 h6 v4 h-6 z" fill="#d1c4e9" />
@@ -738,6 +771,7 @@ export default function App() {
   // Title effects
   const [sakuraClicks, setSakuraClicks] = useState([]);
   const [bugsClicks, setBugsClicks] = useState([]);
+  const [butterflyBursts, setButterflyBursts] = useState([]);
   const [lingeringBugs, setLingeringBugs] = useState({ bees: [], woodlice: [] });
 
   const triggerSakura = () => {
@@ -781,6 +815,16 @@ export default function App() {
         woodlice: newWoodlice.slice(-15) // Cap max woodlice
       };
     });
+  };
+
+  const triggerButterflies = (e) => {
+    e.stopPropagation();
+    const x = e.clientX;
+    const y = e.clientY;
+    const id = Date.now() + Math.random();
+    
+    setButterflyBursts(prev => [...prev, { id, x, y }]);
+    setTimeout(() => setButterflyBursts(prev => prev.filter(b => b.id !== id)), 2500);
   };
 
   const handleBeeClick = (id) => {
@@ -1371,31 +1415,54 @@ export default function App() {
       {/* Flower Decorations */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Bottom Left */}
-        <div className="absolute bottom-4 left-4 md:left-12 w-10 h-20 md:w-16 md:h-32"><SunflowerSprite /></div>
-        <div className="absolute bottom-2 left-16 md:left-32 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
-        <div className="absolute bottom-12 left-24 md:left-48 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
-        <div className="absolute bottom-20 left-4 md:left-10 w-8 h-16 md:w-12 md:h-24"><LavenderSprite /></div>
+        <div className="absolute bottom-4 left-4 md:left-12 w-10 h-20 md:w-16 md:h-32 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
+        <div className="absolute bottom-2 left-16 md:left-32 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
+        <div className="absolute bottom-12 left-24 md:left-48 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
+        <div className="absolute bottom-20 left-4 md:left-10 w-8 h-16 md:w-12 md:h-24 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
 
         {/* Bottom Right */}
-        <div className="absolute bottom-8 right-6 md:right-16 w-12 h-24 md:w-16 md:h-32"><SunflowerSprite /></div>
-        <div className="absolute bottom-4 right-20 md:right-36 w-8 h-16 md:w-12 md:h-24"><LavenderSprite /></div>
-        <div className="absolute bottom-16 right-28 md:right-48 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
-        <div className="absolute bottom-2 right-4 md:right-8 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
+        <div className="absolute bottom-8 right-6 md:right-16 w-12 h-24 md:w-16 md:h-32 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
+        <div className="absolute bottom-4 right-20 md:right-36 w-8 h-16 md:w-12 md:h-24 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
+        <div className="absolute bottom-16 right-28 md:right-48 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-6 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
+        <div className="absolute bottom-2 right-4 md:right-8 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
 
         {/* Top Left */}
-        <div className="absolute top-12 left-8 md:left-16 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
-        <div className="absolute top-24 left-2 md:left-6 w-8 h-12 md:w-12 md:h-16"><ZinniaSprite /></div>
-        <div className="absolute top-8 left-24 md:left-36 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
+        <div className="absolute top-12 left-8 md:left-16 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
+        <div className="absolute top-24 left-2 md:left-6 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
+        <div className="absolute top-8 left-24 md:left-36 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
 
         {/* Top Right */}
-        <div className="absolute top-16 right-10 md:right-20 w-10 h-20 md:w-14 md:h-28"><SunflowerSprite /></div>
-        <div className="absolute top-8 right-24 md:right-40 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
-        <div className="absolute top-32 right-4 md:right-12 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
+        <div className="absolute top-16 right-10 md:right-20 w-10 h-20 md:w-14 md:h-28 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
+        <div className="absolute top-8 right-24 md:right-40 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
+        <div className="absolute top-32 right-4 md:right-12 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
 
         {/* Middle Edges */}
-        <div className="absolute top-1/2 left-2 md:left-8 w-8 h-12 md:w-12 md:h-16 -translate-y-1/2"><MarigoldSprite /></div>
-        <div className="absolute top-1/3 right-4 md:right-10 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
+        <div className="absolute top-1/2 left-2 md:left-8 w-8 h-12 md:w-12 md:h-16 -translate-y-1/2 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
+        <div className="absolute top-1/3 right-4 md:right-10 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
       </div>
+
+      {/* Fluttering Butterflies Overlay */}
+      {butterflyBursts.map(burst => (
+        <div key={`bb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
+          {[...Array(6)].map((_, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 60 + Math.random() * 150;
+            const tx = Math.cos(angle) * dist;
+            const ty = Math.sin(angle) * dist - 40; // bias upward 
+            
+            const Sprites = [MonarchSprite, PaintedLadySprite, DogfaceSprite];
+            const Sprite = Sprites[Math.floor(Math.random() * Sprites.length)];
+            
+            return (
+              <div key={`bf-${i}`} className="absolute animate-butterfly-burst" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDuration: `${1.5 + Math.random()}s` }}>
+                 <div className="w-5 h-5 animate-butterfly-flap drop-shadow-md" style={{ animationDuration: `${0.1 + Math.random() * 0.1}s` }}>
+                    <Sprite />
+                 </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
 
       {/* Lingering Bugs Overlay */}
       <div className="fixed inset-0 pointer-events-none z-[140] overflow-hidden">
@@ -2265,6 +2332,20 @@ export default function App() {
           100% { transform: scale(15) translate(10px, -20px) rotate(45deg); opacity: 0; }
         }
         .animate-bee-zoom { animation: bee-zoom-out 0.4s ease-in forwards !important; }
+
+        @keyframes butterfly-fly {
+          0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+          20% { opacity: 1; transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(1.2); }
+          70% { opacity: 1; }
+          100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+        }
+        .animate-butterfly-burst { animation: butterfly-fly forwards; pointer-events: none; }
+
+        @keyframes butterfly-flap {
+          0%, 100% { transform: scaleX(1) translateY(0); }
+          50% { transform: scaleX(0.2) translateY(-2px); }
+        }
+        .animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
