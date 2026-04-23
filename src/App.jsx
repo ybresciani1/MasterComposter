@@ -137,7 +137,6 @@ const SakuraSprite = () => (
   </svg>
 );
 
-// --- BUTTERFLY SPRITES (CA NATIVES) ---
 const MonarchSprite = () => (
   <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
     <path d="M7,3 h2 v10 h-2 z" fill="#212121" />
@@ -291,24 +290,50 @@ const StudentPortrait = () => {
   );
 };
 
-const PolishHenSprite = ({ isGold }) => (
-  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Legs */}
-    <path d="M4,10 h1 v2 h-1 z M7,10 h1 v2 h-1 z" fill="#f57f17" />
-    {/* Body */}
-    <path d="M2,5 h6 v5 h-6 z" fill={isGold ? "#fbc02d" : "#212121"} />
-    {/* Tail */}
-    <path d="M1,4 h2 v4 h-2 z M0,5 h1 v2 h-1 z" fill={isGold ? "#ffffff" : "#a1887f"} />
-    {/* Neck/Head area */}
-    <path d="M7,4 h2 v3 h-2 z" fill={isGold ? "#fbc02d" : "#212121"} />
-    {/* Beak */}
-    <path d="M9,5 h1 v1 h-1 z" fill="#f57f17" />
-    {/* Eye */}
-    <path d="M8,5 h1 v1 h-1 z" fill={isGold ? "#000000" : "#ffffff"} />
-    {/* Polish Crest (Poof) */}
-    <path d="M6,2 h4 v2 h-4 z M7,1 h2 v1 h-2 z M5,3 h1 v2 h-1 z M10,3 h1 v2 h-1 z" fill={isGold ? "#ffffff" : "#d7ccc8"} />
-  </svg>
-);
+const PolishHenSprite = ({ name }) => {
+  const isRiot = name === 'Riot';
+  
+  // Riot is a Buff Laced Polish (Gold/Buff body, White lacing)
+  // Beyonce is a Golden Laced Polish (Black body, Copper/Gold lacing)
+  const baseColor = isRiot ? "#fbc02d" : "#1a1a1a"; 
+  const laceColor1 = isRiot ? "#ffffff" : "#d84315"; 
+  const laceColor2 = isRiot ? "#fff9c4" : "#ff9800"; 
+  const legColor = "#78909c"; 
+  const beakColor = isRiot ? "#d7ccc8" : "#90a4ae";
+
+  return (
+    <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+      {/* Legs */}
+      <path d="M6,13 h1 v3 h-1 z M10,13 h1 v3 h-1 z M5,15 h2 v1 h-2 z M9,15 h2 v1 h-2 z" fill={legColor} />
+      
+      {/* Tail Base */}
+      <path d="M1,2 h4 v8 h-4 z M0,3 h2 v6 h-2 z M4,1 h2 v4 h-2 z" fill={baseColor} />
+      {/* Tail Lacing */}
+      <path d="M2,3 h1 v6 h-1 z M4,3 h1 v5 h-1 z M1,4 h1 v4 h-1 z M5,2 h1 v3 h-1 z" fill={laceColor1} />
+      
+      {/* Body Base */}
+      <path d="M3,8 h9 v5 h-9 z M4,13 h7 v1 h-7 z M10,7 h2 v2 h-2 z" fill={baseColor} />
+      {/* Body Feathers / Lacing */}
+      <path d="M4,9 h1 v1 h-1 z M6,9 h1 v1 h-1 z M8,9 h1 v1 h-1 z M10,9 h1 v1 h-1 z M5,10 h1 v1 h-1 z M7,10 h1 v1 h-1 z M9,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M4,11 h1 v1 h-1 z M6,11 h1 v1 h-1 z M8,11 h1 v1 h-1 z M10,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M7,12 h1 v1 h-1 z M9,12 h1 v1 h-1 z" fill={laceColor1} />
+      
+      {/* Neck */}
+      <path d="M8,5 h4 v4 h-4 z" fill={baseColor} />
+      
+      {/* Beak & Wattle */}
+      <path d="M13,6 h2 v1 h-2 z M14,7 h1 v1 h-1 z" fill={beakColor} />
+      <path d="M12,7 h1 v1 h-1 z" fill="#d32f2f" />
+      
+      {/* Giant Crest (Poof) Base */}
+      <path d="M7,1 h6 v5 h-6 z M8,0 h4 v1 h-4 z M6,2 h2 v4 h-2 z M13,2 h2 v3 h-2 z M12,1 h2 v1 h-2 z" fill={baseColor} />
+      {/* Giant Crest Lacing/Feather Details */}
+      <path d="M9,1 h1 v1 h-1 z M11,1 h1 v1 h-1 z M8,2 h1 v1 h-1 z M10,2 h1 v1 h-1 z M12,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z M9,3 h1 v1 h-1 z M11,3 h1 v1 h-1 z M13,3 h1 v1 h-1 z M8,4 h1 v1 h-1 z M10,4 h1 v1 h-1 z M12,4 h1 v1 h-1 z M14,4 h1 v1 h-1 z M7,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z M11,5 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill={laceColor2} />
+      <path d="M10,0 h1 v1 h-1 z M8,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M11,2 h1 v1 h-1 z M13,2 h1 v1 h-1 z M10,3 h1 v1 h-1 z M12,3 h1 v1 h-1 z M9,4 h1 v1 h-1 z M11,4 h1 v1 h-1 z M8,5 h1 v1 h-1 z M10,5 h1 v1 h-1 z" fill={laceColor1} />
+
+      {/* Eye */}
+      <path d="M12,5 h1 v1 h-1 z" fill="#000000" />
+    </svg>
+  );
+};
 
 const CornSprite = () => (
   <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
@@ -2004,21 +2029,21 @@ export default function App() {
                    })}
                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 z-30"><FarmerSprite /></div>
                    
-                   {/* Riot (Gold/White Polish Hen) */}
+                   {/* Riot (Gold/White Buff Laced Polish Hen) */}
                    <div className="absolute bottom-[30%] left-[20%] z-20 animate-hen-walk" style={{ animationDelay: '0.5s' }}>
                       <div className="flex flex-col items-center animate-hen-hop">
-                         <div className="w-10 h-10">
-                            <PolishHenSprite isGold={true} />
+                         <div className="w-14 h-14">
+                            <PolishHenSprite name="Riot" />
                          </div>
                          <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Riot</span>
                       </div>
                    </div>
 
-                   {/* Beyonce (Black/Tan Polish Hen) */}
+                   {/* Beyonce (Black/Copper Golden Laced Polish Hen) */}
                    <div className="absolute bottom-[35%] right-[20%] z-20 animate-hen-walk" style={{ animationDelay: '1.5s' }}>
                       <div className="flex flex-col items-center animate-hen-hop" style={{ animationDelay: '0.15s' }}>
-                         <div className="w-10 h-10" style={{ transform: 'scaleX(-1)' }}>
-                            <PolishHenSprite isGold={false} />
+                         <div className="w-14 h-14" style={{ transform: 'scaleX(-1)' }}>
+                            <PolishHenSprite name="Beyonce" />
                          </div>
                          <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Beyonce</span>
                       </div>
