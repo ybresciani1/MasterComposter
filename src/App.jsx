@@ -955,8 +955,8 @@ export default function App() {
 
   const [heldItem, setHeldItem] = useState(null);
   const [groundItems, setGroundItems] = useState([]);
-  const farmerPosRef = useRef({ x: 150, y: 150, bounceY: 0, walkPhase: 0 });
-  const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, bounceY: 0 });
+  const farmerPosRef = useRef({ x: 150, y: 150, isWalking: false });
+  const [farmerRenderPos, setFarmerRenderPos] = useState({ x: 150, y: 150, isWalking: false });
   const wallacePosRef = useRef({ x: 100, y: 165 });
   const [wallaceRenderPos, setWallaceRenderPos] = useState({ x: 100, y: 165 });
   const wallaceDirRef = useRef('right');
@@ -1104,8 +1104,8 @@ export default function App() {
       .map((name, idx) => ({ id: `craft-${idx}`, name, x: 20 + Math.random() * 260, y: 110 + Math.random() * 140 }));
     setGroundItems(items);
     setCauldron([]); setHeldItem(null);
-    farmerPosRef.current = { x: 150, y: 150, bounceY: 0, walkPhase: 0 };
-    setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+    farmerPosRef.current = { x: 150, y: 150, isWalking: false };
+    setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
   };
 
   const initializeExamplesItems = (phase = 0) => {
@@ -1117,8 +1117,8 @@ export default function App() {
     const positionedItems = items.map((item) => ({ ...item, x: 40 + Math.random() * 220, y: 110 + Math.random() * 140 }));
     setGroundItems(positionedItems); setHeldItem(null);
     if (phase === 0) {
-      farmerPosRef.current = { x: 150, y: 150, bounceY: 0, walkPhase: 0 };
-      setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+      farmerPosRef.current = { x: 150, y: 150, isWalking: false };
+      setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
       setCompletedExamples([]); setMatchPhase(0); setCombinedBins([]);
     }
   };
@@ -1127,15 +1127,15 @@ export default function App() {
      if (dreamStage === 'CRAFT_SOIL') initializeGroundItems();
      else if (dreamStage === 'MATCH_EXAMPLES') initializeExamplesItems(0);
      else if (dreamStage === 'FIX_PLOTS') {
-       farmerPosRef.current = { x: 150, y: 220, bounceY: 0, walkPhase: 0 };
-       setFarmerRenderPos({ x: 150, y: 220, bounceY: 0 });
+       farmerPosRef.current = { x: 150, y: 220, isWalking: false };
+       setFarmerRenderPos({ x: 150, y: 220, isWalking: false });
        wallacePosRef.current = { x: 134, y: 228 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
        setGroundItems([]); setHeldItem(null); setAppliedItems([]);
      } else if (dreamStage === 'PLANT_SEEDS') {
        const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
        setGroundItems(seeds); setHeldItem(null);
-       farmerPosRef.current = { x: 150, y: 150, bounceY: 0, walkPhase: 0 };
-       setFarmerRenderPos({ x: 150, y: 150, bounceY: 0 });
+       farmerPosRef.current = { x: 150, y: 150, isWalking: false };
+       setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
        wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
      }
   }, [dreamStage]);
@@ -1200,11 +1200,14 @@ export default function App() {
          const dx = targetPosRef.current.x - farmerPosRef.current.x;
          const dy = targetPosRef.current.y - farmerPosRef.current.y;
          const dist = Math.hypot(dx, dy);
-         if (dist > 5) {
-           farmerPosRef.current.x += (dx / dist) * speed;
-           farmerPosRef.current.y += (dy / dist) * speed;
+         if (dist > 1) {
+           const step = Math.min(speed, dist * 0.15);
+           farmerPosRef.current.x += (dx / dist) * step;
+           farmerPosRef.current.y += (dy / dist) * step;
            moved = true;
          } else {
+           farmerPosRef.current.x = targetPosRef.current.x;
+           farmerPosRef.current.y = targetPosRef.current.y;
            targetPosRef.current = null;
          }
        }
@@ -1212,15 +1215,11 @@ export default function App() {
        if (moved) {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
-           
-           farmerPosRef.current.walkPhase = (farmerPosRef.current.walkPhase || 0) + 0.2;
-           farmerPosRef.current.bounceY = -Math.abs(Math.sin(farmerPosRef.current.walkPhase)) * 4;
-           
-           setFarmerRenderPos({ ...farmerPosRef.current });
-       } else if (farmerPosRef.current.bounceY !== 0) {
-           farmerPosRef.current.walkPhase = 0;
-           farmerPosRef.current.bounceY = 0;
-           setFarmerRenderPos({ ...farmerPosRef.current });
+           farmerPosRef.current.isWalking = true;
+           setFarmerRenderPos({ x: farmerPosRef.current.x, y: farmerPosRef.current.y, isWalking: true });
+       } else if (farmerPosRef.current.isWalking) {
+           farmerPosRef.current.isWalking = false;
+           setFarmerRenderPos(prev => ({ ...prev, isWalking: false }));
        }
        if (moved) {
          farmerHistoryRef.current.push({ x: farmerPosRef.current.x, y: farmerPosRef.current.y });
@@ -1462,7 +1461,7 @@ export default function App() {
         if (newFixedPlots.length === 3) {
           const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
           setGroundItems(seeds); setHeldItem(null); 
-          farmerPosRef.current = { x: 150, y: 150, bounceY: 0, walkPhase: 0 };
+          farmerPosRef.current = { x: 150, y: 150, isWalking: false };
           setFarmerRenderPos({ ...farmerPosRef.current });
           wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
           setPlantedBeds({}); 
@@ -1977,7 +1976,8 @@ export default function App() {
                        </div>
                     </div>
 
-                    <div className="absolute w-10 h-10 z-30 transition-all duration-75" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y + (farmerRenderPos.bounceY || 0)}px)` }}>
+                    <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)` }}>
+                      <div className={farmerRenderPos.isWalking ? 'farmer-walking' : ''}>
                        <FarmerSprite />
                        {heldItem && (
                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
@@ -1985,6 +1985,7 @@ export default function App() {
                             <span>{heldItem.name}</span>
                          </div>
                        )}
+                      </div>
                     </div>
                  </div>
                  </div>
@@ -2297,6 +2298,8 @@ export default function App() {
         }
 
         .garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
+        @keyframes walk-bounce { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        .farmer-walking { animation: walk-bounce 350ms ease-in-out infinite; }
         @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
         .animate-stir { animation: stir-animation 0.3s infinite linear; }
         @keyframes pour-animation { 0% { transform: rotate(0deg); } 20% { transform: rotate(-45deg); } 80% { transform: rotate(-45deg); } 100% { transform: rotate(0deg); } }
