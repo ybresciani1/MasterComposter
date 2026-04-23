@@ -39,6 +39,7 @@ const SOIL_PROBLEMS = [
     sprite: "🪨",
     x: 30, y: 50,
     description: "The soil is packed too tightly, suffocating roots and blocking water.",
+    hint: "Yikes, that dirt is hard as a rock! We need to poke some holes to let air in and mix in some compost.",
     options: [
       { text: "Aerate with Pitchfork & add Organic Matter", correct: true },
       { text: "Flood it with water until it's mud", correct: false },
@@ -51,6 +52,7 @@ const SOIL_PROBLEMS = [
     sprite: "💨",
     x: 135, y: 50,
     description: "Wind and rain are washing the precious topsoil away!",
+    hint: "The wind and rain are stealing our soil! We should cover it up and give it some roots to hold onto.",
     options: [
       { text: "Remove all plants to clear the area", correct: false },
       { text: "Plant Cover Crops & apply Mulch", correct: true },
@@ -63,6 +65,7 @@ const SOIL_PROBLEMS = [
     sprite: "💧",
     x: 240, y: 50,
     description: "Water pools on the surface. The roots are drowning!",
+    hint: "That's a swamp, not a garden! We need to raise the beds so the water can flow away.",
     options: [
       { text: "Pave over it with concrete", correct: false },
       { text: "Build Raised Beds & improve grading", correct: true },
@@ -1990,7 +1993,7 @@ export default function App() {
 <DialogBox name="Wallace" text={
                    dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
                    dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
-                   dreamStage === 'FIX_PLOTS' ? (activePlot ? `Wallace: ${activePlot.description}` : "Let's fix up this garden before we plant.") :
+                   dreamStage === 'FIX_PLOTS' ? (activePlot ? activePlot.hint : "Let's fix up this garden before we plant.") :
                    "Final stretch! Get those seeds in the right dirt."
                  } hideNext emotion={wallaceEmotion} />
               </div>
