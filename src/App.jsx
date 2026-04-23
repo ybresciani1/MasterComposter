@@ -1368,6 +1368,35 @@ export default function App() {
   const renderTitle = () => (
     <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 relative overflow-hidden">
       
+      {/* Flower Decorations */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Bottom Left */}
+        <div className="absolute bottom-4 left-4 md:left-12 w-10 h-20 md:w-16 md:h-32"><SunflowerSprite /></div>
+        <div className="absolute bottom-2 left-16 md:left-32 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
+        <div className="absolute bottom-12 left-24 md:left-48 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
+        <div className="absolute bottom-20 left-4 md:left-10 w-8 h-16 md:w-12 md:h-24"><LavenderSprite /></div>
+
+        {/* Bottom Right */}
+        <div className="absolute bottom-8 right-6 md:right-16 w-12 h-24 md:w-16 md:h-32"><SunflowerSprite /></div>
+        <div className="absolute bottom-4 right-20 md:right-36 w-8 h-16 md:w-12 md:h-24"><LavenderSprite /></div>
+        <div className="absolute bottom-16 right-28 md:right-48 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
+        <div className="absolute bottom-2 right-4 md:right-8 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
+
+        {/* Top Left */}
+        <div className="absolute top-12 left-8 md:left-16 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
+        <div className="absolute top-24 left-2 md:left-6 w-8 h-12 md:w-12 md:h-16"><ZinniaSprite /></div>
+        <div className="absolute top-8 left-24 md:left-36 w-8 h-12 md:w-12 md:h-16"><MarigoldSprite /></div>
+
+        {/* Top Right */}
+        <div className="absolute top-16 right-10 md:right-20 w-10 h-20 md:w-14 md:h-28"><SunflowerSprite /></div>
+        <div className="absolute top-8 right-24 md:right-40 w-6 h-10 md:w-10 md:h-14"><ZinniaSprite /></div>
+        <div className="absolute top-32 right-4 md:right-12 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
+
+        {/* Middle Edges */}
+        <div className="absolute top-1/2 left-2 md:left-8 w-8 h-12 md:w-12 md:h-16 -translate-y-1/2"><MarigoldSprite /></div>
+        <div className="absolute top-1/3 right-4 md:right-10 w-8 h-16 md:w-10 md:h-20"><LavenderSprite /></div>
+      </div>
+
       {/* Lingering Bugs Overlay */}
       <div className="fixed inset-0 pointer-events-none z-[140] overflow-hidden">
         {lingeringBugs.bees.map(bee => (
