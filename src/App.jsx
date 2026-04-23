@@ -166,6 +166,23 @@ const WallaceFollowerSprite = () => (
   </svg>
 );
 
+const SakuraSprite = () => (
+  <svg viewBox="0 0 10 10" className="w-full h-full drop-shadow-sm opacity-90" shapeRendering="geometricPrecision">
+    <path d="M5,0 C8,0 10,4 5,10 C0,4 2,0 5,0 Z" fill="#f8bbd0" />
+    <path d="M5,2 C7,2 8,4 5,8 C2,4 3,2 5,2 Z" fill="#f48fb1" />
+  </svg>
+);
+
+const WoodlouseSprite = () => (
+  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M2,2 h6 v4 h-6 z" fill="#5d4037" />
+    <path d="M3,1 h4 v1 h-4 z M3,6 h4 v1 h-4 z" fill="#5d4037" />
+    <path d="M4,2 h1 v4 h-1 z M6,2 h1 v4 h-1 z" fill="#3e2723" />
+    <path d="M2,6 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M8,6 h1 v1 h-1 z" fill="#212121" />
+    <path d="M1,3 h1 v2 h-1 z M8,3 h1 v2 h-1 z" fill="#4e342e" />
+  </svg>
+);
+
 const LightningSprite = ({ color = "#ab47bc" }) => (
   <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" shapeRendering="crispEdges">
     <path d="M9,0 h3 v4 h-2 v3 h3 v2 h-5 v7 h-3 v-6 h2 v-2 h-3 v-4 h3 z" fill={color} />
@@ -803,6 +820,52 @@ export default function App() {
   const [lives, setLives] = useState(3);
   const [isChapterSelectOpen, setIsChapterSelectOpen] = useState(false);
 
+  // Title effects
+  const [sakuraClicks, setSakuraClicks] = useState([]);
+  const [bugsClicks, setBugsClicks] = useState([]);
+  const [lingeringBugs, setLingeringBugs] = useState({ bees: [], woodlice: [] });
+
+  const triggerSakura = () => {
+    const id = Date.now();
+    setSakuraClicks(prev => [...prev, id]);
+    setTimeout(() => setSakuraClicks(prev => prev.filter(c => c !== id)), 4000);
+  };
+
+  const triggerBugs = () => {
+    const id = Date.now();
+    setBugsClicks(prev => [...prev, id]);
+    setTimeout(() => setBugsClicks(prev => prev.filter(c => c !== id)), 2000);
+
+    // Add persistent lingering bugs to the background
+    setLingeringBugs(prev => {
+      const newBees = [...prev.bees];
+      for (let i = 0; i < 3; i++) {
+         const anims = ['animate-fly', 'animate-fly-delayed', 'animate-fly-fast'];
+         newBees.push({
+           id: id + 'b' + i,
+           x: Math.random() * 80 + 10,
+           y: Math.random() * 80 + 10,
+           anim: anims[Math.floor(Math.random() * anims.length)]
+         });
+      }
+      
+      const newWoodlice = [...prev.woodlice];
+      for (let i = 0; i < 2; i++) {
+         newWoodlice.push({
+           id: id + 'w' + i,
+           y: Math.random() * 90 + 5,
+           duration: 10 + Math.random() * 15,
+           dir: Math.random() > 0.5 ? 'lr' : 'rl'
+         });
+      }
+      
+      return {
+        bees: newBees.slice(-20), // Cap max bees so it doesn't crash browsers
+        woodlice: newWoodlice.slice(-15) // Cap max woodlice
+      };
+    });
+  };
+
   const audioRef = useRef(null);
   const wowAudioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -1378,12 +1441,88 @@ export default function App() {
 
   // --- RENDERERS ---
   const renderTitle = () => (
-    <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4">
-      <PixelBox className="text-center max-w-lg w-full">
-        <div className="mb-8 mt-4">
-          <h1 className="text-5xl md:text-6xl font-bold mb-2 stardew-title">Master<br/>Composter</h1>
-          <br />
-          <h2 className="text-3xl md:text-4xl mt-2 tracking-[0.2em] stardew-subtitle">VALLEY</h2>
+    <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Lingering Bugs Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-[140] overflow-hidden">
+        {lingeringBugs.bees.map(bee => (
+           <div key={bee.id} className={`absolute ${bee.anim}`} style={{ top: `${bee.y}%`, left: `${bee.x}%` }}>
+              <div className="w-5 h-5"><BeeSprite /></div>
+           </div>
+        ))}
+        {lingeringBugs.woodlice.map(louse => (
+           <div key={louse.id} className={`absolute animate-crawl-${louse.dir}`} style={{ top: `${louse.y}%`, animationDuration: `${louse.duration}s` }}>
+              <div className="w-5 h-4"><WoodlouseSprite /></div>
+           </div>
+        ))}
+      </div>
+
+      {/* Sakura Petals Overlay */}
+      {sakuraClicks.map(id => (
+        <div key={`sakura-cascade-${id}`} className="fixed inset-0 pointer-events-none z-[150]">
+          {[...Array(30)].map((_, i) => (
+            <div key={`petal-${i}`} className="absolute -top-10 animate-sakura-fall" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 1.5}s`,
+              animationDuration: `${2.5 + Math.random() * 2}s`,
+              '--tx': `${(Math.random() - 0.5) * 300}px`
+            }}>
+              <div className="w-4 h-4"><SakuraSprite /></div>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      {/* Bugs Burst Overlay */}
+      {bugsClicks.map(id => (
+        <div key={`bug-burst-${id}`} className="fixed top-[45%] left-1/2 -translate-x-1/2 pointer-events-none z-[150]">
+          {[...Array(15)].map((_, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 100 + Math.random() * 250;
+            const tx = Math.cos(angle) * dist;
+            const ty = Math.sin(angle) * dist;
+            return (
+              <div key={`bee-${i}`} className="absolute animate-bug-burst" style={{
+                '--tx': `${tx}px`, '--ty': `${ty}px`, '--rot': '0rad', animationDuration: `${0.8 + Math.random()}s`
+              }}>
+                <div className="w-5 h-5"><BeeSprite /></div>
+              </div>
+            );
+          })}
+          {[...Array(12)].map((_, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 80 + Math.random() * 150;
+            const tx = Math.cos(angle) * dist;
+            const ty = Math.sin(angle) * dist;
+            return (
+              <div key={`louse-${i}`} className="absolute animate-bug-burst" style={{
+                '--tx': `${tx}px`, '--ty': `${ty}px`, '--rot': `${Math.atan2(ty, tx)}rad`, animationDuration: `${1.2 + Math.random() * 0.8}s`
+              }}>
+                <div className="w-4 h-3"><WoodlouseSprite /></div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      <PixelBox className="text-center max-w-lg w-full relative z-10">
+        <div className="mb-8 mt-4 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold mb-2">
+            <span 
+               className="stardew-title cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform inline-block select-none" 
+               onClick={triggerSakura}
+            >
+              Master
+            </span>
+            <br />
+            <span 
+               className="stardew-subtitle text-3xl md:text-4xl mt-2 tracking-[0.2em] cursor-pointer hover:scale-110 hover:rotate-6 transition-transform inline-block select-none" 
+               onClick={triggerBugs}
+            >
+              COMPOSTER
+            </span>
+          </h1>
+          <h2 className="text-2xl mt-2 tracking-[0.4em] font-bold text-white drop-shadow-md">VALLEY</h2>
         </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
@@ -1968,9 +2107,6 @@ export default function App() {
             -3px  3px 0 #5d4037, 
             -3px  0   0 #5d4037,
              0    8px 0 #3e2723;
-          transform: rotate(-2deg);
-          display: inline-block;
-          line-height: 1.1;
         }
 
         .stardew-subtitle {
@@ -1986,8 +2122,6 @@ export default function App() {
             -2px  2px 0 #33691e, 
             -2px  0   0 #33691e,
              0    5px 0 #1b5e20;
-          transform: rotate(1deg);
-          display: inline-block;
         }
 
         .garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
@@ -2130,6 +2264,33 @@ export default function App() {
           100% { transform: translate(0px, 0px) scaleX(1); }
         }
         .animate-frog { animation: frog-action 14s infinite ease-in-out; }
+
+        /* NEW ANIMATIONS FOR TITLE SCREEN */
+        @keyframes sakura-fall {
+          0% { transform: translateY(-20px) translateX(0) rotate(0deg) scale(0.5); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(110vh) translateX(var(--tx)) rotate(720deg) scale(1); opacity: 0; }
+        }
+        .animate-sakura-fall { animation: sakura-fall linear forwards; }
+
+        @keyframes bug-burst {
+          0% { transform: translate(0, 0) scale(0) rotate(var(--rot)); opacity: 1; }
+          20% { transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2)) scale(1.5) rotate(var(--rot)); opacity: 1; }
+          100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
+        }
+        .animate-bug-burst { animation: bug-burst ease-out forwards; }
+
+        @keyframes crawl-lr {
+          0% { left: -10%; transform: scaleX(-1); }
+          100% { left: 110%; transform: scaleX(-1); }
+        }
+        @keyframes crawl-rl {
+          0% { left: 110%; transform: scaleX(1); }
+          100% { left: -10%; transform: scaleX(1); }
+        }
+        .animate-crawl-lr { animation: crawl-lr linear infinite; }
+        .animate-crawl-rl { animation: crawl-rl linear infinite; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
