@@ -273,6 +273,53 @@ const InstructorPortrait = () => (
   <img src={`${BASE}/Teacher.png`} alt="Instructor" className="w-full h-full object-cover" />
 );
 
+const StudentBlondeSprite = () => (
+  <svg viewBox="0 0 16 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,13 h8 v5 h-8 z" fill="#4caf50" />
+    <path d="M6,10 h4 v3 h-4 z" fill="#ffccaa" />
+    <path d="M4,5 h8 v6 h-8 z" fill="#ffccaa" />
+    <path d="M5,7 h2 v2 h-2 z M9,7 h2 v2 h-2 z" fill="#ffffff" />
+    <path d="M6,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z" fill="#000000" />
+    <path d="M3,2 h10 v4 h-10 z" fill="#fdd835" />
+    <path d="M2,4 h1 v4 h-1 z M13,4 h1 v4 h-1 z" fill="#fdd835" />
+    <path d="M4,1 h8 v1 h-8 z" fill="#fdd835" />
+    <path d="M4,6 h3 v1 h-3 z M10,6 h2 v1 h-2 z M13,5 h1 v2 h-1 z M2,5 h1 v2 h-1 z" fill="#fbc02d" />
+  </svg>
+);
+
+const StudentBrownHairSprite = () => (
+  <svg viewBox="0 0 16 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,13 h8 v5 h-8 z" fill="#ab47bc" />
+    <path d="M6,10 h4 v3 h-4 z" fill="#ffb74d" />
+    <path d="M4,5 h8 v6 h-8 z" fill="#ffb74d" />
+    <path d="M5,7 h2 v2 h-2 z M9,7 h2 v2 h-2 z" fill="#ffffff" />
+    <path d="M6,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z" fill="#4e342e" />
+    <path d="M3,2 h10 v4 h-10 z M2,4 h1 v7 h-1 z M13,4 h1 v7 h-1 z" fill="#6d4c41" />
+    <path d="M4,1 h8 v1 h-8 z M3,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z" fill="#6d4c41" />
+    <path d="M4,6 h1 v2 h-1 z M11,6 h1 v2 h-1 z" fill="#5d4037" />
+  </svg>
+);
+
+const StudentPonytailSprite = () => (
+  <svg viewBox="0 0 16 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M13,5 h3 v6 h-3 z" fill="#111111" />
+    <path d="M14,11 h2 v3 h-2 z" fill="#212121" />
+    <path d="M4,13 h8 v5 h-8 z" fill="#ff4081" />
+    <path d="M6,10 h4 v3 h-4 z" fill="#ffe0b2" />
+    <path d="M4,5 h8 v6 h-8 z" fill="#ffe0b2" />
+    <path d="M5,7 h2 v3 h-2 z M9,7 h2 v3 h-2 z" fill="#ffffff" />
+    <path d="M5,8 h2 v2 h-2 z M9,8 h2 v2 h-2 z" fill="#81d4fa" /> 
+    <path d="M6,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z" fill="#01579b" /> 
+    <path d="M5,7 h1 v1 h-1 z M10,7 h1 v1 h-1 z" fill="#ffffff" /> 
+    <path d="M4,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z" fill="#ff8a80" opacity="0.6"/>
+    <path d="M3,2 h10 v3 h-10 z M2,4 h1 v4 h-1 z" fill="#212121" />
+    <path d="M12,4 h1 v4 h-1 z" fill="#212121" />
+    <path d="M4,1 h8 v1 h-8 z" fill="#212121" />
+    <path d="M4,5 h8 v1 h-8 z" fill="#212121" />
+    <path d="M12,4 h2 v2 h-2 z" fill="#ffeb3b" />
+  </svg>
+);
+
 const StudentPortrait = () => {
   const [imgIdx, setImgIdx] = useState(0);
   const urls = [
@@ -1630,9 +1677,19 @@ export default function App() {
       <div key="scene-class-intro" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
          <div className="w-full max-w-[500px] h-[260px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-4 md:mb-24">
             <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
-            <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
-              <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
-              <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
+            <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center overflow-hidden">
+              <div className="absolute top-2 left-4 flex flex-col items-center scale-90 opacity-90">
+                 <div className="w-12 h-12 relative z-10"><StudentBlondeSprite /></div>
+                 <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-2 top-1 w-4 h-6 bg-white opacity-80 rotate-6"></div></div>
+              </div>
+              <div className="absolute top-4 right-8 flex flex-col items-center scale-90 opacity-90">
+                 <div className="w-12 h-12 relative z-10"><StudentBrownHairSprite /></div>
+                 <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute right-2 top-2 w-5 h-5 bg-[#fdd835] opacity-80 -rotate-12"></div></div>
+              </div>
+              <div className="absolute top-1 right-[35%] flex flex-col items-center scale-[0.85] opacity-80">
+                 <div className="w-12 h-12 relative z-10"><StudentPonytailSprite /></div>
+                 <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-4 top-1 w-6 h-4 bg-pink-200 opacity-80 rotate-12"></div></div>
+              </div>
             </div>
             <div className="absolute top-[100px] left-1/4 w-10 h-12"><InstructorSprite /></div>
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
@@ -2105,9 +2162,19 @@ export default function App() {
         <div key="scene-wakeup-classroom" className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-mono">
            <div className="w-full max-w-[500px] h-[260px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-4 md:mb-24">
               <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
-              <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center">
-                <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 left-10 opacity-70"></div>
-                <div className="w-16 h-8 bg-[#4e342e] border-2 border-[#3e2723] absolute top-4 right-10 opacity-70"></div>
+              <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center overflow-hidden">
+                <div className="absolute top-2 left-4 flex flex-col items-center scale-90 opacity-90">
+                   <div className="w-12 h-12 relative z-10"><StudentBlondeSprite /></div>
+                   <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-2 top-1 w-4 h-6 bg-white opacity-80 rotate-6"></div></div>
+                </div>
+                <div className="absolute top-4 right-8 flex flex-col items-center scale-90 opacity-90">
+                   <div className="w-12 h-12 relative z-10"><StudentBrownHairSprite /></div>
+                   <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute right-2 top-2 w-5 h-5 bg-[#fdd835] opacity-80 -rotate-12"></div></div>
+                </div>
+                <div className="absolute top-1 right-[35%] flex flex-col items-center scale-[0.85] opacity-80">
+                   <div className="w-12 h-12 relative z-10"><StudentPonytailSprite /></div>
+                   <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-4 top-1 w-6 h-4 bg-pink-200 opacity-80 rotate-12"></div></div>
+                </div>
               </div>
               <div className="absolute top-[100px] left-1/4 w-10 h-12 relative">
                   <InstructorSprite />
