@@ -1470,36 +1470,36 @@ export default function App() {
               {/* Lightning striking silo */}
               <div className="absolute bottom-[16.5rem] left-[8.5rem] w-12 h-24 z-10 animate-lightning"><LightningSprite color="#ab47bc" /></div>
               
-              {/* Silo Fires Spreading */}
-              <div className="absolute bottom-[15.5rem] left-[8.5rem] w-10 h-10 z-20 animate-spread" style={{animationDelay: '2.8s'}}>
+              {/* Silo Fires Spreading (z-0 to stay behind dialog container) */}
+              <div className="absolute bottom-[15.5rem] left-[8.5rem] w-10 h-10 z-0 animate-spread" style={{animationDelay: '2.8s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute bottom-[16.5rem] left-[9rem] w-8 h-8 z-20 animate-spread" style={{animationDelay: '3.2s'}}>
+              <div className="absolute bottom-[16.5rem] left-[9rem] w-8 h-8 z-0 animate-spread" style={{animationDelay: '3.2s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute bottom-[14.5rem] left-[8rem] w-12 h-12 z-20 animate-spread" style={{animationDelay: '3.8s'}}>
+              <div className="absolute bottom-[14.5rem] left-[8rem] w-12 h-12 z-0 animate-spread" style={{animationDelay: '3.8s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute bottom-[14rem] left-[9.5rem] w-10 h-10 z-20 animate-spread" style={{animationDelay: '4.5s'}}>
-                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
-              </div>
-
-              {/* Large Fire Off Plot */}
-              <div className="absolute top-40 right-4 w-32 h-32 z-20 animate-spread" style={{animationDelay: '0.5s'}}>
+              <div className="absolute bottom-[14rem] left-[9.5rem] w-10 h-10 z-0 animate-spread" style={{animationDelay: '4.5s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
 
-              {/* Other Spreading Fires around the farm */}
-              <div className="absolute top-[35%] left-[25%] w-16 h-16 z-20 animate-spread" style={{animationDelay: '1.2s'}}>
+              {/* Large Fire Off Plot (z-0 to stay behind dialog container) */}
+              <div className="absolute top-40 right-4 w-32 h-32 z-0 animate-spread" style={{animationDelay: '0.5s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute bottom-[20%] right-[35%] w-12 h-12 z-20 animate-spread" style={{animationDelay: '2.5s'}}>
+
+              {/* Other Spreading Fires around the farm (z-0 to stay behind dialog container) */}
+              <div className="absolute top-[35%] left-[25%] w-16 h-16 z-0 animate-spread" style={{animationDelay: '1.2s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute top-[50%] left-[8%] w-14 h-14 z-20 animate-spread" style={{animationDelay: '4.0s'}}>
+              <div className="absolute bottom-[20%] right-[35%] w-12 h-12 z-0 animate-spread" style={{animationDelay: '2.5s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
-              <div className="absolute bottom-[40%] right-[8%] w-20 h-20 z-20 animate-spread" style={{animationDelay: '5.0s'}}>
+              <div className="absolute top-[50%] left-[8%] w-14 h-14 z-0 animate-spread" style={{animationDelay: '4.0s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[40%] right-[8%] w-20 h-20 z-0 animate-spread" style={{animationDelay: '5.0s'}}>
                  <div className="w-full h-full animate-flicker"><FireSprite /></div>
               </div>
             </>
@@ -1556,7 +1556,9 @@ export default function App() {
               </div>
             ))}
           </div>
-          <div className="max-w-3xl w-full mt-8 relative z-10 pb-48">
+          
+          {/* Main content wrapper safely raised to z-40 so it stays over background fires */}
+          <div className="max-w-3xl w-full mt-8 relative z-40 pb-48">
             <div className="flex justify-between items-center mb-3">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
                {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
