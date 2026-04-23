@@ -81,59 +81,29 @@ const PLANTS = [
 // --- REUSABLE UI COMPONENTS ---
 const FarmerSprite = () => (
   <svg viewBox="0 0 16 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Back hair */}
     <path d="M5,5 h6 v3 h-6 z" fill="#bf360c" />
-
-    {/* Arms */}
     <path d="M2,9 h3 v3 h-3 z M11,9 h3 v3 h-3 z" fill="#e53935" />
-    {/* Hands */}
     <path d="M2,12 h2 v2 h-2 z M12,12 h2 v2 h-2 z" fill="#ffccaa" />
-
-    {/* Overalls - back layer */}
     <path d="M5,9 h6 v6 h-6 z" fill="#1e88e5" />
-    
-    {/* Legs */}
     <path d="M5,15 h2 v2 h-2 z M9,15 h2 v2 h-2 z" fill="#1e88e5" />
-    {/* Boots */}
     <path d="M4,17 h3 v1 h-3 z M9,17 h3 v1 h-3 z" fill="#8b5a2b" />
-    {/* Boot detail */}
     <path d="M4,16 h1 v1 h-1 z M11,16 h1 v1 h-1 z" fill="#5d4037" />
-
-    {/* Overall Straps & Chest */}
     <path d="M5,11 h6 v4 h-6 z" fill="#1e88e5" />
     <path d="M5,9 h1 v2 h-1 z M10,9 h1 v2 h-1 z" fill="#1565c0" />
     <path d="M5,10 h1 v1 h-1 z M10,10 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Pocket */}
     <path d="M7,12 h2 v2 h-2 z" fill="#1565c0" />
-
-    {/* Face */}
     <path d="M5,5 h6 v4 h-6 z" fill="#ffccaa" />
-    {/* Eyes */}
     <path d="M6,6 h1 v1 h-1 z M9,6 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Blush */}
     <path d="M5,7 h1 v1 h-1 z M10,7 h1 v1 h-1 z" fill="#ff8a80" />
-
-    {/* Hat Crown (Pink like Wallace) */}
     <path d="M4,1 h8 v3 h-8 z" fill="#f48fb1" />
-    {/* Hat Band */}
     <path d="M4,3 h8 v1 h-8 z" fill="#d81b60" />
-    {/* Hat Brim */}
     <path d="M2,4 h12 v1 h-12 z" fill="#f48fb1" />
-    
-    {/* Pink Flower */}
     <path d="M3,2 h1 v1 h-1 z M5,2 h1 v1 h-1 z M4,1 h1 v1 h-1 z M4,3 h1 v1 h-1 z" fill="#ff4081" />
     <path d="M4,2 h1 v1 h-1 z" fill="#fdd835" />
-
-    {/* Hair - Bangs */}
     <path d="M5,4 h6 v1 h-6 z" fill="#d84315" />
-    
-    {/* Redhead Braids (Left & Right) */}
     <path d="M4,5 h1 v8 h-1 z M11,5 h1 v8 h-1 z" fill="#d84315" />
-    {/* Braid Textures */}
     <path d="M4,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M4,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M4,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z" fill="#bf360c" />
-    {/* Hair Ties */}
     <path d="M3,12 h3 v1 h-3 z M10,12 h3 v1 h-3 z" fill="#4caf50" />
-    {/* Braid Ends */}
     <path d="M4,13 h1 v2 h-1 z M11,13 h1 v2 h-1 z" fill="#d84315" />
   </svg>
 );
@@ -149,18 +119,12 @@ const WormSprite = () => (
 
 const WallaceFollowerSprite = () => (
   <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Straw hat crown */}
     <path d="M12,6 h4 v4 h-4 z" fill="#c8960c" />
-    {/* Hat band */}
     <path d="M12,9 h4 v1 h-4 z" fill="#5d4037" />
-    {/* Straw hat brim */}
     <path d="M10,10 h6 v1 h-6 z" fill="#e8c44a" />
-    {/* Head — same as WormSprite, shifted down 4 */}
     <path d="M12,10 h4 v4 h-4 z" fill="#f48fb1" />
-    {/* Eyes: white sclera + dark pupils, clearly two distinct dots */}
     <path d="M12,11 h2 v2 h-2 z M14,11 h2 v2 h-2 z" fill="white" />
     <path d="M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Body humps — same as WormSprite, shifted down 4 */}
     <path d="M2,15 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
     <path d="M4,13 h1 v2 h-1 z M7,15 h1 v1 h-1 z M10,12 h1 v3 h-1 z M13,13 h1 v1 h-1 z" fill="#d81b60" />
   </svg>
@@ -175,11 +139,20 @@ const SakuraSprite = () => (
 
 const WoodlouseSprite = () => (
   <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M2,2 h6 v4 h-6 z" fill="#5d4037" />
-    <path d="M3,1 h4 v1 h-4 z M3,6 h4 v1 h-4 z" fill="#5d4037" />
-    <path d="M4,2 h1 v4 h-1 z M6,2 h1 v4 h-1 z" fill="#3e2723" />
-    <path d="M2,6 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M8,6 h1 v1 h-1 z" fill="#212121" />
-    <path d="M1,3 h1 v2 h-1 z M8,3 h1 v2 h-1 z" fill="#4e342e" />
+    <path d="M2,2 h6 v4 h-6 z" fill="#d1c4e9" />
+    <path d="M3,1 h4 v1 h-4 z M3,6 h4 v1 h-4 z" fill="#b39ddb" />
+    <path d="M4,2 h1 v4 h-1 z M6,2 h1 v4 h-1 z" fill="#9575cd" />
+    <path d="M2,6 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M8,6 h1 v1 h-1 z" fill="#512da8" />
+    <path d="M1,3 h1 v2 h-1 z M8,3 h1 v2 h-1 z" fill="#b39ddb" />
+  </svg>
+);
+
+const RolledWoodlouseSprite = () => (
+  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M2,1 h4 v6 h-4 z" fill="#d1c4e9" />
+    <path d="M1,2 h6 v4 h-6 z" fill="#d1c4e9" />
+    <path d="M3,1 h2 v6 h-2 z" fill="#b39ddb" />
+    <path d="M2,3 h4 v1 h-4 z M2,5 h4 v1 h-4 z" fill="#9575cd" />
   </svg>
 );
 
@@ -254,19 +227,12 @@ const HammerSprite = () => (
 
 const InstructorSprite = () => (
   <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hair */}
     <path d="M2,1 h6 v2 h-6 z M1,2 h1 v2 h-1 z M8,2 h1 v2 h-1 z" fill="#616161" />
-    {/* Face */}
     <path d="M3,3 h4 v3 h-4 z M2,4 h1 v2 h-1 z M7,4 h1 v2 h-1 z" fill="#ffccaa" />
-    {/* Glasses/Eyes */}
     <path d="M3,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill="#000000" />
-    {/* Suit Jacket */}
     <path d="M2,6 h6 v4 h-6 z" fill="#3949ab" />
-    {/* Shirt */}
     <path d="M4,6 h2 v3 h-2 z" fill="#ffffff" />
-    {/* Tie */}
     <path d="M4,7 h1 v2 h-1 z" fill="#d32f2f" />
-    {/* Legs */}
     <path d="M3,10 h1 v2 h-1 z M6,10 h1 v2 h-1 z" fill="#212121" />
   </svg>
 );
@@ -294,67 +260,47 @@ const StudentPortrait = () => {
 
 const CornSprite = () => (
   <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stalk */}
     <path d="M5,10 h2 v6 h-2 z" fill="#8b5a2b" />
-    {/* Leaves wrapping */}
     <path d="M2,6 h2 v6 h-2 z" fill="#4caf50" />
     <path d="M8,6 h2 v6 h-2 z" fill="#388e3c" />
     <path d="M3,4 h1 v5 h-1 z M8,5 h1 v4 h-1 z" fill="#66bb6a" />
-    {/* Cob body */}
     <path d="M4,1 h4 v9 h-4 z" fill="#ffeb3b" />
-    {/* Kernel rows */}
     <path d="M4,2 h1 v1 h-1 z M6,2 h1 v1 h-1 z M4,4 h1 v1 h-1 z M6,4 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M4,8 h1 v1 h-1 z M6,8 h1 v1 h-1 z" fill="#f9a825" />
     <path d="M5,3 h1 v1 h-1 z M5,5 h1 v1 h-1 z M5,7 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Silk top */}
     <path d="M5,0 h1 v1 h-1 z M4,0 h1 v2 h-1 z M6,0 h1 v2 h-1 z" fill="#ffe082" />
-    {/* Highlight */}
     <path d="M4,1 h1 v4 h-1 z" fill="#fff176" opacity="0.4" />
   </svg>
 );
 
 const CarrotSprite = () => (
   <svg viewBox="0 0 10 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Leafy tops */}
     <path d="M4,0 h1 v3 h-1 z" fill="#4caf50" />
     <path d="M5,0 h1 v4 h-1 z" fill="#388e3c" />
     <path d="M3,1 h1 v2 h-1 z M6,1 h1 v2 h-1 z" fill="#66bb6a" />
     <path d="M2,2 h1 v1 h-1 z M7,2 h1 v1 h-1 z" fill="#4caf50" />
-    {/* Carrot body */}
     <path d="M3,4 h4 v2 h-4 z M3,6 h3 v2 h-3 z M3,8 h2 v2 h-2 z M3,10 h1 v2 h-1 z" fill="#ff9800" />
-    {/* Highlight stripe */}
     <path d="M3,4 h1 v8 h-1 z" fill="#ffb74d" opacity="0.6" />
-    {/* Ridge lines */}
     <path d="M3,6 h3 v1 h-3 z M3,9 h2 v1 h-2 z" fill="#e65100" opacity="0.4" />
-    {/* Tip */}
     <path d="M3,12 h1 v2 h-1 z" fill="#ef6c00" />
   </svg>
 );
 
 const MelonSprite = () => (
   <svg viewBox="0 0 14 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem */}
     <path d="M6,0 h2 v2 h-2 z" fill="#8b5a2b" />
     <path d="M5,1 h1 v1 h-1 z M8,1 h1 v1 h-1 z" fill="#6d4c41" />
-    {/* Melon body */}
     <path d="M2,2 h10 v10 h-10 z" fill="#4caf50" />
-    {/* Rounded corners */}
     <path d="M3,2 h8 v1 h-8 z M2,3 h1 v8 h-1 z M11,3 h1 v8 h-1 z M3,11 h8 v1 h-8 z" fill="#43a047" />
-    {/* Stripe pattern */}
     <path d="M4,2 h1 v10 h-1 z M7,2 h1 v10 h-1 z M10,2 h1 v10 h-1 z" fill="#2e7d32" />
-    {/* Light stripes between */}
     <path d="M5,2 h2 v10 h-2 z M8,2 h2 v10 h-2 z" fill="#66bb6a" />
-    {/* Highlight */}
     <path d="M3,3 h2 v3 h-2 z" fill="#a5d6a7" opacity="0.5" />
-    {/* Inner flesh peek at bottom */}
     <path d="M4,11 h6 v1 h-6 z" fill="#ff8f00" opacity="0.3" />
   </svg>
 );
 
 const TreeSprite = () => (
   <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Trunk */}
     <path d="M7,16 h2 v4 h-2 z" fill="#5d4037" />
-    {/* Leaves layers */}
     <path d="M7,1 h2 v2 h-2 z M5,3 h6 v3 h-6 z M3,6 h10 v4 h-10 z M1,10 h14 v6 h-14 z" fill="#2e7d32" />
     <path d="M6,1 h1 v2 h-1 z M4,3 h2 v3 h-2 z M2,6 h2 v4 h-2 z M0,10 h2 v6 h-2 z" fill="#388e3c" />
   </svg>
@@ -362,49 +308,36 @@ const TreeSprite = () => (
 
 const CowSprite = () => (
   <svg viewBox="0 0 24 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Legs */}
     <path d="M4,12 h2 v4 h-2 z M8,12 h2 v4 h-2 z M16,12 h2 v4 h-2 z M20,12 h2 v4 h-2 z" fill="#e0e0e0" />
     <path d="M4,15 h2 v1 h-2 z M8,15 h2 v1 h-2 z M16,15 h2 v1 h-2 z M20,15 h2 v1 h-2 z" fill="#212121" />
-    {/* Body */}
     <path d="M3,4 h19 v8 h-19 z" fill="#ffffff" />
-    {/* Spots */}
     <path d="M8,4 h4 v3 h-4 z M10,7 h3 v3 h-3 z M16,5 h4 v4 h-4 z M5,9 h2 v2 h-2 z" fill="#212121" />
-    {/* Tail */}
     <path d="M22,5 h1 v4 h-1 z M22,9 h1 v2 h-1 z" fill="#e0e0e0" />
     <path d="M22,11 h1 v1 h-1 z" fill="#212121" />
-    {/* Head */}
     <path d="M1,2 h5 v6 h-5 z" fill="#ffffff" />
-    <path d="M1,6 h5 v2 h-5 z" fill="#f48fb1" /> {/* Snout */}
-    <path d="M2,3 h1 v1 h-1 z M4,3 h1 v1 h-1 z" fill="#212121" /> {/* Eyes */}
-    <path d="M2,1 h1 v1 h-1 z M4,1 h1 v1 h-1 z" fill="#9e9e9e" /> {/* Horns */}
+    <path d="M1,6 h5 v2 h-5 z" fill="#f48fb1" /> 
+    <path d="M2,3 h1 v1 h-1 z M4,3 h1 v1 h-1 z" fill="#212121" /> 
+    <path d="M2,1 h1 v1 h-1 z M4,1 h1 v1 h-1 z" fill="#9e9e9e" /> 
   </svg>
 );
 
 const PigSprite = () => (
   <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Legs */}
     <path d="M2,8 h2 v4 h-2 z M5,8 h2 v4 h-2 z M9,8 h2 v4 h-2 z M12,8 h2 v4 h-2 z" fill="#f06292" />
-    {/* Body */}
     <path d="M1,4 h13 v6 h-13 z" fill="#f48fb1" />
-    {/* Head */}
     <path d="M13,3 h3 v5 h-3 z" fill="#f48fb1" />
-    <path d="M14,5 h2 v2 h-2 z" fill="#ec407a" /> {/* Snout */}
-    <path d="M14,4 h1 v1 h-1 z" fill="#212121" /> {/* Eye */}
-    <path d="M13,2 h1 v1 h-1 z M15,2 h1 v1 h-1 z" fill="#f06292" /> {/* Ears */}
-    {/* Tail */}
+    <path d="M14,5 h2 v2 h-2 z" fill="#ec407a" /> 
+    <path d="M14,4 h1 v1 h-1 z" fill="#212121" /> 
+    <path d="M13,2 h1 v1 h-1 z M15,2 h1 v1 h-1 z" fill="#f06292" /> 
     <path d="M0,5 h1 v1 h-1 z" fill="#f06292" />
   </svg>
 );
 
 const SunflowerSprite = () => (
   <svg viewBox="0 0 12 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem */}
     <path d="M5,10 h2 v14 h-2 z" fill="#4caf50" />
-    {/* Leaves */}
     <path d="M3,14 h2 v1 h-2 z M7,17 h2 v1 h-2 z" fill="#388e3c" />
-    {/* Petals */}
     <path d="M4,1 h4 v8 h-4 z M1,4 h10 v2 h-10 z M2,2 h8 v6 h-8 z" fill="#ffeb3b" />
-    {/* Center */}
     <path d="M4,4 h4 v2 h-4 z M5,3 h2 v4 h-2 z" fill="#5d4037" />
   </svg>
 );
@@ -430,7 +363,7 @@ const LavenderSprite = () => (
   <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M4,8 h2 v12 h-2 z" fill="#4caf50" />
     <path d="M3,2 h4 v6 h-4 z M4,1 h2 v8 h-2 z" fill="#ab47bc" />
-    <path d="M2,12 h2 v1 h-2 z M6,14 h2 v1 h-2 z" fill="#81c784" /> {/* Leaves */}
+    <path d="M2,12 h2 v1 h-2 z M6,14 h2 v1 h-2 z" fill="#81c784" />
   </svg>
 );
 
@@ -445,9 +378,9 @@ const ChickenSprite = () => (
     <path d="M4,8 h1 v2 h-1 z M7,8 h1 v2 h-1 z" fill="#fbc02d" />
     <path d="M2,4 h6 v4 h-6 z" fill="#ffffff" />
     <path d="M7,2 h2 v2 h-2 z" fill="#ffffff" />
-    <path d="M8,1 h1 v1 h-1 z M7,0 h1 v1 h-1 z" fill="#e53935" /> {/* Comb */}
-    <path d="M9,3 h1 v1 h-1 z" fill="#fbc02d" /> {/* Beak */}
-    <path d="M1,3 h1 v2 h-1 z" fill="#ffffff" /> {/* Tail */}
+    <path d="M8,1 h1 v1 h-1 z M7,0 h1 v1 h-1 z" fill="#e53935" /> 
+    <path d="M9,3 h1 v1 h-1 z" fill="#fbc02d" /> 
+    <path d="M1,3 h1 v2 h-1 z" fill="#ffffff" /> 
   </svg>
 );
 
@@ -456,19 +389,19 @@ const RoosterSprite = () => (
     <path d="M5,10 h1 v2 h-1 z M8,10 h1 v2 h-1 z" fill="#fbc02d" />
     <path d="M3,5 h6 v5 h-6 z" fill="#8d6e63" />
     <path d="M8,3 h2 v3 h-2 z" fill="#a1887f" />
-    <path d="M8,0 h2 v2 h-2 z M10,1 h1 v2 h-1 z" fill="#e53935" /> {/* Comb */}
-    <path d="M9,6 h1 v2 h-1 z" fill="#e53935" /> {/* Wattle */}
-    <path d="M10,4 h1 v1 h-1 z" fill="#fbc02d" /> {/* Beak */}
-    <path d="M1,3 h2 v6 h-2 z M0,4 h1 v4 h-1 z" fill="#1e88e5" /> {/* Tail */}
-    <path d="M2,5 h1 v2 h-1 z" fill="#43a047" /> {/* Tail accent */}
+    <path d="M8,0 h2 v2 h-2 z M10,1 h1 v2 h-1 z" fill="#e53935" /> 
+    <path d="M9,6 h1 v2 h-1 z" fill="#e53935" /> 
+    <path d="M10,4 h1 v1 h-1 z" fill="#fbc02d" /> 
+    <path d="M1,3 h2 v6 h-2 z M0,4 h1 v4 h-1 z" fill="#1e88e5" /> 
+    <path d="M2,5 h1 v2 h-1 z" fill="#43a047" /> 
   </svg>
 );
 
 const ChickSprite = () => (
   <svg viewBox="0 0 6 6" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M1,2 h4 v3 h-4 z" fill="#ffeb3b" />
-    <path d="M5,3 h1 v1 h-1 z" fill="#f57f17" /> {/* Beak */}
-    <path d="M2,5 h1 v1 h-1 z M4,5 h1 v1 h-1 z" fill="#f57f17" /> {/* Legs */}
+    <path d="M5,3 h1 v1 h-1 z" fill="#f57f17" /> 
+    <path d="M2,5 h1 v1 h-1 z M4,5 h1 v1 h-1 z" fill="#f57f17" /> 
   </svg>
 );
 
@@ -476,28 +409,28 @@ const BeeSprite = () => (
   <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
     <path d="M2,4 h4 v2 h-4 z" fill="#ffeb3b" />
     <path d="M3,4 h1 v2 h-1 z M5,4 h1 v2 h-1 z" fill="#212121" />
-    <path d="M3,2 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/> {/* Wings */}
+    <path d="M3,2 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/> 
   </svg>
 );
 
 const SheepSprite = () => (
   <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z" fill="#212121" /> {/* Legs */}
-    <path d="M1,2 h12 v8 h-12 z M0,4 h14 v4 h-14 z" fill="#f5f5f5" /> {/* Wool */}
-    <path d="M12,3 h3 v3 h-3 z" fill="#212121" /> {/* Face */}
-    <path d="M13,3 h1 v1 h-1 z" fill="#ffffff" /> {/* Eye */}
+    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z" fill="#212121" /> 
+    <path d="M1,2 h12 v8 h-12 z M0,4 h14 v4 h-14 z" fill="#f5f5f5" /> 
+    <path d="M12,3 h3 v3 h-3 z" fill="#212121" /> 
+    <path d="M13,3 h1 v1 h-1 z" fill="#ffffff" /> 
   </svg>
 );
 
 const GoatSprite = () => (
   <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z M14,8 h2 v4 h-2 z" fill="#9e9e9e" /> {/* Legs */}
+    <path d="M2,8 h2 v4 h-2 z M10,8 h2 v4 h-2 z M14,8 h2 v4 h-2 z" fill="#9e9e9e" /> 
     <path d="M3,10 h1 v4 h-1 z M6,10 h1 v4 h-1 z M10,10 h1 v4 h-1 z M13,10 h1 v4 h-1 z" fill="#757575" />
-    <path d="M2,5 h10 v5 h-10 z" fill="#e0e0e0" /> {/* Body */}
-    <path d="M11,3 h3 v4 h-3 z" fill="#e0e0e0" /> {/* Head */}
-    <path d="M14,4 h2 v2 h-2 z" fill="#e0e0e0" /> {/* Snout */}
-    <path d="M12,1 h1 v2 h-1 z M14,1 h1 v2 h-1 z" fill="#9e9e9e" /> {/* Horns */}
-    <path d="M13,7 h1 v2 h-1 z" fill="#bdbdbd" /> {/* Beard */}
+    <path d="M2,5 h10 v5 h-10 z" fill="#e0e0e0" /> 
+    <path d="M11,3 h3 v4 h-3 z" fill="#e0e0e0" /> 
+    <path d="M14,4 h2 v2 h-2 z" fill="#e0e0e0" /> 
+    <path d="M12,1 h1 v2 h-1 z M14,1 h1 v2 h-1 z" fill="#9e9e9e" /> 
+    <path d="M13,7 h1 v2 h-1 z" fill="#bdbdbd" /> 
   </svg>
 );
 
@@ -506,13 +439,9 @@ const PondSprite = () => (
     <path d="M4,4 h32 v12 h-32 z" fill="#4fc3f7" opacity="0.8"/>
     <path d="M2,6 h36 v8 h-36 z" fill="#4fc3f7" opacity="0.8"/>
     <path d="M6,2 h28 v16 h-28 z" fill="#4fc3f7" opacity="0.8"/>
-    {/* Lilypad */}
     <path d="M10,8 h4 v2 h-4 z M11,7 h2 v4 h-2 z" fill="#4caf50" />
-    <path d="M12,8 h1 v1 h-1 z" fill="#4fc3f7" /> {/* Lilypad cut */}
-    {/* Water lines */}
+    <path d="M12,8 h1 v1 h-1 z" fill="#4fc3f7" /> 
     <path d="M16,10 h6 v1 h-6 z M24,14 h4 v1 h-4 z" fill="#81d4fa" />
-    
-    {/* Ambient splashes/ripples */}
     <g className="animate-pond-ripple-1">
        <path d="M20,12 h4 v1 h-4 z M21,11 h2 v1 h-2 z" fill="#e1f5fe" opacity="0.7"/>
     </g>
@@ -529,15 +458,15 @@ const FrogSprite = () => (
   <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
     <g className="frog-sit">
        <path d="M4,6 h8 v4 h-8 z" fill="#4caf50" />
-       <path d="M5,4 h2 v2 h-2 z M9,4 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes */}
-       <path d="M5,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill="#212121" /> {/* Pupils on left side of eyes */}
+       <path d="M5,4 h2 v2 h-2 z M9,4 h2 v2 h-2 z" fill="#4caf50" />
+       <path d="M5,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill="#212121" />
        <path d="M3,8 h2 v2 h-2 z M11,8 h2 v2 h-2 z" fill="#388e3c" />
     </g>
     <g className="frog-leap">
        <path d="M4,4 h8 v4 h-8 z" fill="#4caf50" />
-       <path d="M4,2 h2 v2 h-2 z M8,2 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes shifted left */}
-       <path d="M4,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z" fill="#212121" /> {/* Pupils on left */}
-       <path d="M1,6 h3 v2 h-3 z M12,7 h3 v2 h-3 z" fill="#388e3c" /> {/* Left leg high, right leg low (trailing) */}
+       <path d="M4,2 h2 v2 h-2 z M8,2 h2 v2 h-2 z" fill="#4caf50" />
+       <path d="M4,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z" fill="#212121" />
+       <path d="M1,6 h3 v2 h-3 z M12,7 h3 v2 h-3 z" fill="#388e3c" />
        <path d="M0,8 h2 v1 h-2 z M14,9 h2 v1 h-2 z" fill="#2e7d32" />
     </g>
   </svg>
@@ -548,8 +477,8 @@ const CatSprite = () => (
     <path d="M3,8 h1 v4 h-1 z M10,8 h1 v4 h-1 z" fill="#fb8c00" />
     <path d="M2,5 h10 v4 h-10 z" fill="#ffb74d" />
     <path d="M10,2 h3 v3 h-3 z" fill="#ffb74d" />
-    <path d="M10,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z" fill="#fb8c00" /> {/* Ears */}
-    <path d="M1,6 h1 v4 h-1 z M0,9 h1 v2 h-1 z" fill="#fb8c00" /> {/* Tail */}
+    <path d="M10,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z" fill="#fb8c00" />
+    <path d="M1,6 h1 v4 h-1 z M0,9 h1 v2 h-1 z" fill="#fb8c00" />
   </svg>
 );
 
@@ -558,9 +487,9 @@ const DogSprite = () => (
     <path d="M3,8 h2 v4 h-2 z M11,8 h2 v4 h-2 z" fill="#5d4037" />
     <path d="M2,4 h11 v5 h-11 z" fill="#8d6e63" />
     <path d="M11,1 h4 v4 h-4 z" fill="#8d6e63" />
-    <path d="M11,2 h1 v3 h-1 z" fill="#5d4037" /> {/* Ear */}
-    <path d="M15,3 h1 v1 h-1 z M14,2 h1 v1 h-1 z" fill="#212121" /> {/* Nose/Eye */}
-    <path d="M1,4 h1 v4 h-1 z M0,5 h1 v2 h-1 z" fill="#5d4037" /> {/* Tail */}
+    <path d="M11,2 h1 v3 h-1 z" fill="#5d4037" />
+    <path d="M15,3 h1 v1 h-1 z M14,2 h1 v1 h-1 z" fill="#212121" />
+    <path d="M1,4 h1 v4 h-1 z M0,5 h1 v2 h-1 z" fill="#5d4037" />
   </svg>
 );
 
@@ -717,44 +646,30 @@ const WiltedLavenderSprite = () => (
 
 const BarnSprite = () => (
   <svg viewBox="0 0 24 22" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    {/* Roof */}
     <path d="M12,0 L24,9 h-24 z" fill="#8b1a1a" />
     <path d="M12,0 L24,9 h-2 L12,2 L2,9 H0 z" fill="#c0392b" />
-    {/* Loft window */}
     <path d="M10,3 h4 v4 h-4 z" fill="#87ceeb" />
     <path d="M11,3 h2 v4 h-2 z" fill="#b3e5fc" />
-    {/* Body */}
     <path d="M2,9 h20 v13 h-20 z" fill="#c0392b" />
-    {/* Side shadow */}
     <path d="M18,9 h4 v13 h-4 z" fill="#922b21" />
-    {/* Main doors */}
     <path d="M8,14 h8 v8 h-8 z" fill="#6d4c41" />
     <path d="M8,14 h4 v8 h-4 z" fill="#795548" />
-    {/* Door X braces */}
     <path d="M8,14 h1 v1 h1 v1 h1 v1 h-1 v1 h-1 v1 h-1 z" fill="#5d4037" opacity="0.6"/>
     <path d="M15,14 h1 v3 h-1 z M14,17 h1 v1 h-1 z M13,18 h1 v1 h-1 z M12,19 h1 v1 h-1 z" fill="#5d4037" opacity="0.6"/>
-    {/* Side windows */}
     <path d="M3,11 h3 v3 h-3 z M18,11 h3 v3 h-3 z" fill="#87ceeb" />
     <path d="M3,11 h1 v3 h-1 z M18,11 h1 v3 h-1 z" fill="#b3e5fc" />
-    {/* Ground strip */}
     <path d="M2,21 h20 v1 h-20 z" fill="#5d4037" />
   </svg>
 );
 
 const SiloSprite = () => (
   <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dome cap */}
     <path d="M1,0 h8 v1 h-8 z M0,1 h10 v2 h-10 z" fill="#9e9e9e" />
     <path d="M1,0 h4 v3 h-4 z" fill="#bdbdbd" />
-    {/* Body */}
     <path d="M1,3 h8 v17 h-8 z" fill="#e0e0e0" />
-    {/* Side shadow */}
     <path d="M7,3 h2 v17 h-2 z" fill="#bdbdbd" />
-    {/* Highlight */}
     <path d="M1,3 h2 v17 h-2 z" fill="#f5f5f5" />
-    {/* Bands */}
     <path d="M1,7 h8 v1 h-8 z M1,12 h8 v1 h-8 z M1,17 h8 v1 h-8 z" fill="#9e9e9e" />
-    {/* Door */}
     <path d="M3,15 h4 v5 h-4 z" fill="#8d6e63" />
     <path d="M4,15 h2 v5 h-2 z" fill="#a1887f" />
   </svg>
@@ -845,7 +760,8 @@ export default function App() {
            id: id + 'b' + i,
            x: Math.random() * 80 + 10,
            y: Math.random() * 80 + 10,
-           anim: anims[Math.floor(Math.random() * anims.length)]
+           anim: anims[Math.floor(Math.random() * anims.length)],
+           zoomed: false
          });
       }
       
@@ -855,7 +771,8 @@ export default function App() {
            id: id + 'w' + i,
            y: Math.random() * 90 + 5,
            duration: 10 + Math.random() * 15,
-           dir: Math.random() > 0.5 ? 'lr' : 'rl'
+           dir: Math.random() > 0.5 ? 'lr' : 'rl',
+           rolled: false
          });
       }
       
@@ -864,6 +781,20 @@ export default function App() {
         woodlice: newWoodlice.slice(-15) // Cap max woodlice
       };
     });
+  };
+
+  const handleBeeClick = (id) => {
+    setLingeringBugs(prev => ({
+      ...prev,
+      bees: prev.bees.map(b => b.id === id ? { ...b, zoomed: true } : b)
+    }));
+  };
+
+  const handleWoodlouseClick = (id) => {
+    setLingeringBugs(prev => ({
+      ...prev,
+      woodlice: prev.woodlice.map(w => w.id === id ? { ...w, rolled: true } : w)
+    }));
   };
 
   const audioRef = useRef(null);
@@ -1116,7 +1047,7 @@ export default function App() {
     if (!['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) || isFixModalOpen || isWorking || lives <= 0) return;
 
     let animationFrameId;
-    const speed = 1.5; // Walking pace, reduced from 2.5
+    const speed = 1.5; // Walking pace
     const maxX = 340 - 40; const maxY = 300 - 40;
 
     const loop = () => {
@@ -1144,7 +1075,6 @@ export default function App() {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
            
-           // Tie bounce naturally to movement distance instead of time for smooth walking
            farmerPosRef.current.walkPhase = (farmerPosRef.current.walkPhase || 0) + 0.2;
            farmerPosRef.current.bounceY = -Math.abs(Math.sin(farmerPosRef.current.walkPhase)) * 4;
            
@@ -1154,7 +1084,6 @@ export default function App() {
            farmerPosRef.current.bounceY = 0;
            setFarmerRenderPos({ ...farmerPosRef.current });
        }
-       // Wallace trails the farmer's path — only update history when moving so Wallace holds position when farmer stops
        if (moved) {
          farmerHistoryRef.current.push({ x: farmerPosRef.current.x, y: farmerPosRef.current.y });
          if (farmerHistoryRef.current.length > 45) farmerHistoryRef.current.shift();
@@ -1197,7 +1126,6 @@ export default function App() {
                 setHeldItem(null); showToast(`Emptied ${heldItem.name}!`); return;
               }
             }
-            // IF IN FIX PLOTS, dropping is just returning to ground items or plot specific items
             if (dreamStage === 'FIX_PLOTS') {
                 setPlotItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
             } else {
@@ -1207,13 +1135,11 @@ export default function App() {
          }
          let closest = null; let minDist = 60;
          
-         // Standard Ground Items
          groundItems.forEach(item => {
             const dist = Math.hypot(farmerPosRef.current.x + 20 - (item.x + 20), farmerPosRef.current.y + 20 - (item.y + 10));
             if (dist < minDist) { minDist = dist; closest = item; }
          });
 
-         // Phase 1 Bins
          if (!closest && dreamStage === 'MATCH_EXAMPLES' && matchPhase === 1) {
             EXAMPLE_BINS.forEach(bin => {
                if (!combinedBins.includes(bin.id) && Math.hypot(farmerPosRef.current.x + 20 - (bin.x + 40), farmerPosRef.current.y + 20 - (bin.y + 40)) < 60) {
@@ -1222,7 +1148,6 @@ export default function App() {
             });
          }
          
-         // Fix Plot Items (Materials that appeared after selection)
          if (!closest && dreamStage === 'FIX_PLOTS' && plotItems.length > 0) {
             plotItems.forEach(item => {
                const dist = Math.hypot(farmerPosRef.current.x + 20 - (item.x + 10), farmerPosRef.current.y + 20 - (item.y + 10));
@@ -1447,12 +1372,26 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none z-[140] overflow-hidden">
         {lingeringBugs.bees.map(bee => (
            <div key={bee.id} className={`absolute ${bee.anim}`} style={{ top: `${bee.y}%`, left: `${bee.x}%` }}>
-              <div className="w-5 h-5"><BeeSprite /></div>
+              <div 
+                className={`w-5 h-5 ${bee.zoomed ? 'animate-bee-zoom pointer-events-none' : 'pointer-events-auto cursor-pointer hover:scale-125 transition-transform'}`}
+                onClick={() => handleBeeClick(bee.id)}
+              >
+                <BeeSprite />
+              </div>
            </div>
         ))}
         {lingeringBugs.woodlice.map(louse => (
-           <div key={louse.id} className={`absolute animate-crawl-${louse.dir}`} style={{ top: `${louse.y}%`, animationDuration: `${louse.duration}s` }}>
-              <div className="w-5 h-4"><WoodlouseSprite /></div>
+           <div 
+              key={louse.id} 
+              className={`absolute animate-crawl-${louse.dir}`} 
+              style={{ top: `${louse.y}%`, animationDuration: `${louse.duration}s`, animationPlayState: louse.rolled ? 'paused' : 'running' }}
+           >
+              <div 
+                className="w-5 h-4 pointer-events-auto cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                onClick={() => handleWoodlouseClick(louse.id)}
+              >
+                {louse.rolled ? <div className="w-4 h-4"><RolledWoodlouseSprite /></div> : <div className="w-5 h-4"><WoodlouseSprite /></div>}
+              </div>
            </div>
         ))}
       </div>
@@ -1528,8 +1467,8 @@ export default function App() {
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite /></div>
         </div>
-        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3">New Game</button>
-        <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full">Chapter Select</button>
+        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3 relative z-20 pointer-events-auto">New Game</button>
+        <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full relative z-20 pointer-events-auto">Chapter Select</button>
       </PixelBox>
     </div>
   );
@@ -2291,6 +2230,12 @@ export default function App() {
         }
         .animate-crawl-lr { animation: crawl-lr linear infinite; }
         .animate-crawl-rl { animation: crawl-rl linear infinite; }
+
+        @keyframes bee-zoom-out {
+          0% { transform: scale(1) translate(0,0); opacity: 1; }
+          100% { transform: scale(15) translate(10px, -20px) rotate(45deg); opacity: 0; }
+        }
+        .animate-bee-zoom { animation: bee-zoom-out 0.4s ease-in forwards !important; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
