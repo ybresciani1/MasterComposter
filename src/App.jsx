@@ -1375,8 +1375,11 @@ export default function App() {
   const renderTitle = () => (
     <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4">
       <PixelBox className="text-center max-w-lg w-full">
-        <h1 className="text-2xl md:text-4xl font-extrabold text-[#5d4037] mb-2 text-shadow text-white">Master Composter</h1>
-        <h2 className="text-base md:text-xl text-[#8b5a2b] mb-8 tracking-widest text-white drop-shadow-sm">VALLEY</h2>
+        <div className="mb-8 mt-4">
+          <h1 className="text-5xl md:text-6xl font-bold mb-2 stardew-title">Master<br/>Composter</h1>
+          <br />
+          <h2 className="text-3xl md:text-4xl mt-2 tracking-[0.2em] stardew-subtitle">VALLEY</h2>
+        </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite /></div>
@@ -1945,6 +1948,43 @@ export default function App() {
         <p>Please rotate your device to portrait mode to play.</p>
       </div>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@700&display=swap');
+
+        .stardew-title {
+          font-family: 'Pixelify Sans', sans-serif;
+          color: #ffeb3b;
+          text-shadow: 
+            -3px -3px 0 #5d4037, 
+             0   -3px 0 #5d4037, 
+             3px -3px 0 #5d4037, 
+             3px  0   0 #5d4037, 
+             3px  3px 0 #5d4037, 
+             0    3px 0 #5d4037, 
+            -3px  3px 0 #5d4037, 
+            -3px  0   0 #5d4037,
+             0    8px 0 #3e2723;
+          transform: rotate(-2deg);
+          display: inline-block;
+          line-height: 1.1;
+        }
+
+        .stardew-subtitle {
+          font-family: 'Pixelify Sans', sans-serif;
+          color: #8bc34a;
+          text-shadow: 
+            -2px -2px 0 #33691e, 
+             0   -2px 0 #33691e, 
+             2px -2px 0 #33691e, 
+             2px  0   0 #33691e, 
+             2px  2px 0 #33691e, 
+             0    2px 0 #33691e, 
+            -2px  2px 0 #33691e, 
+            -2px  0   0 #33691e,
+             0    5px 0 #1b5e20;
+          transform: rotate(1deg);
+          display: inline-block;
+        }
+
         .garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
         @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
         .animate-stir { animation: stir-animation 0.3s infinite linear; }
