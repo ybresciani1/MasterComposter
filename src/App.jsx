@@ -291,6 +291,25 @@ const StudentPortrait = () => {
   );
 };
 
+const PolishHenSprite = ({ isGold }) => (
+  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Legs */}
+    <path d="M4,10 h1 v2 h-1 z M7,10 h1 v2 h-1 z" fill="#f57f17" />
+    {/* Body */}
+    <path d="M2,5 h6 v5 h-6 z" fill={isGold ? "#fbc02d" : "#212121"} />
+    {/* Tail */}
+    <path d="M1,4 h2 v4 h-2 z M0,5 h1 v2 h-1 z" fill={isGold ? "#ffffff" : "#a1887f"} />
+    {/* Neck/Head area */}
+    <path d="M7,4 h2 v3 h-2 z" fill={isGold ? "#fbc02d" : "#212121"} />
+    {/* Beak */}
+    <path d="M9,5 h1 v1 h-1 z" fill="#f57f17" />
+    {/* Eye */}
+    <path d="M8,5 h1 v1 h-1 z" fill={isGold ? "#000000" : "#ffffff"} />
+    {/* Polish Crest (Poof) */}
+    <path d="M6,2 h4 v2 h-4 z M7,1 h2 v1 h-2 z M5,3 h1 v2 h-1 z M10,3 h1 v2 h-1 z" fill={isGold ? "#ffffff" : "#d7ccc8"} />
+  </svg>
+);
+
 const CornSprite = () => (
   <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M5,10 h2 v6 h-2 z" fill="#8b5a2b" />
@@ -1983,7 +2002,28 @@ export default function App() {
                        </div>
                      );
                    })}
-                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12"><FarmerSprite /></div>
+                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 z-30"><FarmerSprite /></div>
+                   
+                   {/* Riot (Gold/White Polish Hen) */}
+                   <div className="absolute bottom-[30%] left-[20%] z-20 animate-hen-walk" style={{ animationDelay: '0.5s' }}>
+                      <div className="flex flex-col items-center animate-hen-hop">
+                         <div className="w-10 h-10">
+                            <PolishHenSprite isGold={true} />
+                         </div>
+                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Riot</span>
+                      </div>
+                   </div>
+
+                   {/* Beyonce (Black/Tan Polish Hen) */}
+                   <div className="absolute bottom-[35%] right-[20%] z-20 animate-hen-walk" style={{ animationDelay: '1.5s' }}>
+                      <div className="flex flex-col items-center animate-hen-hop" style={{ animationDelay: '0.15s' }}>
+                         <div className="w-10 h-10" style={{ transform: 'scaleX(-1)' }}>
+                            <PolishHenSprite isGold={false} />
+                         </div>
+                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Beyonce</span>
+                      </div>
+                   </div>
+
                 </div>
                 </div>
                 <DialogBox key="end-dialog" name="Wallace" text={endStory[dialogIndex]} onNext={() => handleDialogNext(endStory, 'WAKE_UP')} emotion={wallaceEmotion} />
@@ -2348,6 +2388,20 @@ export default function App() {
           50% { transform: scaleX(0.2) translateY(-2px); }
         }
         .animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
+
+        /* HENS ANIMATION */
+        @keyframes hen-walk {
+          0% { transform: translateY(180px); opacity: 0; }
+          5% { opacity: 1; }
+          100% { transform: translateY(0px); opacity: 1; }
+        }
+        .animate-hen-walk { animation: hen-walk 4s ease-out forwards; opacity: 0; }
+        
+        @keyframes hen-hop {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+        .animate-hen-hop { animation: hen-hop 0.3s infinite alternate ease-in-out; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
