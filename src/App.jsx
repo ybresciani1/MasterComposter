@@ -1678,15 +1678,15 @@ export default function App() {
          <div className="w-full max-w-[500px] h-[260px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-4 md:mb-24">
             <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
             <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center overflow-hidden">
-              <div className="absolute top-2 left-4 flex flex-col items-center scale-90 opacity-90">
+              <div className="absolute top-10 left-6 flex flex-col items-center scale-90 opacity-90 z-10">
                  <div className="w-12 h-12 relative z-10"><StudentBlondeSprite /></div>
                  <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-2 top-1 w-4 h-6 bg-white opacity-80 rotate-6"></div></div>
               </div>
-              <div className="absolute top-4 right-8 flex flex-col items-center scale-90 opacity-90">
+              <div className="absolute top-10 right-6 flex flex-col items-center scale-90 opacity-90 z-10">
                  <div className="w-12 h-12 relative z-10"><StudentBrownHairSprite /></div>
                  <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute right-2 top-2 w-5 h-5 bg-[#fdd835] opacity-80 -rotate-12"></div></div>
               </div>
-              <div className="absolute top-1 right-[35%] flex flex-col items-center scale-[0.85] opacity-80">
+              <div className="absolute -top-2 right-24 flex flex-col items-center scale-[0.80] opacity-80 z-0">
                  <div className="w-12 h-12 relative z-10"><StudentPonytailSprite /></div>
                  <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-4 top-1 w-6 h-4 bg-pink-200 opacity-80 rotate-12"></div></div>
               </div>
@@ -2163,15 +2163,15 @@ export default function App() {
            <div className="w-full max-w-[500px] h-[260px] md:h-[350px] bg-[#d7ccc8] border-8 border-[#5d4037] relative overflow-hidden shadow-2xl mb-4 md:mb-24">
               <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#1b5e20] border-4 border-[#3e2723] flex items-center justify-center"><span className="text-white font-mono text-xs opacity-80">COMPOST = 🍃+🍂+💧+💨</span></div>
               <div className="absolute bottom-0 w-full h-[140px] bg-[#8d6e63] border-t-4 border-[#5d4037] flex justify-center overflow-hidden">
-                <div className="absolute top-2 left-4 flex flex-col items-center scale-90 opacity-90">
+                <div className="absolute top-10 left-6 flex flex-col items-center scale-90 opacity-90 z-10">
                    <div className="w-12 h-12 relative z-10"><StudentBlondeSprite /></div>
                    <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-2 top-1 w-4 h-6 bg-white opacity-80 rotate-6"></div></div>
                 </div>
-                <div className="absolute top-4 right-8 flex flex-col items-center scale-90 opacity-90">
+                <div className="absolute top-10 right-6 flex flex-col items-center scale-90 opacity-90 z-10">
                    <div className="w-12 h-12 relative z-10"><StudentBrownHairSprite /></div>
                    <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute right-2 top-2 w-5 h-5 bg-[#fdd835] opacity-80 -rotate-12"></div></div>
                 </div>
-                <div className="absolute top-1 right-[35%] flex flex-col items-center scale-[0.85] opacity-80">
+                <div className="absolute -top-2 right-24 flex flex-col items-center scale-[0.80] opacity-80 z-0">
                    <div className="w-12 h-12 relative z-10"><StudentPonytailSprite /></div>
                    <div className="w-20 h-10 bg-[#4e342e] border-4 border-[#3e2723] relative z-20 shadow-lg -mt-3"><div className="absolute left-4 top-1 w-6 h-4 bg-pink-200 opacity-80 rotate-12"></div></div>
                 </div>
