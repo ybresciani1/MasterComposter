@@ -494,15 +494,35 @@ const PondSprite = () => (
     <path d="M12,8 h1 v1 h-1 z" fill="#4fc3f7" /> {/* Lilypad cut */}
     {/* Water lines */}
     <path d="M16,10 h6 v1 h-6 z M24,14 h4 v1 h-4 z" fill="#81d4fa" />
+    
+    {/* Ambient splashes/ripples */}
+    <g className="animate-pond-ripple-1">
+       <path d="M20,12 h4 v1 h-4 z M21,11 h2 v1 h-2 z" fill="#e1f5fe" opacity="0.7"/>
+    </g>
+    <g className="animate-pond-ripple-2">
+       <path d="M30,6 h4 v1 h-4 z M31,7 h2 v1 h-2 z" fill="#e1f5fe" opacity="0.7"/>
+    </g>
+    <g className="animate-pond-ripple-3">
+       <path d="M8,14 h4 v1 h-4 z M9,15 h2 v1 h-2 z" fill="#e1f5fe" opacity="0.7"/>
+    </g>
   </svg>
 );
 
 const FrogSprite = () => (
-  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M1,4 h8 v3 h-8 z" fill="#4caf50" />
-    <path d="M2,2 h2 v2 h-2 z M6,2 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes */}
-    <path d="M3,3 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#212121" /> {/* Pupils */}
-    <path d="M0,6 h2 v2 h-2 z M8,6 h2 v2 h-2 z" fill="#388e3c" /> {/* Legs */}
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <g className="frog-sit">
+       <path d="M4,6 h8 v4 h-8 z" fill="#4caf50" />
+       <path d="M5,4 h2 v2 h-2 z M9,4 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes */}
+       <path d="M5,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill="#212121" /> {/* Pupils on left side of eyes */}
+       <path d="M3,8 h2 v2 h-2 z M11,8 h2 v2 h-2 z" fill="#388e3c" />
+    </g>
+    <g className="frog-leap">
+       <path d="M4,4 h8 v4 h-8 z" fill="#4caf50" />
+       <path d="M4,2 h2 v2 h-2 z M8,2 h2 v2 h-2 z" fill="#4caf50" /> {/* Eyes shifted left */}
+       <path d="M4,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z" fill="#212121" /> {/* Pupils on left */}
+       <path d="M1,6 h3 v2 h-3 z M12,7 h3 v2 h-3 z" fill="#388e3c" /> {/* Left leg high, right leg low (trailing) */}
+       <path d="M0,8 h2 v1 h-2 z M14,9 h2 v1 h-2 z" fill="#2e7d32" />
+    </g>
   </svg>
 );
 
@@ -615,10 +635,17 @@ const SkeletonDogSprite = () => (
 );
 
 const SkeletonFrogSprite = () => (
-  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M1,4 h8 v1 h-8 z M2,2 h2 v2 h-2 z M6,2 h2 v2 h-2 z" fill="#ffffff" />
-    <path d="M3,3 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#000000" />
-    <path d="M0,6 h2 v1 h-2 z M8,6 h2 v1 h-2 z" fill="#bdbdbd" />
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <g className="frog-sit">
+      <path d="M4,6 h8 v1 h-8 z M5,4 h2 v2 h-2 z M9,4 h2 v2 h-2 z" fill="#ffffff" />
+      <path d="M5,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill="#000000" />
+      <path d="M3,8 h2 v1 h-2 z M11,8 h2 v1 h-2 z" fill="#bdbdbd" />
+    </g>
+    <g className="frog-leap">
+      <path d="M4,4 h8 v1 h-8 z M4,2 h2 v2 h-2 z M8,2 h2 v2 h-2 z" fill="#ffffff" />
+      <path d="M4,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z" fill="#000000" />
+      <path d="M1,6 h2 v1 h-2 z M12,7 h2 v1 h-2 z" fill="#bdbdbd" />
+    </g>
   </svg>
 );
 
@@ -1422,7 +1449,16 @@ useEffect(() => {
 
           {/* Pond & Frog */}
           <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
-          <div className="absolute top-30 sm:top-22 left-[55%] w-6 h-5 opacity-90 z-20">{dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}</div>
+          <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] w-6 h-5 opacity-90 z-20 animate-frog">
+             {dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}
+          </div>
+          {dreamStage !== 'NIGHTMARE_END' && (
+             <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] w-6 h-5 opacity-90 z-20 pointer-events-none animate-frog-splash">
+               <svg viewBox="0 0 16 12" className="w-full h-full" shapeRendering="crispEdges">
+                 <path d="M4,10 h8 v2 h-8 z M6,8 h4 v2 h-4 z M8,6 h2 v2 h-2 z M2,6 h2 v2 h-2 z M12,6 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/>
+               </svg>
+             </div>
+          )}
 
           {/* Barn & Silo */}
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
@@ -1999,6 +2035,53 @@ useEffect(() => {
           100% { opacity: 1; transform: scale(1); }
         }
         .animate-spread { opacity: 0; animation: spread-fire 0.5s ease-out forwards; }
+
+        @keyframes sit-toggle {
+           0% { opacity: 1; }
+           1%, 7% { opacity: 0; }
+           8%, 83% { opacity: 1; }
+           84%, 99% { opacity: 0; }
+           100% { opacity: 1; }
+        }
+        @keyframes leap-toggle {
+           0% { opacity: 0; }
+           1%, 7% { opacity: 1; }
+           8%, 83% { opacity: 0; }
+           84%, 99% { opacity: 1; }
+           100% { opacity: 0; }
+        }
+        .frog-sit { animation: sit-toggle 14s infinite ease-in-out; }
+        .frog-leap { animation: leap-toggle 14s infinite ease-in-out; }
+
+        @keyframes pond-ripple {
+           0%, 100% { opacity: 0; transform: translateY(0); }
+           50% { opacity: 1; transform: translateY(-1px); }
+        }
+        .animate-pond-ripple-1 { animation: pond-ripple 3s infinite ease-in-out; }
+        .animate-pond-ripple-2 { animation: pond-ripple 4s infinite ease-in-out 1s; }
+        .animate-pond-ripple-3 { animation: pond-ripple 3.5s infinite ease-in-out 2s; }
+
+        @keyframes frog-splash-anim {
+           0%, 7.9% { opacity: 0; transform: translate(-40px, 10px) scale(0.5); }
+           8% { opacity: 1; transform: translate(-40px, 10px) scale(1); }
+           10% { opacity: 1; transform: translate(-40px, 10px) scale(1.5); }
+           13%, 100% { opacity: 0; transform: translate(-40px, 10px) scale(2); }
+        }
+        .animate-frog-splash { animation: frog-splash-anim 14s infinite ease-out; }
+
+        @keyframes frog-action {
+          0% { transform: translate(0px, 0px) scaleX(1); }
+          4% { transform: translate(-20px, -20px) scaleX(1) rotate(-15deg); }
+          8% { transform: translate(-40px, 10px) scaleX(1) rotate(0deg); }
+          25% { transform: translate(-70px, 20px) scaleX(1); }
+          30% { transform: translate(-70px, 20px) scaleX(-1); }
+          55% { transform: translate(-20px, 5px) scaleX(-1); }
+          60% { transform: translate(-20px, 5px) scaleX(1); }
+          84% { transform: translate(-50px, 15px) scaleX(1); }
+          92% { transform: translate(-25px, -15px) scaleX(1) rotate(15deg); }
+          100% { transform: translate(0px, 0px) scaleX(1); }
+        }
+        .animate-frog { animation: frog-action 14s infinite ease-in-out; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
