@@ -527,6 +527,150 @@ const DogSprite = () => (
   </svg>
 );
 
+const SkeletonCowSprite = () => (
+  <svg viewBox="0 0 24 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,12 h1 v4 h-1 z M9,12 h1 v4 h-1 z M16,12 h1 v4 h-1 z M21,12 h1 v4 h-1 z" fill="#e0e0e0" />
+    <path d="M3,4 h18 v2 h-18 z" fill="#ffffff" />
+    <path d="M6,6 h2 v4 h-2 z M10,6 h2 v4 h-2 z M14,6 h2 v4 h-2 z M18,6 h2 v3 h-2 z" fill="#ffffff" />
+    <path d="M7,6 h1 v3 h-1 z M11,6 h1 v3 h-1 z M15,6 h1 v3 h-1 z" fill="#212121" />
+    <path d="M22,5 h1 v1 h-1 z M22,7 h1 v1 h-1 z M22,9 h1 v1 h-1 z" fill="#e0e0e0" />
+    <path d="M1,2 h5 v6 h-5 z" fill="#ffffff" />
+    <path d="M2,3 h2 v2 h-2 z M1,6 h1 v1 h-1 z" fill="#000000" />
+    <path d="M2,1 h1 v1 h-1 z M4,1 h1 v1 h-1 z" fill="#9e9e9e" />
+  </svg>
+);
+
+const SkeletonPigSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,8 h1 v4 h-1 z M6,8 h1 v4 h-1 z M10,8 h1 v4 h-1 z M13,8 h1 v4 h-1 z" fill="#e0e0e0" />
+    <path d="M1,4 h13 v2 h-13 z" fill="#ffffff" />
+    <path d="M3,6 h1 v3 h-1 z M6,6 h1 v3 h-1 z M9,6 h1 v3 h-1 z" fill="#ffffff" />
+    <path d="M13,3 h3 v5 h-3 z" fill="#ffffff" />
+    <path d="M14,4 h1 v1 h-1 z M14,6 h1 v1 h-1 z" fill="#000000" />
+    <path d="M13,2 h1 v1 h-1 z M15,2 h1 v1 h-1 z M0,5 h1 v1 h-1 z" fill="#bdbdbd" />
+  </svg>
+);
+
+const SkeletonSheepSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,8 h1 v4 h-1 z M11,8 h1 v4 h-1 z" fill="#e0e0e0" />
+    <path d="M1,4 h12 v2 h-12 z" fill="#ffffff" />
+    <path d="M4,6 h1 v3 h-1 z M7,6 h1 v3 h-1 z M10,6 h1 v3 h-1 z" fill="#ffffff" />
+    <path d="M12,3 h3 v3 h-3 z" fill="#ffffff" />
+    <path d="M13,3 h1 v1 h-1 z" fill="#000000" />
+    <path d="M12,2 h2 v1 h-2 z" fill="#bdbdbd" />
+  </svg>
+);
+
+const SkeletonGoatSprite = () => (
+  <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M2,8 h1 v4 h-1 z M11,8 h1 v4 h-1 z M14,8 h1 v4 h-1 z" fill="#e0e0e0" />
+    <path d="M2,5 h10 v2 h-10 z" fill="#ffffff" />
+    <path d="M4,7 h1 v3 h-1 z M7,7 h1 v3 h-1 z M10,7 h1 v3 h-1 z" fill="#ffffff" />
+    <path d="M11,3 h3 v4 h-3 z" fill="#ffffff" />
+    <path d="M12,4 h1 v1 h-1 z" fill="#000000" />
+    <path d="M12,1 h1 v2 h-1 z M14,1 h1 v2 h-1 z" fill="#9e9e9e" />
+  </svg>
+);
+
+const SkeletonChickenSprite = () => (
+  <svg viewBox="0 0 10 10" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,8 h1 v2 h-1 z M7,8 h1 v2 h-1 z" fill="#bdbdbd" />
+    <path d="M2,4 h6 v2 h-6 z M3,6 h1 v1 h-1 z M5,6 h1 v1 h-1 z M7,2 h2 v2 h-2 z" fill="#ffffff" />
+    <path d="M7,2 h1 v1 h-1 z" fill="#000000" />
+    <path d="M9,3 h1 v1 h-1 z M1,3 h1 v1 h-1 z" fill="#bdbdbd" />
+  </svg>
+);
+
+const SkeletonRoosterSprite = () => (
+  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,10 h1 v2 h-1 z M8,10 h1 v2 h-1 z M10,4 h1 v1 h-1 z M1,3 h2 v1 h-2 z M0,4 h1 v1 h-1 z" fill="#bdbdbd" />
+    <path d="M3,5 h6 v2 h-6 z M4,7 h1 v2 h-1 z M6,7 h1 v2 h-1 z M8,3 h2 v3 h-2 z" fill="#ffffff" />
+    <path d="M8,4 h1 v1 h-1 z" fill="#000000" />
+  </svg>
+);
+
+const SkeletonChickSprite = () => (
+  <svg viewBox="0 0 6 6" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M1,2 h4 v2 h-4 z" fill="#ffffff" />
+    <path d="M2,2 h1 v1 h-1 z" fill="#000000" />
+    <path d="M5,3 h1 v1 h-1 z M2,5 h1 v1 h-1 z M4,5 h1 v1 h-1 z" fill="#bdbdbd" />
+  </svg>
+);
+
+const SkeletonCatSprite = () => (
+  <svg viewBox="0 0 14 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M3,8 h1 v4 h-1 z M10,8 h1 v4 h-1 z M1,6 h1 v1 h-1 z M1,8 h1 v1 h-1 z M0,9 h1 v2 h-1 z" fill="#bdbdbd" />
+    <path d="M2,5 h10 v2 h-10 z M4,7 h1 v2 h-1 z M7,7 h1 v2 h-1 z M10,2 h3 v3 h-3 z M10,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z" fill="#ffffff" />
+    <path d="M11,3 h1 v1 h-1 z" fill="#000000" />
+  </svg>
+);
+
+const SkeletonDogSprite = () => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M3,8 h1 v4 h-1 z M11,8 h1 v4 h-1 z M11,2 h1 v2 h-1 z M1,4 h1 v1 h-1 z M1,6 h1 v1 h-1 z M0,7 h1 v1 h-1 z" fill="#bdbdbd" />
+    <path d="M2,4 h11 v2 h-11 z M4,6 h1 v3 h-1 z M8,6 h1 v3 h-1 z M11,1 h4 v4 h-4 z" fill="#ffffff" />
+    <path d="M12,2 h1 v1 h-1 z M15,3 h1 v1 h-1 z" fill="#000000" />
+  </svg>
+);
+
+const SkeletonFrogSprite = () => (
+  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,4 h8 v1 h-8 z M2,2 h2 v2 h-2 z M6,2 h2 v2 h-2 z" fill="#ffffff" />
+    <path d="M3,3 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#000000" />
+    <path d="M0,6 h2 v1 h-2 z M8,6 h2 v1 h-2 z" fill="#bdbdbd" />
+  </svg>
+);
+
+const LocustSprite = () => (
+  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,4 h6 v2 h-6 z" fill="#5d4037" />
+    <path d="M7,4 h1 v1 h-1 z" fill="#d84315" />
+    <path d="M2,2 h3 v2 h-3 z M1,3 h1 v1 h-1 z" fill="#d7ccc8" opacity="0.8"/>
+    <path d="M5,5 h1 v2 h-1 z M6,6 h1 v2 h-1 z" fill="#4e342e" />
+  </svg>
+);
+
+const BareTreeSprite = () => (
+  <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M7,16 h2 v4 h-2 z" fill="#3e2723" />
+    <path d="M6,14 h2 v2 h-2 z M8,12 h2 v4 h-2 z M5,12 h2 v2 h-2 z M9,9 h2 v3 h-2 z M6,7 h2 v5 h-2 z M4,8 h2 v2 h-2 z M7,4 h2 v3 h-2 z M9,2 h1 v2 h-1 z" fill="#4e342e" />
+  </svg>
+);
+
+const WiltedSunflowerSprite = () => (
+  <svg viewBox="0 0 12 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,16 h2 v8 h-2 z M4,14 h2 v2 h-2 z M3,12 h2 v2 h-2 z M2,10 h2 v2 h-2 z" fill="#5d4037" />
+    <path d="M3,18 h2 v1 h-2 z M7,21 h2 v1 h-2 z" fill="#4e342e" />
+    <path d="M1,9 h4 v4 h-4 z M0,11 h6 v2 h-6 z" fill="#8d6e63" />
+    <path d="M1,10 h4 v2 h-4 z" fill="#3e2723" />
+  </svg>
+);
+
+const WiltedZinniaSprite = () => (
+  <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,10 h2 v6 h-2 z M4,8 h2 v2 h-2 z M3,6 h2 v2 h-2 z" fill="#5d4037" />
+    <path d="M1,5 h4 v3 h-4 z" fill="#8d6e63" />
+    <path d="M2,6 h2 v2 h-2 z" fill="#4e342e" />
+  </svg>
+);
+
+const WiltedMarigoldSprite = () => (
+  <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M5,10 h2 v6 h-2 z M6,8 h2 v2 h-2 z M7,6 h2 v2 h-2 z" fill="#5d4037" />
+    <path d="M7,5 h4 v3 h-4 z" fill="#8d6e63" />
+    <path d="M8,6 h2 v2 h-2 z" fill="#4e342e" />
+  </svg>
+);
+
+const WiltedLavenderSprite = () => (
+  <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,12 h2 v8 h-2 z M5,10 h2 v2 h-2 z M6,8 h2 v2 h-2 z" fill="#5d4037" />
+    <path d="M6,6 h2 v4 h-2 z M7,4 h2 v4 h-2 z" fill="#5d4037" />
+    <path d="M3,16 h2 v1 h-2 z M6,18 h2 v1 h-2 z" fill="#4e342e" /> 
+  </svg>
+);
+
 const BarnSprite = () => (
   <svg viewBox="0 0 24 22" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
     {/* Roof */}
@@ -1268,54 +1412,94 @@ useEffect(() => {
     return (
       <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
           {/* Background farm scenery */}
-          <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
-          <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
-          <div className={`absolute top-2 left-40 w-10 h-14 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-2 left-40 w-10 h-14 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
           
-          <div className={`absolute top-6 right-10 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
-          <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
-          <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><TreeSprite /></div>
+          <div className={`absolute top-6 right-10 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
 
           {/* Pond & Frog */}
           <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
-          <div className={`absolute top-30 sm:top-22 left-[55%] w-6 h-5 opacity-90 z-20 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><FrogSprite /></div>
+          <div className="absolute top-30 sm:top-22 left-[55%] w-6 h-5 opacity-90 z-20">{dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}</div>
 
           {/* Barn & Silo */}
           <div className={`absolute bottom-48 left-10 w-24 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><BarnSprite /></div>
           <div className={`absolute bottom-48 left-36 w-10 h-20 opacity-70 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><SiloSprite /></div>
           
+          {dreamStage === 'NIGHTMARE_END' && (
+            <>
+              {/* Lightning striking silo */}
+              <div className="absolute bottom-[16.5rem] left-[8.5rem] w-12 h-24 z-10 animate-lightning"><LightningSprite color="#ab47bc" /></div>
+              
+              {/* Silo Fires Spreading */}
+              <div className="absolute bottom-[15.5rem] left-[8.5rem] w-10 h-10 z-20 animate-spread" style={{animationDelay: '2.8s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[16.5rem] left-[9rem] w-8 h-8 z-20 animate-spread" style={{animationDelay: '3.2s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[14.5rem] left-[8rem] w-12 h-12 z-20 animate-spread" style={{animationDelay: '3.8s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[14rem] left-[9.5rem] w-10 h-10 z-20 animate-spread" style={{animationDelay: '4.5s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+
+              {/* Large Fire Off Plot */}
+              <div className="absolute top-40 right-4 w-32 h-32 z-20 animate-spread" style={{animationDelay: '0.5s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+
+              {/* Other Spreading Fires around the farm */}
+              <div className="absolute top-[35%] left-[25%] w-16 h-16 z-20 animate-spread" style={{animationDelay: '1.2s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[20%] right-[35%] w-12 h-12 z-20 animate-spread" style={{animationDelay: '2.5s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute top-[50%] left-[8%] w-14 h-14 z-20 animate-spread" style={{animationDelay: '4.0s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+              <div className="absolute bottom-[40%] right-[8%] w-20 h-20 z-20 animate-spread" style={{animationDelay: '5.0s'}}>
+                 <div className="w-full h-full animate-flicker"><FireSprite /></div>
+              </div>
+            </>
+          )}
+
           {/* Farm Animals */}
-          <div className={`absolute bottom-40 right-28 w-16 h-12 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><CowSprite /></div>
-          <div className={`absolute bottom-52 right-12 w-12 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><PigSprite /></div>
+          <div className="absolute bottom-40 right-28 w-16 h-12 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonCowSprite /> : <CowSprite />}</div>
+          <div className="absolute bottom-52 right-12 w-12 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonPigSprite /> : <PigSprite />}</div>
           
-          <div className={`absolute bottom-56 right-36 w-12 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SheepSprite /></div>
-          <div className={`absolute bottom-44 right-44 w-10 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><GoatSprite /></div>
+          <div className="absolute bottom-56 right-36 w-12 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonSheepSprite /> : <SheepSprite />}</div>
+          <div className="absolute bottom-44 right-44 w-10 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonGoatSprite /> : <GoatSprite />}</div>
           
-          <div className={`absolute bottom-48 left-20 w-6 h-6 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickenSprite /></div>
-          <div className={`absolute bottom-52 left-28 w-8 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><RoosterSprite /></div>
-          <div className={`absolute bottom-46 left-24 w-3 h-3 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickSprite /></div>
-          <div className={`absolute bottom-45 left-26 w-3 h-3 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ChickSprite /></div>
+          <div className="absolute bottom-48 left-20 w-6 h-6 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickenSprite /> : <ChickenSprite />}</div>
+          <div className="absolute bottom-52 left-28 w-8 h-8 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonRoosterSprite /> : <RoosterSprite />}</div>
+          <div className="absolute bottom-46 left-24 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
+          <div className="absolute bottom-45 left-26 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
 
           {/* Pets */}
-          <div className={`absolute bottom-36 left-48 w-8 h-6 opacity-90 z-10 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><CatSprite /></div>
-          <div className={`absolute bottom-32 left-64 w-10 h-8 opacity-90 z-10 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><DogSprite /></div>
+          <div className="absolute bottom-36 left-48 w-8 h-6 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
+          <div className="absolute bottom-32 left-64 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
 
           {/* Flowers */}
-          <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
-          <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
-          <div className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><SunflowerSprite /></div>
+          <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
+          <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
+          <div className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
 
-          <div className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ZinniaSprite /></div>
-          <div className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><MarigoldSprite /></div>
-          <div className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><LavenderSprite /></div>
-          <div className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><LavenderSprite /></div>
-          <div className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}><ZinniaSprite /></div>
+          <div className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
+          <div className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedMarigoldSprite /> : <MarigoldSprite />}</div>
+          <div className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
+          <div className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
+          <div className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
 
           {/* Bees */}
-          <div className={`absolute top-1/4 left-1/4 w-3 h-3 z-50 animate-fly ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
-          <div className={`absolute top-1/3 right-1/3 w-3 h-3 z-50 animate-fly-delayed ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
-          <div className={`absolute top-2/3 left-1/3 w-3 h-3 z-50 animate-fly-fast ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
-          <div className={`absolute top-1/2 right-1/4 w-3 h-3 z-50 animate-fly ${dreamStage === 'NIGHTMARE_END' ? 'hidden' : ''}`}><BeeSprite /></div>
+          <div className="absolute top-1/4 left-1/4 w-3 h-3 z-50 animate-fly">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
+          <div className="absolute top-1/3 right-1/3 w-3 h-3 z-50 animate-fly-delayed">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
+          <div className="absolute top-2/3 left-1/3 w-3 h-3 z-50 animate-fly-fast">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
+          <div className="absolute top-1/2 right-1/4 w-3 h-3 z-50 animate-fly">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
 
           {/* Grass details */}
           <div className={`absolute top-60 left-12 w-4 h-3 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><GrassSprite /></div>
@@ -1809,6 +1993,12 @@ useEffect(() => {
         .animate-fly { animation: fly-around 8s infinite ease-in-out; }
         .animate-fly-delayed { animation: fly-around 10s infinite ease-in-out 2s reverse; }
         .animate-fly-fast { animation: fly-around 6s infinite ease-in-out 1s; }
+
+        @keyframes spread-fire {
+          0% { opacity: 0; transform: scale(0.1); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-spread { opacity: 0; animation: spread-fire 0.5s ease-out forwards; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
