@@ -11,6 +11,10 @@ const wakeUpSound = `${BASE}/Wake up Sound Final.mp3`;
 const nightmareSound = `${BASE}/Nightmare sound.mp3`;
 const tossBinSound = `${BASE}/Toss Bin Final Sound.mp3`;
 const questSound = `${BASE}/Quest sound.mp3`;
+const sakuraSound = `${BASE}/Master tap sakura flowers.mp3`;
+const woodliceSound = `${BASE}/Woodlice touch sound.mp3`;
+const beeTapSound = `${BASE}/bee tap.mp3`;
+const butterflyTapSound = `${BASE}/Butterfly tap.mp3`;
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -924,7 +928,8 @@ export default function App() {
       duration: 2.5 + Math.random() * 2,
       tx: (Math.random() - 0.5) * 300
     }));
-    
+
+    const sfx = new Audio(sakuraSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     setSakuraClicks(prev => [...prev, { id, petals }]);
     setTimeout(() => setSakuraClicks(prev => prev.filter(c => c.id !== id)), 4000);
   };
@@ -991,6 +996,7 @@ export default function App() {
 
   const triggerButterflies = (e) => {
     e.stopPropagation();
+    const sfx = new Audio(butterflyTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     const x = e.clientX;
     const y = e.clientY;
     const id = Date.now() + Math.random();
@@ -1013,6 +1019,7 @@ export default function App() {
   };
 
   const handleBeeClick = (id) => {
+    const sfx = new Audio(beeTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     setLingeringBugs(prev => ({
       ...prev,
       bees: prev.bees.map(b => b.id === id ? { ...b, zoomed: true } : b)
@@ -1020,6 +1027,7 @@ export default function App() {
   };
 
   const handleWoodlouseClick = (id) => {
+    const sfx = new Audio(woodliceSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     setLingeringBugs(prev => ({
       ...prev,
       woodlice: prev.woodlice.map(w => w.id === id ? { ...w, rolled: true } : w)
