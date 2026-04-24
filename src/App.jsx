@@ -981,17 +981,27 @@ export default function App() {
   const playAudio = () => {
     if (audioRef.current) {
       audioRef.current.volume = 0.15;
-      audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
     }
+    setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
   };
 
   const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isMusicPlaying) { audioRef.current.pause(); setIsMusicPlaying(false); }
-      else { if (audioRef.current.readyState === 0) audioRef.current.load(); audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(() => showToast("Audio blocked!")); }
-    }
+    setIsMusicPlaying(!isMusicPlaying);
   };
+
+  // Centralized audio controller
+  useEffect(() => {
+    if (!audioRef.current || !audioDismissed) return;
+
+    const allowedScenes = gameState === 'TITLE' || (gameState === 'DREAM' && !['NIGHTMARE_END', 'WAKE_UP'].includes(dreamStage));
+
+    if (allowedScenes && isMusicPlaying) {
+      audioRef.current.play().catch(() => setIsMusicPlaying(false));
+    } else {
+      audioRef.current.pause();
+    }
+  }, [gameState, dreamStage, audioDismissed, isMusicPlaying]);
 
   const introStory = [
     "5:00 PM. You hold the familiar orange pill bottle in your hand.",
@@ -1046,7 +1056,7 @@ export default function App() {
     else { setDialogIndex(0); setDreamStage(nextStage); }
   };
 
-  const handleStartDream = () => { setGameState('DREAM'); playAudio(); };
+  const handleStartDream = () => { setGameState('DREAM'); };
 
   const jumpToChapter = (stage) => {
     setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
@@ -1054,7 +1064,7 @@ export default function App() {
     setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
     setAudioDismissed(true); setIsChapterSelectOpen(false); 
     setLives(stage === 'NIGHTMARE_END' ? 0 : 3);
-    setGameState('DREAM'); playAudio();
+    setGameState('DREAM');
   };
 
   // Watch for game over / lives empty
@@ -1082,16 +1092,14 @@ export default function App() {
       }
     }
     if (dreamStage === 'NIGHTMARE_END') {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
-      setIsMusicPlaying(false);
+      if (audioRef.current) { audioRef.current.currentTime = 0; }
       const sfx = new Audio(nightmareSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
     if (dreamStage === 'WAKE_UP') {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
-      setIsMusicPlaying(false);
+      if (audioRef.current) { audioRef.current.currentTime = 0; }
       const sfx = new Audio(wakeUpSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }
-  }, [dreamStage]);
+  }, [dreamStage, lives]);
 
   useEffect(() => {
     if (gameState === 'SLEEP_TRANSITION') {
@@ -2505,12 +2513,12 @@ export default function App() {
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
-      {gameState === 'DREAM' && !isMusicPlaying && !audioDismissed && dreamStage !== 'WAKE_UP' && dreamStage !== 'NIGHTMARE_END' && (
+      {!audioDismissed && (
          <div key="audio-prompt-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
             <PixelBox className="text-center animate-bounce max-w-sm mx-4">
-               <h3 className="text-2xl mb-4 font-bold text-amber-900">Start Dream?</h3>
-               <p className="text-sm mb-6 font-mono">Click to begin the quest and start the music!</p>
-               <button onClick={() => { setAudioDismissed(true); toggleMusic(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg">Let's Go! 🧑‍🌾</button>
+               <h3 className="text-2xl mb-4 font-bold text-amber-900">Master Composter Quest</h3>
+               <p className="text-sm mb-6 font-mono">Turn on audio for the best experience!</p>
+               <button onClick={() => { setAudioDismissed(true); playAudio(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg">Enter Game 🎵</button>
             </PixelBox>
          </div>
       )}
