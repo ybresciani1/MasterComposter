@@ -385,6 +385,13 @@ const PolishHenSprite = ({ name }) => {
   );
 };
 
+const PixelHeartSprite = () => (
+  <svg viewBox="0 0 7 6" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,0 h2 v1 h1 v-1 h2 v1 h1 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v-1 h-1 v-1 h-1 v-1 h-1 v-2 z" fill="#e53935" />
+    <path d="M1,1 h1 v1 h-1 z M2,2 h1 v1 h-1 z" fill="#ffcdd2" opacity="0.6" />
+  </svg>
+);
+
 const CornSprite = () => (
   <svg viewBox="0 0 12 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M5,10 h2 v6 h-2 z" fill="#8b5a2b" />
@@ -898,6 +905,16 @@ export default function App() {
   const [bugsClicks, setBugsClicks] = useState([]);
   const [butterflyBursts, setButterflyBursts] = useState([]);
   const [lingeringBugs, setLingeringBugs] = useState({ bees: [], woodlice: [] });
+  const [henHearts, setHenHearts] = useState([]);
+
+  const handleHenClick = (e, henName) => {
+    e.stopPropagation();
+    const id = Date.now() + Math.random();
+    setHenHearts(prev => [...prev, { id, hen: henName }]);
+    setTimeout(() => {
+      setHenHearts(prev => prev.filter(h => h.id !== id));
+    }, 1000);
+  };
 
   const triggerSakura = () => {
     const id = Date.now();
@@ -2152,21 +2169,38 @@ export default function App() {
                    
                    {/* Riot (Gold/White Buff Laced Polish Hen) */}
                    <div className="absolute bottom-[30%] left-[20%] z-20 animate-hen-walk" style={{ animationDelay: '0.5s' }}>
-                      <div className="flex flex-col items-center animate-hen-hop">
+                      <div 
+                         className="flex flex-col items-center animate-hen-hop cursor-pointer hover:scale-110 transition-transform relative"
+                         onClick={(e) => handleHenClick(e, 'Riot')}
+                      >
+                         {henHearts.filter(h => h.hen === 'Riot').map(h => (
+                           <div key={h.id} className="absolute -top-6 w-5 h-4 animate-float-up pointer-events-none z-30">
+                             <PixelHeartSprite />
+                           </div>
+                         ))}
                          <div className="w-14 h-14">
                             <PolishHenSprite name="Riot" />
                          </div>
-                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Riot</span>
+                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm pointer-events-none">Riot</span>
                       </div>
                    </div>
 
                    {/* Beyonce (Black/Copper Golden Laced Polish Hen) */}
                    <div className="absolute bottom-[35%] right-[20%] z-20 animate-hen-walk" style={{ animationDelay: '1.5s' }}>
-                      <div className="flex flex-col items-center animate-hen-hop" style={{ animationDelay: '0.15s' }}>
+                      <div 
+                         className="flex flex-col items-center animate-hen-hop cursor-pointer hover:scale-110 transition-transform relative" 
+                         style={{ animationDelay: '0.15s' }}
+                         onClick={(e) => handleHenClick(e, 'Beyonce')}
+                      >
+                         {henHearts.filter(h => h.hen === 'Beyonce').map(h => (
+                           <div key={h.id} className="absolute -top-6 w-5 h-4 animate-float-up pointer-events-none z-30">
+                             <PixelHeartSprite />
+                           </div>
+                         ))}
                          <div className="w-14 h-14" style={{ transform: 'scaleX(-1)' }}>
                             <PolishHenSprite name="Beyonce" />
                          </div>
-                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm">Beyonce</span>
+                         <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm pointer-events-none">Beyonce</span>
                       </div>
                    </div>
 
@@ -2546,6 +2580,12 @@ export default function App() {
           50% { transform: scaleX(0.2) translateY(-2px); }
         }
         .animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
+
+        @keyframes float-up-fade {
+          0% { transform: translateY(0) scale(1); opacity: 1; }
+          100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
+        }
+        .animate-float-up { animation: float-up-fade 1s ease-out forwards; }
 
         /* RABBIT ANIMATIONS */
         @keyframes rabbit-dash {
