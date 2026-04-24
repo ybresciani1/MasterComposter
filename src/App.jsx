@@ -918,14 +918,44 @@ export default function App() {
 
   const triggerSakura = () => {
     const id = Date.now();
-    setSakuraClicks(prev => [...prev, id]);
-    setTimeout(() => setSakuraClicks(prev => prev.filter(c => c !== id)), 4000);
+    const petals = [...Array(30)].map(() => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 1.5,
+      duration: 2.5 + Math.random() * 2,
+      tx: (Math.random() - 0.5) * 300
+    }));
+    
+    setSakuraClicks(prev => [...prev, { id, petals }]);
+    setTimeout(() => setSakuraClicks(prev => prev.filter(c => c.id !== id)), 4000);
   };
 
   const triggerBugs = () => {
     const id = Date.now();
-    setBugsClicks(prev => [...prev, id]);
-    setTimeout(() => setBugsClicks(prev => prev.filter(c => c !== id)), 2000);
+    
+    const bees = [...Array(15)].map(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 100 + Math.random() * 250;
+      return {
+        tx: Math.cos(angle) * dist,
+        ty: Math.sin(angle) * dist,
+        duration: 0.8 + Math.random()
+      };
+    });
+    
+    const woodlice = [...Array(12)].map(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 80 + Math.random() * 150;
+      const ty = Math.sin(angle) * dist;
+      const tx = Math.cos(angle) * dist;
+      return {
+        tx, ty,
+        rot: Math.atan2(ty, tx),
+        duration: 1.2 + Math.random() * 0.8
+      };
+    });
+
+    setBugsClicks(prev => [...prev, { id, bees, woodlice }]);
+    setTimeout(() => setBugsClicks(prev => prev.filter(c => c.id !== id)), 2000);
 
     // Add persistent lingering bugs to the background
     setLingeringBugs(prev => {
@@ -965,7 +995,20 @@ export default function App() {
     const y = e.clientY;
     const id = Date.now() + Math.random();
     
-    setButterflyBursts(prev => [...prev, { id, x, y }]);
+    // Pre-calculate randomized animation data so re-renders don't scramble them
+    const butterflies = [...Array(6)].map(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 150;
+      return {
+        tx: Math.cos(angle) * dist,
+        ty: Math.sin(angle) * dist - 40,
+        spriteIdx: Math.floor(Math.random() * 3),
+        duration: 1.5 + Math.random(),
+        flapDuration: 0.1 + Math.random() * 0.1
+      };
+    });
+    
+    setButterflyBursts(prev => [...prev, { id, x, y, butterflies }]);
     setTimeout(() => setButterflyBursts(prev => prev.filter(b => b.id !== id)), 2500);
   };
 
@@ -1607,18 +1650,13 @@ export default function App() {
       {/* Fluttering Butterflies Overlay */}
       {butterflyBursts.map(burst => (
         <div key={`bb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
-          {[...Array(6)].map((_, i) => {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = 60 + Math.random() * 150;
-            const tx = Math.cos(angle) * dist;
-            const ty = Math.sin(angle) * dist - 40; // bias upward 
-            
+          {burst.butterflies.map((bf, i) => {
             const Sprites = [MonarchSprite, PaintedLadySprite, DogfaceSprite];
-            const Sprite = Sprites[Math.floor(Math.random() * Sprites.length)];
+            const Sprite = Sprites[bf.spriteIdx];
             
             return (
-              <div key={`bf-${i}`} className="absolute animate-butterfly-burst" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDuration: `${1.5 + Math.random()}s` }}>
-                 <div className="w-5 h-5 animate-butterfly-flap drop-shadow-md" style={{ animationDuration: `${0.1 + Math.random() * 0.1}s` }}>
+              <div key={`bf-${i}`} className="absolute animate-butterfly-burst" style={{ '--tx': `${bf.tx}px`, '--ty': `${bf.ty}px`, animationDuration: `${bf.duration}s` }}>
+                 <div className="w-5 h-5 animate-butterfly-flap drop-shadow-md" style={{ animationDuration: `${bf.flapDuration}s` }}>
                     <Sprite />
                  </div>
               </div>
@@ -1656,14 +1694,14 @@ export default function App() {
       </div>
 
       {/* Sakura Petals Overlay */}
-      {sakuraClicks.map(id => (
-        <div key={`sakura-cascade-${id}`} className="fixed inset-0 pointer-events-none z-[150]">
-          {[...Array(30)].map((_, i) => (
+      {sakuraClicks.map(burst => (
+        <div key={`sakura-cascade-${burst.id}`} className="fixed inset-0 pointer-events-none z-[150]">
+          {burst.petals.map((p, i) => (
             <div key={`petal-${i}`} className="absolute -top-10 animate-sakura-fall" style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 1.5}s`,
-              animationDuration: `${2.5 + Math.random() * 2}s`,
-              '--tx': `${(Math.random() - 0.5) * 300}px`
+              left: `${p.left}%`,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.duration}s`,
+              '--tx': `${p.tx}px`
             }}>
               <div className="w-4 h-4"><SakuraSprite /></div>
             </div>
@@ -1672,34 +1710,22 @@ export default function App() {
       ))}
 
       {/* Bugs Burst Overlay */}
-      {bugsClicks.map(id => (
-        <div key={`bug-burst-${id}`} className="fixed top-[45%] left-1/2 -translate-x-1/2 pointer-events-none z-[150]">
-          {[...Array(15)].map((_, i) => {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = 100 + Math.random() * 250;
-            const tx = Math.cos(angle) * dist;
-            const ty = Math.sin(angle) * dist;
-            return (
-              <div key={`bee-${i}`} className="absolute animate-bug-burst" style={{
-                '--tx': `${tx}px`, '--ty': `${ty}px`, '--rot': '0rad', animationDuration: `${0.8 + Math.random()}s`
-              }}>
-                <div className="w-5 h-5"><BeeSprite /></div>
-              </div>
-            );
-          })}
-          {[...Array(12)].map((_, i) => {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = 80 + Math.random() * 150;
-            const tx = Math.cos(angle) * dist;
-            const ty = Math.sin(angle) * dist;
-            return (
-              <div key={`louse-${i}`} className="absolute animate-bug-burst" style={{
-                '--tx': `${tx}px`, '--ty': `${ty}px`, '--rot': `${Math.atan2(ty, tx)}rad`, animationDuration: `${1.2 + Math.random() * 0.8}s`
-              }}>
-                <div className="w-4 h-3"><WoodlouseSprite /></div>
-              </div>
-            );
-          })}
+      {bugsClicks.map(burst => (
+        <div key={`bug-burst-${burst.id}`} className="fixed top-[45%] left-1/2 -translate-x-1/2 pointer-events-none z-[150]">
+          {burst.bees.map((b, i) => (
+            <div key={`bee-${i}`} className="absolute animate-bug-burst" style={{
+              '--tx': `${b.tx}px`, '--ty': `${b.ty}px`, '--rot': '0rad', animationDuration: `${b.duration}s`
+            }}>
+              <div className="w-5 h-5"><BeeSprite /></div>
+            </div>
+          ))}
+          {burst.woodlice.map((w, i) => (
+            <div key={`louse-${i}`} className="absolute animate-bug-burst" style={{
+              '--tx': `${w.tx}px`, '--ty': `${w.ty}px`, '--rot': `${w.rot}rad`, animationDuration: `${w.duration}s`
+            }}>
+              <div className="w-4 h-3"><WoodlouseSprite /></div>
+            </div>
+          ))}
         </div>
       ))}
 
@@ -1794,6 +1820,24 @@ export default function App() {
 
     return (
       <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
+          {/* Fluttering Butterflies Overlay */}
+          {butterflyBursts.map(burst => (
+            <div key={`bb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
+              {burst.butterflies.map((bf, i) => {
+                const Sprites = [MonarchSprite, PaintedLadySprite, DogfaceSprite];
+                const Sprite = Sprites[bf.spriteIdx];
+                
+                return (
+                  <div key={`bf-${i}`} className="absolute animate-butterfly-burst" style={{ '--tx': `${bf.tx}px`, '--ty': `${bf.ty}px`, animationDuration: `${bf.duration}s` }}>
+                     <div className="w-5 h-5 animate-butterfly-flap drop-shadow-md" style={{ animationDuration: `${bf.flapDuration}s` }}>
+                        <Sprite />
+                     </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+
           {/* Background farm scenery */}
           <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
           <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
@@ -1886,15 +1930,15 @@ export default function App() {
           )}
 
           {/* Flowers */}
-          <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
-          <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
-          <div className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
 
-          <div className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
-          <div className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedMarigoldSprite /> : <MarigoldSprite />}</div>
-          <div className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
-          <div className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
-          <div className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedMarigoldSprite /> : <MarigoldSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-6 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
+          <div onClick={triggerButterflies} className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
 
           {/* Bees */}
           <div className="absolute top-1/4 left-1/4 w-3 h-3 z-50 animate-fly">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
