@@ -990,11 +990,21 @@ export default function App() {
     setIsMusicPlaying(!isMusicPlaying);
   };
 
+  const prevGameState = useRef(gameState);
+
   // Centralized audio controller
   useEffect(() => {
     if (!audioRef.current || !audioDismissed) return;
 
     const allowedScenes = gameState === 'TITLE' || (gameState === 'DREAM' && !['NIGHTMARE_END', 'WAKE_UP'].includes(dreamStage));
+
+    // Restart the music when transitioning into the title screen or starting the dream
+    if (prevGameState.current !== gameState) {
+      if (gameState === 'DREAM' || gameState === 'TITLE') {
+        audioRef.current.currentTime = 0;
+      }
+    }
+    prevGameState.current = gameState;
 
     if (allowedScenes && isMusicPlaying) {
       audioRef.current.play().catch(() => setIsMusicPlaying(false));
