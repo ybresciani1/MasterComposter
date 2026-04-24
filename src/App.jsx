@@ -16,6 +16,8 @@ const sakuraSound = `${BASE}/Master tap sakura flowers.mp3`;
 const woodliceSound = `${BASE}/Woodlice touch sound.mp3`;
 const beeTapSound = `${BASE}/bee tap.mp3`;
 const butterflyTapSound = `${BASE}/Butterfly tap.mp3`;
+const frogTapSound = `${BASE}/Frog tap.mp3`;
+const wateringCanSound = `${BASE}/Watering Can.mp3`;
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -1499,7 +1501,7 @@ export default function App() {
                setCombinedBins(prev => [...prev, heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c']);
                setHeldItem(null); showToast(`Combined!`, 'surprised');
              } else if (matchPhase === 2 && heldItem.id === 'ex_w' && distToPile < 80) {
-               setIsWatering(true); setHeldItem(null); showToast("Watering...", 'surprised');
+               setIsWatering(true); setHeldItem(null); showToast("Watering...", 'surprised'); const waterSfx = new Audio(wateringCanSound); waterSfx.volume = 1.0; waterSfx.play().catch(() => {});
                setTimeout(() => { setIsWatering(false); setMatchPhase(3); initializeExamplesItems(3); showToast("Now add air!", 'surprised'); }, 3000);
              } else if (matchPhase === 3 && heldItem.id === 'ex_a' && distToPile < 80) {
                setIsStirring(true); setHeldItem(null); showToast("Aerating...", 'surprised');
@@ -1874,8 +1876,8 @@ export default function App() {
 
           {/* Pond & Frog */}
           <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
-          <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] w-6 h-5 opacity-90 z-20 animate-frog">
-             {dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}
+          <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] z-[100] animate-frog cursor-pointer" onClick={() => { const sfx = new Audio(frogTapSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }} style={{ width: '56px', height: '52px', margin: '-16px' }}>
+             <div className="absolute top-4 left-4 w-6 h-5 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}</div>
           </div>
           {dreamStage !== 'NIGHTMARE_END' && (
              <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] w-6 h-5 opacity-90 z-20 pointer-events-none animate-frog-splash">
