@@ -11,6 +11,7 @@ const wakeUpSound = `${BASE}/Wake up Sound Final.mp3`;
 const nightmareSound = `${BASE}/Nightmare sound.mp3`;
 const tossBinSound = `${BASE}/Toss Bin Final Sound.mp3`;
 const questSound = `${BASE}/Quest sound.mp3`;
+const introAnxietySound = `${BASE}/Intro anxiety.mp3`;
 const sakuraSound = `${BASE}/Master tap sakura flowers.mp3`;
 const woodliceSound = `${BASE}/Woodlice touch sound.mp3`;
 const beeTapSound = `${BASE}/bee tap.mp3`;
@@ -1036,6 +1037,7 @@ export default function App() {
 
   const audioRef = useRef(null);
   const wowAudioRef = useRef(null);
+  const introAnxietyRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
 
@@ -1214,6 +1216,21 @@ export default function App() {
     if (gameState === 'SLEEP_TRANSITION') {
       const timer = setTimeout(() => handleStartDream(), 4000);
       return () => clearTimeout(timer);
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    if (!introAnxietyRef.current) {
+      introAnxietyRef.current = new Audio(introAnxietySound);
+      introAnxietyRef.current.loop = true;
+    }
+    const audio = introAnxietyRef.current;
+    const shouldPlay = ['INTRO', 'CLASS', 'SLEEP_TRANSITION'].includes(gameState);
+    if (shouldPlay) {
+      if (audio.paused) audio.play().catch(() => {});
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
     }
   }, [gameState]);
 
