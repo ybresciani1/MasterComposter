@@ -599,6 +599,37 @@ const FrogSprite = () => (
   </svg>
 );
 
+const RabbitSprite = () => (
+  <svg viewBox="0 0 20 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Back Ear */}
+    <path d="M12,1 h2 v4 h-2 z" fill="#9e9e9e" />
+    <path d="M13,2 h1 v3 h-1 z" fill="#f48fb1" />
+    {/* Tail */}
+    <path d="M1,8 h3 v4 h-3 z" fill="#ffffff" />
+    {/* Body Base (Gray) */}
+    <path d="M3,7 h10 v6 h-10 z" fill="#9e9e9e" />
+    {/* Body White patches */}
+    <path d="M4,9 h8 v4 h-8 z" fill="#ffffff" />
+    {/* Head Base */}
+    <path d="M11,5 h5 v6 h-5 z" fill="#9e9e9e" />
+    {/* Head White */}
+    <path d="M12,7 h4 v4 h-4 z" fill="#ffffff" />
+    {/* Front Ear */}
+    <path d="M10,2 h2 v5 h-2 z" fill="#757575" />
+    <path d="M11,3 h1 v3 h-1 z" fill="#f48fb1" />
+    {/* Eye */}
+    <path d="M14,6 h1 v1 h-1 z" fill="#212121" />
+    {/* Pink Nose */}
+    <path d="M16,8 h1 v1 h-1 z" fill="#f48fb1" />
+    {/* Legs (Back) */}
+    <path d="M4,13 h2 v3 h-2 z" fill="#757575" />
+    <path d="M4,15 h2 v1 h-2 z" fill="#ffffff" />
+    {/* Legs (Front) */}
+    <path d="M11,13 h2 v3 h-2 z" fill="#9e9e9e" />
+    <path d="M11,15 h2 v1 h-2 z" fill="#ffffff" />
+  </svg>
+);
+
 const CatSprite = () => (
   <svg viewBox="0 0 14 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M3,8 h1 v4 h-1 z M10,8 h1 v4 h-1 z" fill="#fb8c00" />
@@ -1828,6 +1859,15 @@ export default function App() {
           <div className="absolute bottom-36 left-48 w-8 h-6 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
           <div className="absolute bottom-32 left-64 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
 
+          {/* Running Rabbit */}
+          {dreamStage !== 'NIGHTMARE_END' && (
+             <div className="absolute top-[42%] z-20 w-10 h-8 animate-rabbit-dash" style={{ left: '-20%' }}>
+                <div className="w-full h-full animate-rabbit-hop">
+                   <RabbitSprite />
+                </div>
+             </div>
+          )}
+
           {/* Flowers */}
           <div className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
           <div className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
@@ -2506,6 +2546,20 @@ export default function App() {
           50% { transform: scaleX(0.2) translateY(-2px); }
         }
         .animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
+
+        /* RABBIT ANIMATIONS */
+        @keyframes rabbit-dash {
+          0% { left: -20%; }
+          3% { left: 120%; }
+          100% { left: 120%; }
+        }
+        .animate-rabbit-dash { animation: rabbit-dash 120s linear infinite 10s; }
+        
+        @keyframes rabbit-hop-fast {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
+        }
+        .animate-rabbit-hop { animation: rabbit-hop-fast 0.25s infinite; }
 
         /* HENS ANIMATION */
         @keyframes hen-walk {
