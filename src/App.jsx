@@ -17,6 +17,7 @@ const woodliceSound = `${BASE}/Woodlice touch sound.mp3`;
 const beeTapSound = `${BASE}/bee tap.mp3`;
 const butterflyTapSound = `${BASE}/Butterfly tap.mp3`;
 const frogTapSound = `${BASE}/Frog tap.mp3`;
+const oiiaCatSound = `${BASE}/oiia-cat-remix TAP sound.mp3`;
 const wateringCanSound = `${BASE}/Watering Can.mp3`;
 
 // --- GAME DATA ---
@@ -867,7 +868,7 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal',
 
   return (
     <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up`}>
-      <PixelBox className="flex gap-4 items-start relative shadow-2xl">
+      <PixelBox className="flex gap-4 items-start relative shadow-2xl bg-[rgba(244,226,184,0.85)]">
         {(portrait || name === 'Wallace') && (
           <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
             {name === 'Wallace' ? (
@@ -1040,6 +1041,9 @@ export default function App() {
   const audioRef = useRef(null);
   const wowAudioRef = useRef(null);
   const introAnxietyRef = useRef(null);
+  const catAudioCtxRef = useRef(null);
+  const catAnimFrameRef = useRef(null);
+  const catIsPlayingRef = useRef(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
 
@@ -1071,6 +1075,58 @@ export default function App() {
 
   const [toastMsg, setToastMsg] = useState(null);
   const [wallaceEmotion, setWallaceEmotion] = useState('normal');
+  const [catSpinning, setCatSpinning] = useState(false);
+
+  const handleCatClick = () => {
+    if (catIsPlayingRef.current) return;
+    catIsPlayingRef.current = true;
+
+    const reset = () => {
+      cancelAnimationFrame(catAnimFrameRef.current);
+      setCatSpinning(false);
+      catIsPlayingRef.current = false;
+      catAudioCtxRef.current?.close();
+      catAudioCtxRef.current = null;
+    };
+
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioCtx();
+      catAudioCtxRef.current = audioCtx;
+
+      const audio = new Audio(oiiaCatSound);
+      audio.crossOrigin = 'anonymous';
+      audio.volume = 1.0;
+
+      const source = audioCtx.createMediaElementSource(audio);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      let currentSpin = false;
+
+      const tick = () => {
+        analyser.getByteFrequencyData(dataArray);
+        const avg = dataArray.reduce((s, v) => s + v, 0) / dataArray.length;
+        const shouldSpin = avg > 8;
+        if (shouldSpin !== currentSpin) {
+          currentSpin = shouldSpin;
+          setCatSpinning(shouldSpin);
+        }
+        catAnimFrameRef.current = requestAnimationFrame(tick);
+      };
+
+      audioCtx.resume().then(() => audio.play()).then(() => {
+        catAnimFrameRef.current = requestAnimationFrame(tick);
+      }).catch(reset);
+
+      audio.onended = reset;
+    } catch {
+      reset();
+    }
+  };
 
   const showToast = (msg, emotion = 'normal') => {
     setToastMsg(msg);
@@ -1944,8 +2000,8 @@ export default function App() {
           <div className="absolute bottom-45 left-26 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
 
           {/* Pets */}
-          <div className="absolute bottom-36 left-48 w-8 h-6 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
-          <div className="absolute bottom-32 left-64 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
+          <div className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
+          <div className="absolute bottom-50 left-72 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
 
           {/* Running Rabbit */}
           {dreamStage !== 'NIGHTMARE_END' && (
@@ -2685,6 +2741,13 @@ export default function App() {
           50% { transform: translateY(-6px); }
         }
         .animate-hen-hop { animation: hen-hop 0.3s infinite alternate ease-in-out; }
+
+        /* OIIA CAT SPIN */
+        @keyframes oiia-spin {
+          from { transform: rotateY(0deg); }
+          to { transform: rotateY(360deg); }
+        }
+        .animate-cat-spin { animation: oiia-spin 0.46s linear infinite; }
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
