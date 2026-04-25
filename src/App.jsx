@@ -1106,7 +1106,10 @@ export default function App() {
       const cy = fieldRect.top - sceneRect.top + fieldRect.height / 2;
       const rx = fieldRect.width / 2 + 28;
       const ry = fieldRect.height / 2 + 28;
-      let angle = 0;
+      const catRect = catEl.getBoundingClientRect();
+      const catCx = catRect.left - sceneRect.left + catEl.offsetWidth / 2;
+      const catCy = catRect.top - sceneRect.top + catEl.offsetHeight / 2;
+      let angle = Math.atan2((catCy - cy) / ry, (catCx - cx) / rx);
       const animate = () => {
         if (catShouldMoveRef.current) {
           angle -= 0.01;
