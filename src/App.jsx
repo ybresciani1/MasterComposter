@@ -1044,6 +1044,10 @@ export default function App() {
   const catAudioCtxRef = useRef(null);
   const catAnimFrameRef = useRef(null);
   const catIsPlayingRef = useRef(false);
+  const catRef = useRef(null);
+  const catOrbitFrameRef = useRef(null);
+  const gameFieldRef = useRef(null);
+  const catShouldMoveRef = useRef(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
 
@@ -1081,9 +1085,45 @@ export default function App() {
     if (catIsPlayingRef.current) return;
     catIsPlayingRef.current = true;
 
+    const stopOrbit = () => {
+      cancelAnimationFrame(catOrbitFrameRef.current);
+      if (catRef.current) {
+        catRef.current.style.left = '';
+        catRef.current.style.top = '';
+        catRef.current.style.bottom = '';
+      }
+    };
+
+    const startOrbit = () => {
+      const catEl = catRef.current;
+      const fieldEl = gameFieldRef.current;
+      if (!catEl || !fieldEl) return;
+      const sceneEl = catEl.offsetParent;
+      if (!sceneEl) return;
+      const fieldRect = fieldEl.getBoundingClientRect();
+      const sceneRect = sceneEl.getBoundingClientRect();
+      const cx = fieldRect.left - sceneRect.left + fieldRect.width / 2;
+      const cy = fieldRect.top - sceneRect.top + fieldRect.height / 2;
+      const rx = fieldRect.width / 2 + 28;
+      const ry = fieldRect.height / 2 + 28;
+      let angle = 0;
+      const animate = () => {
+        if (catShouldMoveRef.current) {
+          angle -= 0.01;
+          catEl.style.left = `${cx + rx * Math.cos(angle) - catEl.offsetWidth / 2}px`;
+          catEl.style.top = `${cy + ry * Math.sin(angle) - catEl.offsetHeight / 2}px`;
+          catEl.style.bottom = 'auto';
+        }
+        catOrbitFrameRef.current = requestAnimationFrame(animate);
+      };
+      catOrbitFrameRef.current = requestAnimationFrame(animate);
+    };
+
     const reset = () => {
       cancelAnimationFrame(catAnimFrameRef.current);
+      stopOrbit();
       setCatSpinning(false);
+      catShouldMoveRef.current = false;
       catIsPlayingRef.current = false;
       catAudioCtxRef.current?.close();
       catAudioCtxRef.current = null;
@@ -1113,6 +1153,7 @@ export default function App() {
         const shouldSpin = avg > 8;
         if (shouldSpin !== currentSpin) {
           currentSpin = shouldSpin;
+          catShouldMoveRef.current = shouldSpin;
           setCatSpinning(shouldSpin);
         }
         catAnimFrameRef.current = requestAnimationFrame(tick);
@@ -1120,6 +1161,7 @@ export default function App() {
 
       audioCtx.resume().then(() => audio.play()).then(() => {
         catAnimFrameRef.current = requestAnimationFrame(tick);
+        startOrbit();
       }).catch(reset);
 
       audio.onended = reset;
@@ -2000,7 +2042,7 @@ export default function App() {
           <div className="absolute bottom-45 left-26 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
 
           {/* Pets */}
-          <div className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
+          <div ref={catRef} className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
           <div className="absolute bottom-50 left-72 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
 
           {/* Running Rabbit */}
@@ -2072,7 +2114,7 @@ export default function App() {
               <div className="text-center animate-fade-in relative flex flex-col items-center">
 
 
-                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
+                 <div ref={gameFieldRef} style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
                    if (isFixModalOpen || isWorking || lives <= 0) return;
                    const rect = e.currentTarget.getBoundingClientRect();
