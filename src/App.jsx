@@ -1048,6 +1048,9 @@ export default function App() {
   const catOrbitFrameRef = useRef(null);
   const gameFieldRef = useRef(null);
   const catShouldMoveRef = useRef(false);
+  const raveOverlayRef = useRef(null);
+  const raveColorIdxRef = useRef(0);
+  const raveColors = ['#ff00ff','#00ffff','#ffff00','#ff0055','#00ff88','#aa00ff','#ff6600'];
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [audioDismissed, setAudioDismissed] = useState(false);
 
@@ -1128,6 +1131,7 @@ export default function App() {
       setCatSpinning(false);
       catShouldMoveRef.current = false;
       catIsPlayingRef.current = false;
+      if (raveOverlayRef.current) raveOverlayRef.current.style.opacity = '0';
       catAudioCtxRef.current?.close();
       catAudioCtxRef.current = null;
     };
@@ -1149,9 +1153,14 @@ export default function App() {
 
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       let currentSpin = false;
+      let lastBass = false;
+      let raveFrame = 0;
+      const raveStartTime = Date.now() + 5000;
 
       const tick = () => {
         analyser.getByteFrequencyData(dataArray);
+
+        // Overall amplitude → spin
         const avg = dataArray.reduce((s, v) => s + v, 0) / dataArray.length;
         const shouldSpin = avg > 8;
         if (shouldSpin !== currentSpin) {
@@ -1159,6 +1168,25 @@ export default function App() {
           catShouldMoveRef.current = shouldSpin;
           setCatSpinning(shouldSpin);
         }
+
+        // Bass bins (0-3) → rave overlay
+        const bassAvg = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
+        const hasBass = bassAvg > 230 && Date.now() >= raveStartTime;
+        if (raveOverlayRef.current) {
+          if (hasBass) {
+            raveFrame++;
+            if (raveFrame % 12 === 0) {
+              raveColorIdxRef.current = (raveColorIdxRef.current + 1) % raveColors.length;
+              raveOverlayRef.current.style.backgroundColor = raveColors[raveColorIdxRef.current];
+            }
+            raveOverlayRef.current.style.opacity = '0.45';
+          } else {
+            raveFrame = 0;
+            raveOverlayRef.current.style.opacity = '0';
+          }
+        }
+        lastBass = hasBass;
+
         catAnimFrameRef.current = requestAnimationFrame(tick);
       };
 
@@ -2796,6 +2824,7 @@ export default function App() {
 
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
+      <div ref={raveOverlayRef} className="fixed inset-0 pointer-events-none z-[180]" style={{ opacity: 0, backgroundColor: '#ff00ff', mixBlendMode: 'screen' }} />
       {!audioDismissed && (
          <div key="audio-prompt-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
             <PixelBox className="text-center animate-bounce max-w-sm mx-4">
