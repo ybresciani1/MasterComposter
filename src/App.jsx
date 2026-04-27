@@ -1301,10 +1301,11 @@ export default function App() {
 
     setCrows(prev => [...prev, { id, targetX, targetY }]);
 
-    // Decrement life and play sound when the crow grabs the heart
+    // Decrement life and play sound when the crow grabs the heart (skip on final heart to avoid clashing with nightmare sound)
+    const isLastHeart = lives === 1;
     setTimeout(() => {
       setLives(l => Math.max(0, l - 1));
-      const sfx = new Audio(loseHeartSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+      if (!isLastHeart) { const sfx = new Audio(loseHeartSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
     }, 1700);
 
     // Remove crow after full animation finishes
