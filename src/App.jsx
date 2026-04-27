@@ -1328,10 +1328,6 @@ export default function App() {
     }
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
-    Object.values(preloadedSfx.current).forEach(audio => {
-      audio.volume = 0;
-      audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => {});
-    });
   };
 
   useEffect(() => {
