@@ -1001,7 +1001,7 @@ export default function App() {
     e.stopPropagation();
     const id = Date.now() + Math.random();
     setHenHearts(prev => [...prev, { id, hen: henName }]);
-    const sfx = new Audio(riotBeyonceTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    playSfx(riotBeyonceTapSound);
     setTimeout(() => {
       setHenHearts(prev => prev.filter(h => h.id !== id));
     }, 1000);
@@ -1016,7 +1016,7 @@ export default function App() {
       tx: (Math.random() - 0.5) * 300
     }));
 
-    const sfx = new Audio(sakuraSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    playSfx(sakuraSound);
     setSakuraClicks(prev => [...prev, { id, petals }]);
     setTimeout(() => setSakuraClicks(prev => prev.filter(c => c.id !== id)), 4000);
   };
@@ -1083,7 +1083,7 @@ export default function App() {
 
   const triggerButterflies = (e) => {
     e.stopPropagation();
-    const sfx = new Audio(butterflyTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    playSfx(butterflyTapSound);
     const x = e.clientX;
     const y = e.clientY;
     const id = Date.now() + Math.random();
@@ -1106,7 +1106,7 @@ export default function App() {
   };
 
   const handleBeeClick = (id) => {
-    const sfx = new Audio(beeTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    playSfx(beeTapSound);
     setLingeringBugs(prev => ({
       ...prev,
       bees: prev.bees.map(b => b.id === id ? { ...b, zoomed: true } : b)
@@ -1114,7 +1114,7 @@ export default function App() {
   };
 
   const handleWoodlouseClick = (id) => {
-    const sfx = new Audio(woodliceSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+    playSfx(woodliceSound);
     setLingeringBugs(prev => ({
       ...prev,
       woodlice: prev.woodlice.map(w => w.id === id ? { ...w, rolled: true } : w)
@@ -1313,7 +1313,7 @@ export default function App() {
     const isLastHeart = lives === 1;
     setTimeout(() => {
       setLives(l => Math.max(0, l - 1));
-      if (!isLastHeart) { const sfx = new Audio(loseHeartSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
+      if (!isLastHeart) { playSfx(loseHeartSound); }
     }, 1700);
 
     // Remove crow after full animation finishes
