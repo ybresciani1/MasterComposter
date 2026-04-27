@@ -1546,7 +1546,7 @@ export default function App() {
       const isCorrect = cauldron.every(c => SOIL_COMPONENTS.includes(c));
       if (isCorrect) {
         setIsStirring(true); showToast("Stirring it all together...", 'surprised');
-        const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+        playSfx(pitchforkSound);
         setTimeout(() => { setIsStirring(false); showToast("Perfect! Compost is made!", 'surprised'); setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 2000); }, 2000);
       } else {
         setTimeout(() => { 
@@ -1742,8 +1742,8 @@ export default function App() {
              const binCenter = { x: 170, y: 50 };
              if (Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y) < 110) {
                 setCauldron(prev => [...prev, heldItem.name || heldItem]); setHeldItem(null);
-                if ((heldItem.name || heldItem) === '✨ Magic') { const sfx = new Audio(magicSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
-                else { const sfx = new Audio(tossBinSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
+                if ((heldItem.name || heldItem) === '✨ Magic') { playSfx(magicSound); }
+                else { playSfx(tossBinSound); }
              } else showToast("Get closer to the mixing bin!");
          } else if (dreamStage === 'MATCH_EXAMPLES') {
              const pileCenter = { x: 170, y: 150 };
@@ -1766,7 +1766,7 @@ export default function App() {
                      setIsWorking(true);
                      setIsChopping(true);
                      showToast("Chopping scraps...", 'surprised');
-                     const sfx = new Audio(patDirtSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+                     playSfx(patDirtSound);
                      setTimeout(() => {
                         setIsWorking(false);
                         setIsChopping(false);
@@ -1784,7 +1784,7 @@ export default function App() {
                      setIsWorking(true);
                      setIsPrepping(true);
                      showToast("Removing tape & stickers...", 'surprised');
-                     const sfx = new Audio(patDirtSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+                     playSfx(patDirtSound);
                      setTimeout(() => {
                         setIsWorking(false);
                         setIsPrepping(false);
@@ -1819,11 +1819,11 @@ export default function App() {
                setCombinedBins(prev => [...prev, heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c']);
                setHeldItem(null); showToast(`Combined!`, 'surprised');
              } else if (matchPhase === 2 && heldItem.id === 'ex_w' && distToPile < 80) {
-               setIsWatering(true); setHeldItem(null); showToast("Watering...", 'surprised'); const waterSfx = new Audio(wateringCanSound); waterSfx.volume = 1.0; waterSfx.play().catch(() => {});
+               setIsWatering(true); setHeldItem(null); showToast("Watering...", 'surprised'); playSfx(wateringCanSound);
                setTimeout(() => { setIsWatering(false); setMatchPhase(3); initializeExamplesItems(3); showToast("Now add air!", 'surprised'); }, 3000);
              } else if (matchPhase === 3 && heldItem.id === 'ex_a' && distToPile < 80) {
                setIsStirring(true); setHeldItem(null); showToast("Aerating...", 'surprised');
-               const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+               playSfx(pitchforkSound);
                setTimeout(() => { setIsStirring(false); showToast("Compost complete!", 'surprised'); setTimeout(() => setDreamStage('FIX_PLOTS'), 2000); }, 2500);
              }
          } else if (dreamStage === 'PLANT_SEEDS') {
@@ -1901,9 +1901,9 @@ export default function App() {
      setIsWorking(true);
      showToast(`Fixing the ${activePlot.name}...`, 'surprised');
      
-     if (activePlot.id === 'compaction') { setIsStirring(true); const sfx = new Audio(pitchforkSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
-     if (activePlot.id === 'erosion') { const sfx = new Audio(patDirtSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
-     if (activePlot.id === 'drainage') { setIsWorking(true); const sfx = new Audio(hammerSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }
+     if (activePlot.id === 'compaction') { setIsStirring(true); playSfx(pitchforkSound); }
+     if (activePlot.id === 'erosion') { playSfx(patDirtSound); }
+     if (activePlot.id === 'drainage') { setIsWorking(true); playSfx(hammerSound); }
      
      setTimeout(() => {
         setIsWorking(false); setIsStirring(false); setIsWatering(false);
@@ -2191,7 +2191,7 @@ export default function App() {
 
           {/* Pond & Frog */}
           <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
-          <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] z-[100] animate-frog cursor-pointer" onClick={() => { const sfx = new Audio(frogTapSound); sfx.volume = 1.0; sfx.play().catch(() => {}); }} style={{ width: '56px', height: '52px', margin: '-16px' }}>
+          <div className="absolute top-[7.5rem] sm:top-[5.5rem] left-[60%] z-[100] animate-frog cursor-pointer" onClick={() => { playSfx(frogTapSound); }} style={{ width: '56px', height: '52px', margin: '-16px' }}>
              <div className="absolute top-4 left-4 w-6 h-5 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonFrogSprite /> : <FrogSprite />}</div>
           </div>
           {dreamStage !== 'NIGHTMARE_END' && (
