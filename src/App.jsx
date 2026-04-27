@@ -269,37 +269,19 @@ const HammerSprite = () => (
 );
 
 const CrowSprite = () => (
-  <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    {/* Far (upper) wing — extends upward, rotates around X axis */}
-    <g className="animate-crow-far-wing" style={{ transformOrigin: '50% 50%', transformBox: 'fill-box' }}>
-      <path d="M13,1 h3 v1 h-3z M12,2 h5 v1 h-5z M11,3 h7 v1 h-7z M10,4 h9 v1 h-9z M10,5 h10 v1 h-10z M9,6 h12 v1 h-12z M9,7 h13 v1 h-13z M9,8 h14 v1 h-14z" fill="#0c0e14" />
-      <path d="M14,1 h2 v1 h-2z M15,2 h2 v1 h-2z M16,3 h2 v1 h-2z M17,4 h2 v1 h-2z M18,5 h2 v1 h-2z M19,6 h2 v1 h-2z M20,7 h2 v1 h-2z M21,8 h2 v1 h-2z" fill="#1a3040" />
-      <path d="M21,6 h1 v1 h-1z M22,7 h1 v1 h-1z M22,8 h1 v1 h-1z" fill="#2e5a6e" />
+  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
+    <path d="M18,10 h4 v4 h-4 z" fill="#111" />
+    <path d="M20,11 h4 v2 h-4 z" fill="#000" />
+    <path d="M14,16 h2 v2 h-2 z M16,17 h2 v1 h-2 z" fill="#333" />
+    <path d="M6,8 h12 v8 h-12 z" fill="#212121" />
+    <path d="M2,9 h4 v6 h-4 z" fill="#212121" />
+    <path d="M0,11 h2 v2 h-2 z" fill="#fbc02d" />
+    <path d="M3,10 h1 v1 h-1 z" fill="#ffffff" />
+    <path d="M3,10 h0.5 v0.5 h-0.5 z" fill="#000" />
+    <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
+       <path d="M8,2 h6 v8 h-6 z" fill="#424242" />
+       <path d="M10,0 h2 v2 h-2 z" fill="#424242" />
     </g>
-
-    {/* Body */}
-    <path d="M9,8 h12 v1 h-12z M8,9 h14 v1 h-14z M7,10 h15 v1 h-15z M8,11 h14 v1 h-14z M9,12 h12 v1 h-12z" fill="#0c0e14" />
-    <path d="M17,8 h4 v1 h-4z M18,9 h4 v1 h-4z M19,10 h3 v1 h-3z M18,11 h4 v1 h-4z M17,12 h4 v1 h-4z" fill="#1a3040" />
-
-    {/* Head */}
-    <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
-
-    {/* Near (lower) wing — extends downward, rotates around X axis */}
-    <g className="animate-crow-near-wing" style={{ transformOrigin: '50% 50%', transformBox: 'fill-box' }}>
-      <path d="M9,12 h14 v1 h-14z M9,13 h13 v1 h-13z M9,14 h12 v1 h-12z M10,15 h10 v1 h-10z M10,16 h9 v1 h-9z M11,17 h7 v1 h-7z M12,18 h5 v1 h-5z M13,19 h3 v1 h-3z" fill="#0c0e14" />
-      <path d="M21,12 h2 v1 h-2z M20,13 h2 v1 h-2z M19,14 h2 v1 h-2z M18,15 h2 v1 h-2z M17,16 h2 v1 h-2z M16,17 h2 v1 h-2z M15,18 h2 v1 h-2z M14,19 h2 v1 h-2z" fill="#1a3040" />
-      <path d="M22,12 h1 v1 h-1z M21,13 h1 v1 h-1z" fill="#2e5a6e" />
-    </g>
-
-    {/* Beak */}
-    <path d="M3,9 h2 v1 h-2z M3,10 h1 v1 h-1z" fill="#e8b820" />
-
-    {/* Eye */}
-    <path d="M6,9 h1 v1 h-1z" fill="#fdd835" />
-
-    {/* Heart in beak */}
-    <path d="M0,7 h1 v1 h-1z M2,7 h1 v1 h-1z M0,8 h3 v1 h-3z M0,9 h3 v1 h-3z M1,10 h1 v1 h-1z" fill="#e53935" />
-    <path d="M0,8 h2 v1 h-2z" fill="#ffcdd2" opacity="0.6" />
   </svg>
 );
 
@@ -2971,19 +2953,12 @@ export default function App() {
         .animate-crow-swoop {
           animation: crow-swoop-anim 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
         }
-        @keyframes crow-near-wing-anim {
-          0%, 100% { transform: rotateX(-50deg); }
-          50%       { transform: rotateX(50deg);  }
+        @keyframes crow-flap-anim {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(-1); }
         }
-        @keyframes crow-far-wing-anim {
-          0%, 100% { transform: rotateX(50deg);  }
-          50%       { transform: rotateX(-50deg); }
-        }
-        .animate-crow-near-wing {
-          animation: crow-near-wing-anim 0.4s ease-in-out infinite;
-        }
-        .animate-crow-far-wing {
-          animation: crow-far-wing-anim 0.4s ease-in-out infinite;
+        .animate-crow-flap {
+          animation: crow-flap-anim 0.25s infinite;
         }
 
       `}</style>
@@ -2991,7 +2966,7 @@ export default function App() {
 
       {/* CROW STEALING LIFE ANIMATION OVERLAY */}
       {crows.map(id => (
-        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '128px', height: '128px' }}>
+        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '80px', height: '80px' }}>
            <div className="relative w-full h-full">
               <CrowSprite />
            </div>
