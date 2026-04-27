@@ -1284,7 +1284,6 @@ export default function App() {
   };
 
   const loseLife = (msg, emotion = 'sad') => {
-    setLives(l => Math.max(0, l - 1));
     if (msg) showToast(msg, emotion);
 
     const id = Date.now() + Math.random();
@@ -1298,6 +1297,11 @@ export default function App() {
     }
 
     setCrows(prev => [...prev, { id, targetX, targetY }]);
+
+    // Decrement life when the crow grabs the heart
+    setTimeout(() => {
+      setLives(l => Math.max(0, l - 1));
+    }, 1700);
 
     // Remove crow after full animation finishes
     setTimeout(() => {
