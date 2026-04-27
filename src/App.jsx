@@ -271,7 +271,7 @@ const HammerSprite = () => (
 const CrowSprite = () => (
   <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
     {/* Far (upper) wing — behind body, opposite flap phase */}
-    <g className="animate-crow-far-wing" style={{ transformOrigin: '18px 5px' }}>
+    <g className="animate-crow-far-wing" style={{ transformOrigin: '18px 5px', transformBox: 'fill-box' }}>
       <path d="M9,8 h8 v1 h-8z M10,7 h9 v1 h-9z M11,6 h8 v1 h-8z M12,5 h7 v1 h-7z M14,4 h5 v1 h-5z M16,3 h3 v1 h-3z M17,2 h2 v1 h-2z" fill="#0c0e14" />
       <path d="M17,8 h5 v1 h-5z M19,7 h5 v1 h-5z M19,6 h5 v1 h-5z M19,5 h5 v1 h-5z M19,4 h4 v1 h-4z M19,3 h4 v1 h-4z M19,2 h3 v1 h-3z" fill="#1a3040" />
       <path d="M22,8 h3 v1 h-3z M24,7 h3 v1 h-3z M24,6 h3 v1 h-3z M24,5 h3 v1 h-3z M23,4 h3 v1 h-3z M23,3 h3 v1 h-3z M22,2 h3 v1 h-3z" fill="#2e5a6e" />
@@ -286,7 +286,7 @@ const CrowSprite = () => (
     <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
 
     {/* Near (lower) wing — in front of body */}
-    <g className="animate-crow-near-wing" style={{ transformOrigin: '18px 15px' }}>
+    <g className="animate-crow-near-wing" style={{ transformOrigin: '18px 15px', transformBox: 'fill-box' }}>
       <path d="M9,12 h8 v1 h-8z M10,13 h9 v1 h-9z M11,14 h8 v1 h-8z M12,15 h7 v1 h-7z M14,16 h5 v1 h-5z M16,17 h3 v1 h-3z M17,18 h2 v1 h-2z" fill="#0c0e14" />
       <path d="M17,12 h5 v1 h-5z M19,13 h5 v1 h-5z M19,14 h5 v1 h-5z M19,15 h5 v1 h-5z M19,16 h4 v1 h-4z M19,17 h4 v1 h-4z M19,18 h3 v1 h-3z" fill="#1a3040" />
       <path d="M22,12 h3 v1 h-3z M24,13 h3 v1 h-3z M24,14 h3 v1 h-3z M24,15 h3 v1 h-3z M23,16 h3 v1 h-3z M23,17 h3 v1 h-3z M22,18 h3 v1 h-3z" fill="#2e5a6e" />
