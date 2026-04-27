@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const BASE = 'https://master-composter.vercel.app/assets';
 const backgroundMusic = `${BASE}/nastelbom-background-music-486996.mp3`;
 const wowSound = `${BASE}/anime-wow-sound-effect.mp3`;
-const endCreditsVideo = `${BASE}/End Credits.mov`;
+const endCreditsVideo = `${BASE}/End Credits-1080.mp4`;
 const pitchforkSound = `${BASE}/Pitchfork Sound Final.mp3`;
 const hammerSound = `${BASE}/Hammer Sound Final.mp3`;
 const patDirtSound = `${BASE}/Pat Dirt Final Sound.mp3`;
