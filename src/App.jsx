@@ -269,28 +269,39 @@ const HammerSprite = () => (
 );
 
 const CrowSprite = () => (
-  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-     {/* Far Wing (Flapping) */}
-     <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
-       <path d="M12,7 h2 v1 h-2 z M11,8 h3 v1 h-3 z M10,9 h2 v1 h-2 z M9,10 h2 v1 h-2 z" fill="#0a0a0c" />
-       <path d="M12,6 h2 v1 h-2 z M11,7 h1 v1 h-1 z" fill="#37474f" />
-     </g>
+  <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
+    {/* Far (upper) wing — behind body, opposite flap phase */}
+    <g className="animate-crow-far-wing" style={{ transformOrigin: '18px 5px' }}>
+      <path d="M9,8 h8 v1 h-8z M10,7 h9 v1 h-9z M11,6 h8 v1 h-8z M12,5 h7 v1 h-7z M14,4 h5 v1 h-5z M16,3 h3 v1 h-3z M17,2 h2 v1 h-2z" fill="#0c0e14" />
+      <path d="M17,8 h5 v1 h-5z M19,7 h5 v1 h-5z M19,6 h5 v1 h-5z M19,5 h5 v1 h-5z M19,4 h4 v1 h-4z M19,3 h4 v1 h-4z M19,2 h3 v1 h-3z" fill="#1a3040" />
+      <path d="M22,8 h3 v1 h-3z M24,7 h3 v1 h-3z M24,6 h3 v1 h-3z M24,5 h3 v1 h-3z M23,4 h3 v1 h-3z M23,3 h3 v1 h-3z M22,2 h3 v1 h-3z" fill="#2e5a6e" />
+      <path d="M26,7 h2 v1 h-2z M27,6 h2 v1 h-2z M27,5 h2 v1 h-2z M26,4 h2 v1 h-2z M26,3 h2 v1 h-2z M25,2 h2 v1 h-2z" fill="#4a8a9a" />
+    </g>
 
-     {/* Near Wing & Body Black Base */}
-     <path d="M14,6 h2 v2 h-2 z M13,8 h2 v1 h-2 z M12,9 h3 v1 h-3 z M11,10 h4 v1 h-4 z M9,11 h8 v1 h-8 z M10,12 h8 v1 h-8 z M10,13 h6 v1 h-6 z M14,14 h2 v1 h-2 z" fill="#111111" />
+    {/* Body */}
+    <path d="M9,8 h12 v1 h-12z M8,9 h14 v1 h-14z M7,10 h15 v1 h-15z M8,11 h14 v1 h-14z M9,12 h12 v1 h-12z" fill="#0c0e14" />
+    <path d="M17,8 h4 v1 h-4z M18,9 h4 v1 h-4z M19,10 h3 v1 h-3z M18,11 h4 v1 h-4z M17,12 h4 v1 h-4z" fill="#1a3040" />
 
-     {/* Slate / Blue-Gray Details */}
-     <path d="M6,12 h3 v1 h-3 z M8,11 h1 v1 h-1 z M8,13 h2 v1 h-2 z M11,10 h1 v1 h-1 z M12,9 h1 v1 h-1 z M13,8 h2 v1 h-2 z M15,11 h2 v1 h-2 z M16,12 h2 v1 h-2 z" fill="#4a6068" />
-     
-     {/* Eye */}
-     <path d="M9,12 h1 v1 h-1 z" fill="#fdd835" />
+    {/* Head */}
+    <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
 
-     {/* Legs */}
-     <path d="M10,14 h2 v1 h-2 z M10,15 h1 v1 h-1 z M13,14 h2 v1 h-2 z M14,15 h1 v1 h-1 z" fill="#111111" />
+    {/* Near (lower) wing — in front of body */}
+    <g className="animate-crow-near-wing" style={{ transformOrigin: '18px 15px' }}>
+      <path d="M9,12 h8 v1 h-8z M10,13 h9 v1 h-9z M11,14 h8 v1 h-8z M12,15 h7 v1 h-7z M14,16 h5 v1 h-5z M16,17 h3 v1 h-3z M17,18 h2 v1 h-2z" fill="#0c0e14" />
+      <path d="M17,12 h5 v1 h-5z M19,13 h5 v1 h-5z M19,14 h5 v1 h-5z M19,15 h5 v1 h-5z M19,16 h4 v1 h-4z M19,17 h4 v1 h-4z M19,18 h3 v1 h-3z" fill="#1a3040" />
+      <path d="M22,12 h3 v1 h-3z M24,13 h3 v1 h-3z M24,14 h3 v1 h-3z M24,15 h3 v1 h-3z M23,16 h3 v1 h-3z M23,17 h3 v1 h-3z M22,18 h3 v1 h-3z" fill="#2e5a6e" />
+      <path d="M26,13 h2 v1 h-2z M27,14 h2 v1 h-2z M27,15 h2 v1 h-2z M26,16 h2 v1 h-2z M26,17 h2 v1 h-2z M25,18 h2 v1 h-2z" fill="#4a8a9a" />
+    </g>
 
-     {/* Heart in beak */}
-     <path d="M3,11 h1 v1 h-1 z M5,11 h1 v1 h-1 z M2,12 h5 v1 h-5 z M3,13 h3 v1 h-3 z M4,14 h1 v1 h-1 z" fill="#e53935" />
-     <path d="M3,12 h2 v1 h-2 z" fill="#ffcdd2" opacity="0.6"/>
+    {/* Beak */}
+    <path d="M3,9 h2 v1 h-2z M3,10 h1 v1 h-1z" fill="#e8b820" />
+
+    {/* Eye */}
+    <path d="M6,9 h1 v1 h-1z" fill="#fdd835" />
+
+    {/* Heart in beak */}
+    <path d="M0,7 h1 v1 h-1z M2,7 h1 v1 h-1z M0,8 h3 v1 h-3z M0,9 h3 v1 h-3z M1,10 h1 v1 h-1z" fill="#e53935" />
+    <path d="M0,8 h2 v1 h-2z" fill="#ffcdd2" opacity="0.6" />
   </svg>
 );
 
