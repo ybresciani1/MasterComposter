@@ -1455,7 +1455,7 @@ export default function App() {
 
   useEffect(() => {
     if (dreamStage === 'WAKE_UP' && dialogIndex >= wakeUpStory.length && lives > 0) {
-      const sfx = new Audio(questSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+      playSfx(questSound);
     }
   }, [dreamStage, dialogIndex, lives]);
 
@@ -1469,11 +1469,11 @@ export default function App() {
     }
     if (dreamStage === 'NIGHTMARE_END') {
       if (audioRef.current) { audioRef.current.currentTime = 0; }
-      const sfx = new Audio(nightmareSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+      playSfx(nightmareSound);
     }
     if (dreamStage === 'WAKE_UP') {
       if (audioRef.current) { audioRef.current.currentTime = 0; }
-      const sfx = new Audio(wakeUpSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+      playSfx(wakeUpSound);
     }
   }, [dreamStage, lives]);
 
