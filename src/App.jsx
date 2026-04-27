@@ -1325,6 +1325,7 @@ export default function App() {
   const playAudio = () => {
     if (audioRef.current) {
       audioRef.current.volume = 0.15;
+      audioRef.current.play().catch(() => {});
     }
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
