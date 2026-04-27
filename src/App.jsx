@@ -1328,6 +1328,10 @@ export default function App() {
     }
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
+    Object.values(preloadedSfx.current).forEach(audio => {
+      audio.volume = 0;
+      audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => {});
+    });
   };
 
   useEffect(() => {
@@ -1338,6 +1342,14 @@ export default function App() {
       preloadedSfx.current[url] = audio;
     });
   }, []);
+
+  const playSfx = (url) => {
+    const sfx = preloadedSfx.current[url];
+    if (!sfx) return;
+    sfx.currentTime = 0;
+    sfx.volume = 1.0;
+    sfx.play().catch(() => {});
+  };
 
   const toggleMusic = () => {
     setIsMusicPlaying(!isMusicPlaying);
