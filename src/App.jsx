@@ -915,6 +915,7 @@ export default function App() {
   const [lingeringBugs, setLingeringBugs] = useState({ bees: [], woodlice: [] });
   const [henHearts, setHenHearts] = useState([]);
   const [isChopping, setIsChopping] = useState(false);
+  const [isPrepping, setIsPrepping] = useState(false);
 
   const handleHenClick = (e, henName) => {
     e.stopPropagation();
@@ -1428,9 +1429,10 @@ export default function App() {
   useEffect(() => {
     if (dreamStage === 'MATCH_EXAMPLES') {
       if (matchPhase === 0) {
-        // Use a helper to correctly identify the component even if it was chopped
+        // Use a helper to correctly identify the component even if it was chopped/prepped
         const getComp = (id) => {
            if (id === 'ex_n2' || id === 'ex_n2_chopped') return '🍃 Nitrogen (Greens)';
+           if (id === 'ex_c2' || id === 'ex_c2_prepped') return '🍂 Carbon (Browns)';
            return EXAMPLE_ITEMS.find(i => i.id === id)?.comp;
         };
         const greens = completedExamples.filter(id => getComp(id)?.includes('Nitrogen')).length;
@@ -1622,8 +1624,11 @@ export default function App() {
                   if (Math.hypot(farmerCenter.x - (bin.x + 40), farmerCenter.y - (bin.y + 40)) < 75) closestBin = bin;
                });
 
-               const cuttingBoardCenter = { x: 130 + 32, y: 15 + 32 };
+               const cuttingBoardCenter = { x: 100 + 32, y: 15 + 32 };
                const nearCuttingBoard = Math.hypot(farmerCenter.x - cuttingBoardCenter.x, farmerCenter.y - cuttingBoardCenter.y) < 70;
+
+               const prepStationCenter = { x: 164 + 32, y: 15 + 32 };
+               const nearPrepStation = Math.hypot(farmerCenter.x - prepStationCenter.x, farmerCenter.y - prepStationCenter.y) < 70;
 
                if (nearCuttingBoard) {
                   if (heldItem.id === 'ex_n2' && !heldItem.isChopped) {
@@ -1643,10 +1648,32 @@ export default function App() {
                   return;
                }
 
+               if (nearPrepStation) {
+                  if (heldItem.id === 'ex_c2' && !heldItem.isPrepped) {
+                     setIsWorking(true);
+                     setIsPrepping(true);
+                     showToast("Removing tape & stickers...", 'surprised');
+                     const sfx = new Audio(patDirtSound); sfx.volume = 1.0; sfx.play().catch(() => {});
+                     setTimeout(() => {
+                        setIsWorking(false);
+                        setIsPrepping(false);
+                        setHeldItem(prev => ({...prev, name: 'Clean Cardboard', isPrepped: true}));
+                        showToast("Tape & stickers removed!");
+                     }, 1500);
+                  } else {
+                     showToast("Nothing to prep here!");
+                  }
+                  return;
+               }
+
                if (closestBin) {
                   if (heldItem.id === 'ex_n2' && !heldItem.isChopped && closestBin.comp.includes('Nitrogen')) {
                      setLives(l => l - 1);
                      showToast("Wallace: Chop those vegetable scraps first!", 'angry');
+                  }
+                  else if (heldItem.id === 'ex_c2' && !heldItem.isPrepped && closestBin.comp.includes('Carbon')) {
+                     setLives(l => l - 1);
+                     showToast("Wallace: Remove the tape and stickers first!", 'angry');
                   }
                   else if (heldItem.comp === closestBin.comp) { 
                      setCompletedExamples(prev => [...prev, heldItem.id]); 
@@ -1658,7 +1685,7 @@ export default function App() {
                      showToast("Wallace: Wrong bin!", 'sad');
                   }
                } else {
-                 if (!nearCuttingBoard) showToast("Get closer to a station!");
+                 if (!nearCuttingBoard && !nearPrepStation) showToast("Get closer to a station!");
                }
              } else if (matchPhase === 1 && heldItem.isBin && distToPile < 80) {
                setCombinedBins(prev => [...prev, heldItem.id === 'held_bin_n' ? 'bin_n' : 'bin_c']);
@@ -1713,7 +1740,7 @@ export default function App() {
         window.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('blur', handleBlur);
     };
-  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, plotItems, appliedItems, fixedPlots, answeredPlots, plantedBeds, lives]);
+  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, isChopping, isPrepping, plotItems, appliedItems, fixedPlots, answeredPlots, plantedBeds, lives]);
 
   const handleApplyItemToPlot = () => {
     // Check if the held item is correct for the active plot
@@ -2163,7 +2190,7 @@ export default function App() {
                  <div className="text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse text-center">
                    {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
                    {dreamStage === 'MATCH_EXAMPLES' && (
-                     matchPhase === 0 ? "Chop veggies on the Cutting Board, then sort into Greens & Browns bins!" :
+                     matchPhase === 0 ? "Chop veggies, remove tape from cardboard, then sort into Greens & Browns!" :
                      matchPhase === 1 ? "Pick up the full bins and dump them into the center compost pile!" :
                      matchPhase === 2 ? "Grab the watering can and water the pile!" :
                      "Grab the pitchfork and aerate the pile!"
@@ -2226,10 +2253,16 @@ export default function App() {
                         })}
                         
                         {matchPhase === 0 && (
-                          <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(130px, 15px)` }}>
-                            <span className="text-2xl mt-1">🔪</span>
-                            <span className="text-white text-[7px] font-bold mt-1 text-center leading-none">Cutting<br/>Board</span>
-                          </div>
+                          <>
+                            <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(100px, 15px)` }}>
+                              <span className="text-2xl mt-1">🔪</span>
+                              <span className="text-white text-[7px] font-bold mt-1 text-center leading-none">Cutting<br/>Board</span>
+                            </div>
+                            <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(164px, 15px)` }}>
+                              <span className="text-2xl mt-1">🗑️</span>
+                              <span className="text-white text-[7px] font-bold mt-1 text-center leading-none">Prep<br/>Station</span>
+                            </div>
+                          </>
                         )}
 
                         <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-[#4e342e] border-4 border-[#3e2723] rounded-full transition-all duration-700 flex items-center justify-center z-5 shadow-inner ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
@@ -2310,10 +2343,14 @@ export default function App() {
                          </div>
                        )}
                        
-                       {/* Render chopping knife if active */}
                        {isChopping && (
                          <div className="absolute z-40 animate-hammer text-3xl drop-shadow-md" style={{ transform: `translate(20px, -10px)` }}>
                            🔪
+                         </div>
+                       )}
+                       {isPrepping && (
+                         <div className="absolute z-40 animate-hammer text-3xl drop-shadow-md" style={{ transform: `translate(20px, -10px)` }}>
+                           ✂️
                          </div>
                        )}
 
@@ -2326,7 +2363,7 @@ export default function App() {
                 <DialogBox name="Wallace" text={
                    dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
                    dreamStage === 'MATCH_EXAMPLES' ? (
-                     matchPhase === 0 ? "Put green stuff in Greens and brown stuff in Browns! Use the cutting board to chop up big veggie scraps!" :
+                     matchPhase === 0 ? "Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!" :
                      matchPhase === 1 ? "Now bring those full bins to the center pile!" :
                      matchPhase === 2 ? "Needs some moisture! Give it a good watering." :
                      "Last step, let's get some air in there. Pitchfork time!"
