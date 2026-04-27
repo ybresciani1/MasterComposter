@@ -1486,7 +1486,7 @@ export default function App() {
 
   useEffect(() => {
     if (!introAnxietyRef.current) {
-      introAnxietyRef.current = new Audio(introAnxietySound);
+      introAnxietyRef.current = preloadedSfx.current[introAnxietySound];
       introAnxietyRef.current.loop = true;
     }
     const audio = introAnxietyRef.current;
