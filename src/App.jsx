@@ -269,19 +269,29 @@ const HammerSprite = () => (
 );
 
 const CrowSprite = () => (
-  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    <path d="M18,10 h4 v4 h-4 z" fill="#111" />
-    <path d="M20,11 h4 v2 h-4 z" fill="#000" />
-    <path d="M14,16 h2 v2 h-2 z M16,17 h2 v1 h-2 z" fill="#333" />
-    <path d="M6,8 h12 v8 h-12 z" fill="#212121" />
-    <path d="M2,9 h4 v6 h-4 z" fill="#212121" />
-    <path d="M0,11 h2 v2 h-2 z" fill="#fbc02d" />
-    <path d="M3,10 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M3,10 h0.5 v0.5 h-0.5 z" fill="#000" />
-    <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
-       <path d="M8,2 h6 v8 h-6 z" fill="#424242" />
-       <path d="M10,0 h2 v2 h-2 z" fill="#424242" />
+  <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
+    {/* Wing (old-style rectangle, scaleY flap around SVG center) */}
+    <g className="animate-crow-flap" style={{ transformOrigin: '14px 10px' }}>
+      <path d="M11,2 h6 v6 h-6z" fill="#424242" />
+      <path d="M13,1 h2 v1 h-2z" fill="#424242" />
     </g>
+
+    {/* Body (newer design with teal highlight) */}
+    <path d="M9,8 h12 v1 h-12z M8,9 h14 v1 h-14z M7,10 h15 v1 h-15z M8,11 h14 v1 h-14z M9,12 h12 v1 h-12z" fill="#0c0e14" />
+    <path d="M17,8 h4 v1 h-4z M18,9 h4 v1 h-4z M19,10 h3 v1 h-3z M18,11 h4 v1 h-4z M17,12 h4 v1 h-4z" fill="#1a3040" />
+
+    {/* Head */}
+    <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
+
+    {/* Beak */}
+    <path d="M3,9 h2 v1 h-2z M3,10 h1 v1 h-1z" fill="#e8b820" />
+
+    {/* Eye */}
+    <path d="M6,9 h1 v1 h-1z" fill="#fdd835" />
+
+    {/* Heart in beak */}
+    <path d="M0,7 h1 v1 h-1z M2,7 h1 v1 h-1z M0,8 h3 v1 h-3z M0,9 h3 v1 h-3z M1,10 h1 v1 h-1z" fill="#e53935" />
+    <path d="M0,8 h2 v1 h-2z" fill="#ffcdd2" opacity="0.6" />
   </svg>
 );
 
