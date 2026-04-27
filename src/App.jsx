@@ -1124,6 +1124,7 @@ export default function App() {
   const audioRef = useRef(null);
   const wowAudioRef = useRef(null);
   const introAnxietyRef = useRef(null);
+  const preloadedSfx = useRef({});
   const catAudioCtxRef = useRef(null);
   const catAnimFrameRef = useRef(null);
   const catIsPlayingRef = useRef(false);
@@ -1328,6 +1329,15 @@ export default function App() {
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
   };
+
+  useEffect(() => {
+    SOUND_URLS.forEach(url => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      audio.load();
+      preloadedSfx.current[url] = audio;
+    });
+  }, []);
 
   const toggleMusic = () => {
     setIsMusicPlaying(!isMusicPlaying);
