@@ -22,6 +22,13 @@ const wateringCanSound = `${BASE}/Watering Can.mp3`;
 const loseHeartSound = `${BASE}/Lose heart Sound.mp3`;
 const riotBeyonceTapSound = `${BASE}/RiotBeyonce Tap Sound.mp3`;
 
+const SOUND_URLS = [
+  pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound,
+  nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound,
+  woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, wateringCanSound,
+  loseHeartSound, riotBeyonceTapSound,
+];
+
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
 const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🪨 Gravel'];
