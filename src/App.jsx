@@ -270,10 +270,10 @@ const HammerSprite = () => (
 
 const CrowSprite = () => (
   <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    {/* Wing (old-style rectangle, scaleY flap around SVG center) */}
+    {/* Wing (matches body color, scaleY flap around SVG center) */}
     <g className="animate-crow-flap" style={{ transformOrigin: '14px 10px' }}>
-      <path d="M11,2 h6 v6 h-6z" fill="#424242" />
-      <path d="M13,1 h2 v1 h-2z" fill="#424242" />
+      <path d="M11,2 h6 v6 h-6z" fill="#0c0e14" />
+      <path d="M13,1 h2 v1 h-2z" fill="#0c0e14" />
     </g>
 
     {/* Body (newer design with teal highlight) */}
@@ -282,6 +282,10 @@ const CrowSprite = () => (
 
     {/* Head */}
     <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
+
+    {/* Legs trailing behind */}
+    <path d="M14,12 h1 v1 h-1z M15,13 h1 v1 h-1z M15,14 h2 v1 h-2z" fill="#e8b820" />
+    <path d="M17,12 h1 v1 h-1z M18,13 h1 v1 h-1z M18,14 h2 v1 h-2z" fill="#e8b820" />
 
     {/* Beak */}
     <path d="M3,9 h2 v1 h-2z M3,10 h1 v1 h-1z" fill="#e8b820" />
