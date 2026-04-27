@@ -19,6 +19,7 @@ const butterflyTapSound = `${BASE}/Butterfly tap.mp3`;
 const frogTapSound = `${BASE}/Frog tap.mp3`;
 const oiiaCatSound = `${BASE}/oiia-cat-remix TAP sound.mp3`;
 const wateringCanSound = `${BASE}/Watering Can.mp3`;
+const loseHeartSound = `${BASE}/Lose heart Sound.mp3`;
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -1298,9 +1299,10 @@ export default function App() {
 
     setCrows(prev => [...prev, { id, targetX, targetY }]);
 
-    // Decrement life when the crow grabs the heart
+    // Decrement life and play sound when the crow grabs the heart
     setTimeout(() => {
       setLives(l => Math.max(0, l - 1));
+      const sfx = new Audio(loseHeartSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     }, 1700);
 
     // Remove crow after full animation finishes
