@@ -268,6 +268,23 @@ const HammerSprite = () => (
   </svg>
 );
 
+const CrowSprite = () => (
+  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
+    <path d="M18,10 h4 v4 h-4 z" fill="#111" />
+    <path d="M20,11 h4 v2 h-4 z" fill="#000" />
+    <path d="M14,16 h2 v2 h-2 z M16,17 h2 v1 h-2 z" fill="#333" />
+    <path d="M6,8 h12 v8 h-12 z" fill="#212121" />
+    <path d="M2,9 h4 v6 h-4 z" fill="#212121" />
+    <path d="M0,11 h2 v2 h-2 z" fill="#fbc02d" />
+    <path d="M3,10 h1 v1 h-1 z" fill="#ffffff" />
+    <path d="M3,10 h0.5 v0.5 h-0.5 z" fill="#000" />
+    <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
+       <path d="M8,2 h6 v8 h-6 z" fill="#424242" />
+       <path d="M10,0 h2 v2 h-2 z" fill="#424242" />
+    </g>
+  </svg>
+);
+
 const InstructorSprite = () => (
   <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M2,1 h6 v2 h-6 z M1,2 h1 v2 h-1 z M8,2 h1 v2 h-1 z" fill="#616161" />
@@ -906,6 +923,7 @@ export default function App() {
   const [combinedBins, setCombinedBins] = useState([]); 
   const [dialogIndex, setDialogIndex] = useState(0);
   const [lives, setLives] = useState(3);
+  const [crows, setCrows] = useState([]);
   const [isChapterSelectOpen, setIsChapterSelectOpen] = useState(false);
 
   // Title effects
@@ -1212,6 +1230,19 @@ export default function App() {
     }, 3500);
   };
 
+  const loseLife = (msg, emotion = 'sad') => {
+    setLives(l => Math.max(0, l - 1));
+    if (msg) showToast(msg, emotion);
+    
+    const id = Date.now() + Math.random();
+    setCrows(prev => [...prev, id]);
+    
+    // Remove crow after animation finishes
+    setTimeout(() => {
+      setCrows(prev => prev.filter(c => c !== id));
+    }, 3500); 
+  };
+
   const playAudio = () => {
     if (audioRef.current) {
       audioRef.current.volume = 0.15;
@@ -1307,7 +1338,7 @@ export default function App() {
     setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
     setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
     setAudioDismissed(true); setIsChapterSelectOpen(false); 
-    setLives(stage === 'NIGHTMARE_END' ? 0 : 3);
+    setLives(stage === 'NIGHTMARE_END' ? 0 : 3); setCrows([]);
     setGameState('DREAM');
   };
 
@@ -1418,8 +1449,7 @@ export default function App() {
         setTimeout(() => { setIsStirring(false); showToast("Perfect! Compost is made!", 'surprised'); setTimeout(() => setDreamStage('MATCH_EXAMPLES'), 2000); }, 2000);
       } else {
         setTimeout(() => { 
-           setLives(l => l - 1);
-           showToast("Wallace: That ain't soil! Try again.", 'sad'); 
+           loseLife("Wallace: That ain't soil! Try again.", 'sad');
            initializeGroundItems(); 
         }, 2000);
       }
@@ -1668,12 +1698,10 @@ export default function App() {
 
                if (closestBin) {
                   if (heldItem.id === 'ex_n2' && !heldItem.isChopped && closestBin.comp.includes('Nitrogen')) {
-                     setLives(l => l - 1);
-                     showToast("Wallace: Chop those vegetable scraps first!", 'angry');
+                     loseLife("Wallace: Chop those vegetable scraps first!", 'angry');
                   }
                   else if (heldItem.id === 'ex_c2' && !heldItem.isPrepped && closestBin.comp.includes('Carbon')) {
-                     setLives(l => l - 1);
-                     showToast("Wallace: Remove the tape and stickers first!", 'angry');
+                     loseLife("Wallace: Remove the tape and stickers first!", 'angry');
                   }
                   else if (heldItem.comp === closestBin.comp) { 
                      setCompletedExamples(prev => [...prev, heldItem.id]); 
@@ -1681,8 +1709,7 @@ export default function App() {
                      showToast(`Correct! Added ${heldItem.name}.`, 'surprised'); 
                   }
                   else {
-                     setLives(l => l - 1);
-                     showToast("Wallace: Wrong bin!", 'sad');
+                     loseLife("Wallace: Wrong bin!", 'sad');
                   }
                } else {
                  if (!nearCuttingBoard && !nearPrepStation) showToast("Get closer to a station!");
@@ -1711,8 +1738,7 @@ export default function App() {
                    if (Object.keys(plantedBeds).length === 2) setTimeout(() => setDreamStage('END_DIALOG'), 1500); 
                 }
                 else {
-                   setLives(l => l - 1);
-                   showToast("Wallace: Wrong soil!", 'sad');
+                   loseLife("Wallace: Wrong soil!", 'sad');
                 }
              }
          }
@@ -1750,8 +1776,7 @@ export default function App() {
     if (activePlot.id === 'drainage' && (heldItem.id === 'tool_h' || heldItem.id === 'item_om2')) isCorrectTool = true;
 
     if (!isCorrectTool) {
-        setLives(l => l - 1);
-        showToast("Wallace: That ain't the right material for this problem!", 'sad');
+        loseLife("Wallace: That ain't the right material for this problem!", 'sad');
         return;
     }
 
@@ -1824,8 +1849,7 @@ export default function App() {
       setAppliedItems([]);
       showToast("Correct! Bring BOTH materials to the plot one by one.", 'surprised');
     } else { 
-      setLives(l => l - 1);
-      showToast("Wallace: That'll make it worse!", 'sad'); 
+      loseLife("Wallace: That'll make it worse!", 'sad'); 
     }
   };
 
@@ -2199,11 +2223,11 @@ export default function App() {
                    {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
                  </div>
                )}
-               <PixelBox className="py-2 px-4 flex gap-4 items-center">
-                  <span className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md">
+               <PixelBox className="py-2 px-4 flex gap-4 items-center relative overflow-visible">
+                  <span className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md relative z-10">
                      {'❤️'.repeat(Math.max(0, lives))}{'🖤'.repeat(Math.max(0, 3 - lives))}
                   </span>
-                  <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723]">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
+                  <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] relative z-10">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
                </PixelBox>
             </div>
 
@@ -2596,7 +2620,7 @@ export default function App() {
               <p className="text-[#3e2723] font-medium">Try again to learn the true secrets of Master Composting!</p>
             </div>
             <button onClick={() => { 
-               setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3);
+               setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
             }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
           </PixelBox>
         </div>
@@ -2642,7 +2666,7 @@ export default function App() {
       case 'END_CREDITS': return (
         <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
           <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
-            onEnded={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3); }} />
+            onEnded={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
         </div>
       );
       default: return renderTitle();
@@ -2919,8 +2943,38 @@ export default function App() {
         }
         .animate-cat-spin { animation: oiia-spin 0.46s linear infinite; }
 
+        /* CROW ANIMATION */
+        @keyframes crow-swoop-anim {
+          0% { right: -20%; top: 5%; transform: rotate(-10deg); }
+          20% { right: 20%; top: 15%; transform: rotate(0deg); }
+          80% { right: 80%; top: 5%; transform: rotate(5deg); }
+          100% { right: 120%; top: -10%; transform: rotate(10deg); }
+        }
+        .animate-crow-swoop {
+          animation: crow-swoop-anim 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        @keyframes crow-flap-anim {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(-1); }
+        }
+        .animate-crow-flap {
+          animation: crow-flap-anim 0.25s infinite;
+        }
+
       `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
+
+      {/* CROW STEALING LIFE ANIMATION OVERLAY */}
+      {crows.map(id => (
+        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '80px', height: '80px' }}>
+           <div className="relative w-full h-full">
+              <CrowSprite />
+              {/* Heart in beak */}
+              <div className="absolute top-[40%] -left-4 text-3xl animate-pulse drop-shadow-lg z-[-1]">❤️</div>
+           </div>
+        </div>
+      ))}
+
       <div ref={raveOverlayRef} className="fixed inset-0 pointer-events-none z-[180]" style={{ opacity: 0, backgroundColor: '#ff00ff', mixBlendMode: 'screen' }} />
       {!audioDismissed && (
          <div key="audio-prompt-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
