@@ -2974,12 +2974,12 @@ export default function App() {
           animation: crow-swoop-anim 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
         }
         @keyframes crow-near-wing-anim {
-          0%, 100% { transform: rotate(-20deg); }
-          50%       { transform: rotate(10deg);  }
+          0%, 100% { transform: rotateX(-20deg); }
+          50%       { transform: rotateX(10deg);  }
         }
         @keyframes crow-far-wing-anim {
-          0%, 100% { transform: rotate(10deg);  }
-          50%       { transform: rotate(-20deg); }
+          0%, 100% { transform: rotateX(10deg);  }
+          50%       { transform: rotateX(-20deg); }
         }
         .animate-crow-near-wing {
           animation: crow-near-wing-anim 0.4s ease-in-out infinite;
