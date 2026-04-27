@@ -2973,12 +2973,19 @@ export default function App() {
         .animate-crow-swoop {
           animation: crow-swoop-anim 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
         }
-        @keyframes crow-flap-anim {
-          0%, 100% { transform: scaleY(1); }
-          50% { transform: scaleY(-1); }
+        @keyframes crow-near-wing-anim {
+          0%, 100% { transform: rotate(-20deg); }
+          50%       { transform: rotate(10deg);  }
         }
-        .animate-crow-flap {
-          animation: crow-flap-anim 0.25s infinite;
+        @keyframes crow-far-wing-anim {
+          0%, 100% { transform: rotate(10deg);  }
+          50%       { transform: rotate(-20deg); }
+        }
+        .animate-crow-near-wing {
+          animation: crow-near-wing-anim 0.4s ease-in-out infinite;
+        }
+        .animate-crow-far-wing {
+          animation: crow-far-wing-anim 0.4s ease-in-out infinite;
         }
 
       `}</style>
