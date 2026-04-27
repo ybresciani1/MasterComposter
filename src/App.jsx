@@ -1351,6 +1351,17 @@ export default function App() {
     sfx.play().catch(() => {});
   };
 
+  const stopAllSfx = () => {
+    Object.values(preloadedSfx.current).forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    if (wowAudioRef.current) {
+      wowAudioRef.current.pause();
+      wowAudioRef.current.currentTime = 0;
+    }
+  };
+
   const toggleMusic = () => {
     setIsMusicPlaying(!isMusicPlaying);
   };
@@ -2722,8 +2733,8 @@ export default function App() {
               <p className="font-bold mb-4 text-[#3e2723]">You fell asleep and dreamt of a barren wasteland.</p>
               <p className="text-[#3e2723] font-medium">Try again to learn the true secrets of Master Composting!</p>
             </div>
-            <button onClick={() => { 
-               setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
+            <button onClick={() => {
+               stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
             }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
           </PixelBox>
         </div>
@@ -2769,7 +2780,7 @@ export default function App() {
       case 'END_CREDITS': return (
         <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
           <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
-            onEnded={() => { setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setAudioDismissed(false); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
+            onEnded={() => { stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
         </div>
       );
       default: return renderTitle();
