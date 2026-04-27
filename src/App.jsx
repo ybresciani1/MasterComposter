@@ -276,9 +276,9 @@ const CrowSprite = () => (
       <path d="M13,1 h2 v1 h-2z" fill="#0c0e14" />
     </g>
 
-    {/* Body (newer design with teal highlight) */}
-    <path d="M9,8 h12 v1 h-12z M8,9 h14 v1 h-14z M7,10 h15 v1 h-15z M8,11 h14 v1 h-14z M9,12 h12 v1 h-12z" fill="#0c0e14" />
-    <path d="M17,8 h4 v1 h-4z M18,9 h4 v1 h-4z M19,10 h3 v1 h-3z M18,11 h4 v1 h-4z M17,12 h4 v1 h-4z" fill="#1a3040" />
+    {/* Body + thin tail */}
+    <path d="M9,8 h10 v1 h-10z M8,9 h12 v1 h-12z M7,10 h13 v1 h-13z M8,11 h12 v1 h-12z M9,12 h10 v1 h-10z M20,9 h3 v1 h-3z M20,10 h5 v1 h-5z M20,11 h3 v1 h-3z" fill="#0c0e14" />
+    <path d="M16,8 h3 v1 h-3z M17,9 h3 v1 h-3z M17,10 h3 v1 h-3z M17,11 h3 v1 h-3z M16,12 h3 v1 h-3z M22,9 h1 v1 h-1z M23,10 h2 v1 h-2z M22,11 h1 v1 h-1z" fill="#1a3040" />
 
     {/* Head */}
     <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
