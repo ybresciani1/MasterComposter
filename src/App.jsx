@@ -268,7 +268,7 @@ const HammerSprite = () => (
   </svg>
 );
 
-const CrowSprite = () => (
+const CrowSprite = ({ hasHeart = true }) => (
   <svg viewBox="0 0 32 20" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
     {/* Wing (matches body color, scaleY flap around SVG center) */}
     <g className="animate-crow-flap" style={{ transformOrigin: '14px 10px' }}>
@@ -294,10 +294,49 @@ const CrowSprite = () => (
     <path d="M6,9 h1 v1 h-1z" fill="#fdd835" />
 
     {/* Heart in beak */}
-    <path d="M0,7 h1 v1 h-1z M2,7 h1 v1 h-1z M0,8 h3 v1 h-3z M0,9 h3 v1 h-3z M1,10 h1 v1 h-1z" fill="#e53935" />
-    <path d="M0,8 h2 v1 h-2z" fill="#ffcdd2" opacity="0.6" />
+    {hasHeart && <>
+      <path d="M0,7 h1 v1 h-1z M2,7 h1 v1 h-1z M0,8 h3 v1 h-3z M0,9 h3 v1 h-3z M1,10 h1 v1 h-1z" fill="#e53935" />
+      <path d="M0,8 h2 v1 h-2z" fill="#ffcdd2" opacity="0.6" />
+    </>}
   </svg>
 );
+
+const CrowOverlay = ({ crow }) => {
+  const [pos, setPos] = React.useState({ left: window.innerWidth + 50, top: crow.targetY });
+  const [transition, setTransition] = React.useState('none');
+  const [hasHeart, setHasHeart] = React.useState(false);
+
+  React.useEffect(() => {
+    // Next frame: trigger approach transition toward the heart
+    const approachFrame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTransition('left 1.4s cubic-bezier(0.25,0.1,0.25,1), top 1.0s cubic-bezier(0.25,0.1,0.25,1)');
+        setPos({ left: crow.targetX, top: crow.targetY });
+      });
+    });
+
+    // After arriving, grab the heart and escape left
+    const escapeTimer = setTimeout(() => {
+      setHasHeart(true);
+      setTransition('left 1.6s cubic-bezier(0.4,0,0.6,1), top 1.2s ease-in');
+      setPos({ left: -150, top: crow.targetY - 60 });
+    }, 1700);
+
+    return () => {
+      cancelAnimationFrame(approachFrame);
+      clearTimeout(escapeTimer);
+    };
+  }, []);
+
+  return (
+    <div className="fixed z-[300] pointer-events-none drop-shadow-2xl"
+         style={{ width: '80px', height: '80px', left: pos.left, top: pos.top, transition }}>
+      <div className="relative w-full h-full">
+        <CrowSprite hasHeart={hasHeart} />
+      </div>
+    </div>
+  );
+};
 
 const InstructorSprite = () => (
   <svg viewBox="0 0 10 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
@@ -1247,14 +1286,23 @@ export default function App() {
   const loseLife = (msg, emotion = 'sad') => {
     setLives(l => Math.max(0, l - 1));
     if (msg) showToast(msg, emotion);
-    
+
     const id = Date.now() + Math.random();
-    setCrows(prev => [...prev, id]);
-    
-    // Remove crow after animation finishes
+
+    let targetX = window.innerWidth / 2 - 40;
+    let targetY = 40;
+    if (heartsRef.current) {
+      const rect = heartsRef.current.getBoundingClientRect();
+      targetX = rect.left + rect.width / 2 - 40;
+      targetY = rect.top - 10;
+    }
+
+    setCrows(prev => [...prev, { id, targetX, targetY }]);
+
+    // Remove crow after full animation finishes
     setTimeout(() => {
-      setCrows(prev => prev.filter(c => c !== id));
-    }, 3500); 
+      setCrows(prev => prev.filter(c => c.id !== id));
+    }, 3500);
   };
 
   const playAudio = () => {
@@ -1269,6 +1317,7 @@ export default function App() {
     setIsMusicPlaying(!isMusicPlaying);
   };
 
+  const heartsRef = useRef(null);
   const prevGameState = useRef(gameState);
 
   // Centralized audio controller
@@ -2238,7 +2287,7 @@ export default function App() {
                  </div>
                )}
                <PixelBox className="py-2 px-4 flex gap-4 items-center relative overflow-visible">
-                  <span className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md relative z-10">
+                  <span ref={heartsRef} className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md relative z-10">
                      {'❤️'.repeat(Math.max(0, lives))}{'🖤'.repeat(Math.max(0, 3 - lives))}
                   </span>
                   <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] relative z-10">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
@@ -2958,15 +3007,6 @@ export default function App() {
         .animate-cat-spin { animation: oiia-spin 0.46s linear infinite; }
 
         /* CROW ANIMATION */
-        @keyframes crow-swoop-anim {
-          0% { right: -20%; top: 5%; transform: rotate(-10deg); }
-          20% { right: 20%; top: 15%; transform: rotate(0deg); }
-          80% { right: 80%; top: 5%; transform: rotate(5deg); }
-          100% { right: 120%; top: -10%; transform: rotate(10deg); }
-        }
-        .animate-crow-swoop {
-          animation: crow-swoop-anim 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-        }
         @keyframes crow-flap-anim {
           0%, 100% { transform: scaleY(1); }
           50% { transform: scaleY(-1); }
@@ -2979,12 +3019,8 @@ export default function App() {
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
 
       {/* CROW STEALING LIFE ANIMATION OVERLAY */}
-      {crows.map(id => (
-        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '80px', height: '80px' }}>
-           <div className="relative w-full h-full">
-              <CrowSprite />
-           </div>
-        </div>
+      {crows.map(crow => (
+        <CrowOverlay key={crow.id} crow={crow} />
       ))}
 
       <div ref={raveOverlayRef} className="fixed inset-0 pointer-events-none z-[180]" style={{ opacity: 0, backgroundColor: '#ff00ff', mixBlendMode: 'screen' }} />
