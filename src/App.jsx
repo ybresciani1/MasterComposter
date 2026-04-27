@@ -20,6 +20,7 @@ const frogTapSound = `${BASE}/Frog tap.mp3`;
 const oiiaCatSound = `${BASE}/oiia-cat-remix TAP sound.mp3`;
 const wateringCanSound = `${BASE}/Watering Can.mp3`;
 const loseHeartSound = `${BASE}/Lose heart Sound.mp3`;
+const riotBeyonceTapSound = `${BASE}/RiotBeyonce Tap Sound.mp3`;
 
 // --- GAME DATA ---
 const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
@@ -993,6 +994,7 @@ export default function App() {
     e.stopPropagation();
     const id = Date.now() + Math.random();
     setHenHearts(prev => [...prev, { id, hen: henName }]);
+    const sfx = new Audio(riotBeyonceTapSound); sfx.volume = 1.0; sfx.play().catch(() => {});
     setTimeout(() => {
       setHenHearts(prev => prev.filter(h => h.id !== id));
     }, 1000);
