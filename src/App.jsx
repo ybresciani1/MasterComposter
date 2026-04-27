@@ -270,18 +270,27 @@ const HammerSprite = () => (
 
 const CrowSprite = () => (
   <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    <path d="M18,10 h4 v4 h-4 z" fill="#111" />
-    <path d="M20,11 h4 v2 h-4 z" fill="#000" />
-    <path d="M14,16 h2 v2 h-2 z M16,17 h2 v1 h-2 z" fill="#333" />
-    <path d="M6,8 h12 v8 h-12 z" fill="#212121" />
-    <path d="M2,9 h4 v6 h-4 z" fill="#212121" />
-    <path d="M0,11 h2 v2 h-2 z" fill="#fbc02d" />
-    <path d="M3,10 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M3,10 h0.5 v0.5 h-0.5 z" fill="#000" />
-    <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
-       <path d="M8,2 h6 v8 h-6 z" fill="#424242" />
-       <path d="M10,0 h2 v2 h-2 z" fill="#424242" />
-    </g>
+     {/* Far Wing (Flapping) */}
+     <g className="animate-crow-flap" style={{ transformOrigin: '12px 12px' }}>
+       <path d="M12,7 h2 v1 h-2 z M11,8 h3 v1 h-3 z M10,9 h2 v1 h-2 z M9,10 h2 v1 h-2 z" fill="#0a0a0c" />
+       <path d="M12,6 h2 v1 h-2 z M11,7 h1 v1 h-1 z" fill="#37474f" />
+     </g>
+
+     {/* Near Wing & Body Black Base */}
+     <path d="M14,6 h2 v2 h-2 z M13,8 h2 v1 h-2 z M12,9 h3 v1 h-3 z M11,10 h4 v1 h-4 z M9,11 h8 v1 h-8 z M10,12 h8 v1 h-8 z M10,13 h6 v1 h-6 z M14,14 h2 v1 h-2 z" fill="#111111" />
+
+     {/* Slate / Blue-Gray Details */}
+     <path d="M6,12 h3 v1 h-3 z M8,11 h1 v1 h-1 z M8,13 h2 v1 h-2 z M11,10 h1 v1 h-1 z M12,9 h1 v1 h-1 z M13,8 h2 v1 h-2 z M15,11 h2 v1 h-2 z M16,12 h2 v1 h-2 z" fill="#4a6068" />
+     
+     {/* Eye */}
+     <path d="M9,12 h1 v1 h-1 z" fill="#fdd835" />
+
+     {/* Legs */}
+     <path d="M10,14 h2 v1 h-2 z M10,15 h1 v1 h-1 z M13,14 h2 v1 h-2 z M14,15 h1 v1 h-1 z" fill="#111111" />
+
+     {/* Heart in beak */}
+     <path d="M3,11 h1 v1 h-1 z M5,11 h1 v1 h-1 z M2,12 h5 v1 h-5 z M3,13 h3 v1 h-3 z M4,14 h1 v1 h-1 z" fill="#e53935" />
+     <path d="M3,12 h2 v1 h-2 z" fill="#ffcdd2" opacity="0.6"/>
   </svg>
 );
 
@@ -2966,11 +2975,9 @@ export default function App() {
 
       {/* CROW STEALING LIFE ANIMATION OVERLAY */}
       {crows.map(id => (
-        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '80px', height: '80px' }}>
+        <div key={id} className="fixed z-[300] animate-crow-swoop pointer-events-none drop-shadow-2xl" style={{ width: '128px', height: '128px' }}>
            <div className="relative w-full h-full">
               <CrowSprite />
-              {/* Heart in beak */}
-              <div className="absolute top-[40%] -left-4 text-3xl animate-pulse drop-shadow-lg z-[-1]">❤️</div>
            </div>
         </div>
       ))}
