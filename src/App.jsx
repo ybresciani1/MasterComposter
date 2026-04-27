@@ -2128,7 +2128,12 @@ export default function App() {
                {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
                  <div className="text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse text-center">
                    {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
-                   {dreamStage === 'MATCH_EXAMPLES' && "Follow the steps to layer, water, and air the pile."}
+                   {dreamStage === 'MATCH_EXAMPLES' && (
+                     matchPhase === 0 ? "Sort Nitrogen into the Greens Bin, and Carbon into the Browns Bin!" :
+                     matchPhase === 1 ? "Pick up the full bins and dump them into the center compost pile!" :
+                     matchPhase === 2 ? "Grab the watering can and water the pile!" :
+                     "Grab the pitchfork and aerate the pile!"
+                   )}
                    {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
                    {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
                  </div>
@@ -2268,9 +2273,14 @@ export default function App() {
                  </div>
 
 
-<DialogBox name="Wallace" text={
+                <DialogBox name="Wallace" text={
                    dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
-                   dreamStage === 'MATCH_EXAMPLES' ? "Step by step, partner! Layer 'em up." :
+                   dreamStage === 'MATCH_EXAMPLES' ? (
+                     matchPhase === 0 ? "Put the green stuff in the Greens bin, and the brown stuff in the Browns bin!" :
+                     matchPhase === 1 ? "Now bring those full bins to the center pile!" :
+                     matchPhase === 2 ? "Needs some moisture! Give it a good watering." :
+                     "Last step, let's get some air in there. Pitchfork time!"
+                   ) :
                    dreamStage === 'FIX_PLOTS' ? (activePlot ? activePlot.hint : "Let's fix up this garden before we plant.") :
                    "Final stretch! Get those seeds in the right dirt."
                  } hideNext emotion={wallaceEmotion} bottomClass="bottom-16" />
@@ -2837,7 +2847,7 @@ export default function App() {
       {isChapterSelectOpen && (
         <div key="chapter-select-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
           <PixelBox className="text-center max-w-sm mx-4 w-full">
-            <h3 className="text-2xl mb-6 font-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
+            <h3 className="text-2xl mb-6 foAVnt-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
             <div className="flex flex-col gap-2 mb-4">
               {[
                 { label: '🌙 The Dream',     stage: 'INTRO_DIALOG'  },
