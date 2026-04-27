@@ -277,8 +277,8 @@ const CrowSprite = () => (
     </g>
 
     {/* Body + large single tail block */}
-    <path d="M9,8 h11 v1 h-11z M8,9 h12 v1 h-12z M7,10 h13 v1 h-13z M8,11 h12 v1 h-12z M9,12 h11 v1 h-11z M20,9 h2 v1 h-2z M20,10 h3 v1 h-3z M20,11 h2 v1 h-2z" fill="#0c0e14" />
-    <path d="M16,8 h3 v1 h-3z M17,9 h3 v1 h-3z M17,10 h3 v1 h-3z M17,11 h3 v1 h-3z M16,12 h3 v1 h-3z M21,10 h2 v1 h-2z" fill="#1a3040" />
+    <path d="M9,8 h11 v1 h-11z M8,9 h12 v1 h-12z M7,10 h13 v1 h-13z M8,11 h12 v1 h-12z M9,12 h11 v1 h-11z M21,7 h5 v1 h-5z M20,8 h7 v1 h-7z M20,9 h8 v1 h-8z M20,10 h8 v1 h-8z M20,11 h8 v1 h-8z M20,12 h7 v1 h-7z M21,13 h5 v1 h-5z" fill="#0c0e14" />
+    <path d="M16,8 h3 v1 h-3z M17,9 h3 v1 h-3z M17,10 h3 v1 h-3z M17,11 h3 v1 h-3z M16,12 h3 v1 h-3z M24,8 h3 v1 h-3z M25,9 h3 v1 h-3z M25,10 h3 v1 h-3z M25,11 h3 v1 h-3z M24,12 h3 v1 h-3z" fill="#1a3040" />
 
     {/* Head */}
     <path d="M5,8 h4 v1 h-4z M4,9 h4 v1 h-4z M4,10 h5 v1 h-5z M4,11 h5 v1 h-5z M5,12 h4 v1 h-4z" fill="#0c0e14" />
