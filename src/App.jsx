@@ -927,6 +927,40 @@ const SiloSprite = () => (
   </svg>
 );
 
+const CuttingStationSprite = ({ isChopping }) => (
+  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Table Legs */}
+    <path d="M6,16 h4 v14 h-4 z M22,16 h4 v14 h-4 z" fill="#5d4037" />
+    <path d="M8,18 h2 v12 h-2 z M24,18 h2 v12 h-2 z" fill="#3e2723" />
+    {/* Table Top */}
+    <path d="M2,12 h28 v6 h-28 z" fill="#8d6e63" />
+    <path d="M2,12 h28 v2 h-28 z" fill="#a1887f" />
+    <path d="M2,16 h28 v2 h-28 z" fill="#5d4037" />
+    {/* Cutting Board */}
+    <path d="M8,9 h16 v3 h-16 z" fill="#ffccaa" />
+    <path d="M8,11 h16 v1 h-16 z" fill="#e6b38c" />
+    
+    {/* Food */}
+    <path d="M10,8 h5 v3 h-5 z M15,10 h2 v1 h-2 z M17,9 h2 v2 h-2 z" fill="#4caf50" />
+    <path d="M11,9 h2 v1 h-2 z M16,9 h1 v1 h-1 z" fill="#81c784" />
+    
+    {/* Chopping Knife Animation */}
+    {isChopping ? (
+       <g className="animate-chop-fast" style={{ transformOrigin: '20px 8px' }}>
+          <path d="M16,4 h6 v3 h-6 z" fill="#bdbdbd" />
+          <path d="M15,5 h1 v2 h-1 z" fill="#9e9e9e" />
+          <path d="M22,4 h4 v3 h-4 z" fill="#212121" />
+       </g>
+    ) : (
+       <g>
+          <path d="M18,9 h6 v2 h-6 z" fill="#bdbdbd" />
+          <path d="M17,10 h1 v1 h-1 z" fill="#9e9e9e" />
+          <path d="M24,9 h4 v2 h-4 z" fill="#212121" />
+       </g>
+    )}
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -2389,9 +2423,9 @@ export default function App() {
                         
                         {matchPhase === 0 && (
                           <>
-                            <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(100px, 15px)` }}>
-                              <span className="text-2xl mt-1">🔪</span>
-                              <span className="text-white text-[7px] font-bold mt-1 text-center leading-none">Cutting<br/>Board</span>
+                            <div className="absolute w-16 h-16 flex flex-col items-center justify-center z-10" style={{ transform: `translate(100px, 15px)` }}>
+                              <CuttingStationSprite isChopping={isChopping} />
+                              <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">Cutting Board</span>
                             </div>
                             <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(164px, 15px)` }}>
                               <span className="text-2xl mt-1">🗑️</span>
@@ -2478,11 +2512,6 @@ export default function App() {
                          </div>
                        )}
                        
-                       {isChopping && (
-                         <div className="absolute z-40 animate-hammer text-3xl drop-shadow-md" style={{ transform: `translate(20px, -10px)` }}>
-                           🔪
-                         </div>
-                       )}
                        {isPrepping && (
                          <div className="absolute z-40 animate-hammer text-3xl drop-shadow-md" style={{ transform: `translate(20px, -10px)` }}>
                            ✂️
@@ -3046,6 +3075,13 @@ export default function App() {
           50% { transform: translateY(-6px); }
         }
         .animate-hen-hop { animation: hen-hop 0.3s infinite alternate ease-in-out; }
+
+        /* CUTTING ANIMATION */
+        @keyframes chop-fast {
+          0%, 100% { transform: rotate(0deg) translateY(0px); }
+          50% { transform: rotate(-25deg) translateY(-8px); }
+        }
+        .animate-chop-fast { animation: chop-fast 0.2s infinite ease-in-out; }
 
         /* OIIA CAT SPIN */
         @keyframes oiia-spin {
