@@ -1582,9 +1582,9 @@ export default function App() {
 
   const jumpToChapter = (stage) => {
     setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
-    setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
+    setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
     setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
-    setAudioDismissed(true); setIsChapterSelectOpen(false); 
+    setAudioDismissed(true); setIsChapterSelectOpen(false);
     setLives(stage === 'NIGHTMARE_END' ? 0 : 3); setCrows([]);
     setGameState('DREAM');
   };
@@ -2868,7 +2868,7 @@ export default function App() {
               <p className="text-[#3e2723] font-medium">Try again to learn the true secrets of Master Composting!</p>
             </div>
             <button onClick={() => {
-               stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
+               stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
             }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
           </PixelBox>
         </div>
@@ -2914,7 +2914,7 @@ export default function App() {
       case 'END_CREDITS': return (
         <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
           <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
-            onEnded={() => { stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
+            onEnded={() => { stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
         </div>
       );
       default: return renderTitle();
