@@ -1467,6 +1467,15 @@ export default function App() {
     }
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
+    // Pre-unlock sounds triggered outside user gesture handlers (setTimeout / useEffect)
+    // so iOS allows programmatic playback when they fire later.
+    [loseHeartSound, nightmareSound, wakeUpSound, questSound, introAnxietySound].forEach(url => {
+      const sfx = preloadedSfx.current[url];
+      if (sfx) {
+        sfx.volume = 0;
+        sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; }).catch(() => {});
+      }
+    });
   };
 
   useEffect(() => {
