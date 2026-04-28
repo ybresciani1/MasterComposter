@@ -1043,6 +1043,42 @@ const CompostBucketSprite = () => (
   </svg>
 );
 
+const BrownsBucketSprite = () => (
+  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="geometricPrecision">
+    {/* Back of Bucket Lip */}
+    <ellipse cx="30" cy="42" rx="16" ry="6" fill="#3e2723" />
+    
+    {/* Leaves and Twigs on top */}
+    {/* Twig */}
+    <line x1="18" y1="40" x2="10" y2="25" stroke="#4e342e" strokeWidth="3" strokeLinecap="round" />
+    <line x1="14" y1="32" x2="8" y2="35" stroke="#4e342e" strokeWidth="2" strokeLinecap="round" />
+    <line x1="42" y1="38" x2="48" y2="22" stroke="#4e342e" strokeWidth="2" strokeLinecap="round" />
+    
+    {/* Leaf 1 (Orange) */}
+    <path d="M18,38 Q10,25 22,22 Q30,30 18,38 Z" fill="#d84315" />
+    {/* Leaf 2 (Yellow/Brown) */}
+    <path d="M38,36 Q48,22 35,20 Q25,28 38,36 Z" fill="#f9a825" />
+    {/* Leaf 3 (Dark Orange) */}
+    <path d="M28,30 Q20,15 32,12 Q42,22 28,30 Z" fill="#ef6c00" />
+    {/* Leaf 4 (Brown) */}
+    <path d="M22,42 Q15,35 28,32 Q35,40 22,42 Z" fill="#6d4c41" />
+    {/* Leaf 5 (Reddish) */}
+    <path d="M35,40 Q45,35 38,28 Q28,35 35,40 Z" fill="#bf360c" />
+    
+    {/* Bucket Body */}
+    <path d="M15,45 L18,85 Q30,90 42,85 L45,45 Z" fill="#5d4037" />
+    <ellipse cx="30" cy="45" rx="15" ry="5" fill="#5d4037" />
+    
+    {/* Bucket Front Lip Highlight */}
+    <path d="M14,42 A16,6 0 0,0 46,42 A16,6 0 0,1 14,42" fill="#8d6e63" />
+    
+    {/* Detail Lines */}
+    <line x1="22" y1="50" x2="25" y2="82" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
+    <line x1="30" y1="52" x2="30" y2="84" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
+    <line x1="38" y1="50" x2="35" y2="82" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -1815,8 +1851,8 @@ export default function App() {
                   closest = { 
                      id: `held_${bin.id}`, 
                      name: bin.label, 
-                     sprite: bin.id === 'bin_n' ? null : '📦', 
-                     component: bin.id === 'bin_n' ? CompostBucketSprite : null,
+                     sprite: null, 
+                     component: bin.id === 'bin_n' ? CompostBucketSprite : BrownsBucketSprite,
                      isBin: true 
                   };
                }
@@ -2502,18 +2538,13 @@ export default function App() {
                       <>
                         {EXAMPLE_BINS.map(bin => {
                            const isCombined = combinedBins.includes(bin.id);
+                           const BucketComponent = bin.id === 'bin_n' ? CompostBucketSprite : BrownsBucketSprite;
                            return (
                               <div key={bin.id} className={`absolute w-20 h-20 flex flex-col items-center justify-center z-10 transition-opacity duration-500 ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
-                                {bin.id === 'bin_n' ? (
-                                    <>
-                                      <div className="w-14 h-20 mt-2"><CompostBucketSprite /></div>
-                                      <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">{bin.label}</span>
-                                    </>
-                                ) : (
-                                    <div className={`w-full h-full border-4 border-[#3e2723] flex flex-col items-center justify-center shadow-md ${bin.color}`}>
-                                      <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
-                                    </div>
-                                )}
+                                <>
+                                  <div className="w-14 h-20 mt-2"><BucketComponent /></div>
+                                  <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">{bin.label}</span>
+                                </>
                               </div>
                            );
                         })}
