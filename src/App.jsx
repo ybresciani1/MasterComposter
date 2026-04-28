@@ -1264,7 +1264,6 @@ export default function App() {
   const introAnxietyRef = useRef(null);
   const preloadedSfx = useRef({});
   const catAudioCtxRef = useRef(null);
-  const sfxAudioCtxRef = useRef(null);
   const catAnimFrameRef = useRef(null);
   const catIsPlayingRef = useRef(false);
   const catRef = useRef(null);
@@ -1468,29 +1467,16 @@ export default function App() {
     }
     setIsMusicPlaying(true);
     if (wowAudioRef.current) wowAudioRef.current.load();
-    // iOS blocks audio.play() calls outside user gesture handlers (setTimeout/useEffect).
-    // audio.volume is read-only on iOS so the volume-0 trick plays audibly.
-    // Instead: create an AudioContext within this gesture handler to unlock it,
-    // then connect the state-driven audio elements through it via createMediaElementSource.
-    // The unlocked context governs their playback permission — no sound is produced here.
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioCtx();
-      sfxAudioCtxRef.current = ctx;
-      const silent = ctx.createBuffer(1, 1, 22050);
-      const silentSrc = ctx.createBufferSource();
-      silentSrc.buffer = silent;
-      silentSrc.connect(ctx.destination);
-      silentSrc.start(0);
-      [loseHeartSound, nightmareSound, wakeUpSound, questSound, introAnxietySound].forEach(url => {
-        const sfx = preloadedSfx.current[url];
-        if (sfx) {
-          try {
-            ctx.createMediaElementSource(sfx).connect(ctx.destination);
-          } catch (_) {}
-        }
-      });
-    } catch (_) {}
+    // Pre-unlock sounds that play outside user gesture handlers (setTimeout/useEffect).
+    // audio.volume is read-only on iOS so volume=0 plays audibly — use muted=true instead,
+    // which iOS respects as a logical property and genuinely silences the brief unlock play.
+    [loseHeartSound, nightmareSound, wakeUpSound, questSound, introAnxietySound].forEach(url => {
+      const sfx = preloadedSfx.current[url];
+      if (sfx) {
+        sfx.muted = true;
+        sfx.play().then(() => { sfx.pause(); sfx.muted = false; sfx.currentTime = 0; }).catch(() => {});
+      }
+    });
   };
 
   useEffect(() => {
