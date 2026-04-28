@@ -961,6 +961,48 @@ const CuttingStationSprite = ({ isChopping }) => (
   </svg>
 );
 
+const PrepStationSprite = ({ isPrepping }) => (
+  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Table Legs */}
+    <path d="M6,16 h4 v14 h-4 z M22,16 h4 v14 h-4 z" fill="#5d4037" />
+    <path d="M8,18 h2 v12 h-2 z M24,18 h2 v12 h-2 z" fill="#3e2723" />
+    {/* Table Top */}
+    <path d="M2,12 h28 v6 h-28 z" fill="#8d6e63" />
+    <path d="M2,12 h28 v2 h-28 z" fill="#a1887f" />
+    <path d="M2,16 h28 v2 h-28 z" fill="#5d4037" />
+
+    {/* Tape Dispenser */}
+    <g>
+      <path d="M19,10 h7 v2 h-7 z" fill="#455a64" />
+      <path d="M20,8 h2 v2 h-2 z" fill="#37474f" />
+      <path d="M18,4 h6 v4 h-6 z" fill="#eeeeee" />
+      <path d="M20,5 h2 v2 h-2 z" fill="#bdbdbd" />
+      <path d="M25,8 h1 v2 h-1 z" fill="#9e9e9e" />
+    </g>
+
+    {/* Scrap papers on table */}
+    <path d="M15,11 h3 v1 h-3 z" fill="#ffffff" opacity="0.8" />
+    <path d="M6,10 h4 v2 h-4 z" fill="#fff59d" opacity="0.9" />
+
+    {/* Scissors */}
+    <g style={{ transform: 'translate(2px, 0)' }}>
+        {/* Top Blade & Handle */}
+        <g className={isPrepping ? "animate-snip-top" : ""} style={{ transformOrigin: "11px 9px" }}>
+          <path d="M5,6 h4 v3 h-4 z" fill="#ef5350" />
+          <path d="M6,7 h2 v1 h-2 z" fill="#a1887f" />
+          <path d="M9,8 h6 v1 h-6 z" fill="#e0e0e0" />
+        </g>
+        {/* Bottom Blade & Handle */}
+        <g className={isPrepping ? "animate-snip-bottom" : ""} style={{ transformOrigin: "11px 9px" }}>
+          <path d="M5,9 h4 v3 h-4 z" fill="#ef5350" />
+          <path d="M6,10 h2 v1 h-2 z" fill="#a1887f" />
+          <path d="M9,9 h6 v1 h-6 z" fill="#bdbdbd" />
+          <rect x="10.5" y="8.5" width="1" height="1" fill="#424242" />
+        </g>
+    </g>
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -2427,9 +2469,9 @@ export default function App() {
                               <CuttingStationSprite isChopping={isChopping} />
                               <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">Cutting Board</span>
                             </div>
-                            <div className="absolute w-16 h-16 bg-[#a1887f] border-4 border-[#5d4037] flex flex-col items-center justify-center z-10 shadow-md rounded-md" style={{ transform: `translate(164px, 15px)` }}>
-                              <span className="text-2xl mt-1">🗑️</span>
-                              <span className="text-white text-[7px] font-bold mt-1 text-center leading-none">Prep<br/>Station</span>
+                            <div className="absolute w-16 h-16 flex flex-col items-center justify-center z-10" style={{ transform: `translate(164px, 15px)` }}>
+                              <PrepStationSprite isPrepping={isPrepping} />
+                              <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">Prep Station</span>
                             </div>
                           </>
                         )}
@@ -2509,12 +2551,6 @@ export default function App() {
                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
                             <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
                             <span>{heldItem.name}</span>
-                         </div>
-                       )}
-                       
-                       {isPrepping && (
-                         <div className="absolute z-40 animate-hammer text-3xl drop-shadow-md" style={{ transform: `translate(20px, -10px)` }}>
-                           ✂️
                          </div>
                        )}
 
@@ -3082,6 +3118,18 @@ export default function App() {
           50% { transform: rotate(-25deg) translateY(-8px); }
         }
         .animate-chop-fast { animation: chop-fast 0.2s infinite ease-in-out; }
+
+        /* SNIPPING ANIMATION */
+        @keyframes snip-top {
+          0%, 100% { transform: rotate(0deg); }
+          50% { transform: rotate(15deg); }
+        }
+        @keyframes snip-bottom {
+          0%, 100% { transform: rotate(0deg); }
+          50% { transform: rotate(-15deg); }
+        }
+        .animate-snip-top { animation: snip-top 0.2s infinite ease-in-out; }
+        .animate-snip-bottom { animation: snip-bottom 0.2s infinite ease-in-out; }
 
         /* OIIA CAT SPIN */
         @keyframes oiia-spin {
