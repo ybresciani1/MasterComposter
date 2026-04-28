@@ -1004,78 +1004,64 @@ const PrepStationSprite = ({ isPrepping }) => (
 );
 
 const CompostBucketSprite = () => (
-  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="geometricPrecision">
+  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="crispEdges">
     {/* Smell Lines */}
-    <g stroke="#65a30d" strokeWidth="3" fill="none" strokeLinecap="round" className="opacity-70">
-       <path className="animate-smell-1" d="M15,40 Q5,20 15,5 T15,-15" />
-       <path className="animate-smell-2" d="M30,40 Q20,20 30,5 T30,-15" />
-       <path className="animate-smell-3" d="M45,40 Q35,20 45,5 T45,-15" />
+    <g stroke="#65a30d" strokeWidth="4" fill="none" className="opacity-70">
+       <path className="animate-smell-1" d="M15,40 v-5 h-5 v-5 h5 v-5 h-5 v-5 h5 v-10" />
+       <path className="animate-smell-2" d="M30,40 v-5 h5 v-5 h-5 v-5 h5 v-5 h-5 v-10" />
+       <path className="animate-smell-3" d="M45,40 v-5 h-5 v-5 h5 v-5 h-5 v-5 h5 v-10" />
     </g>
     
     {/* Glitter */}
     <g fill="#facc15">
-       <polygon points="10,0 12,5 17,5 13,8 14,13 10,10 6,13 7,8 3,5 8,5" className="animate-sparkle-1" />
-       <polygon points="50,10 52,15 57,15 53,18 54,23 50,20 46,23 47,18 43,15 48,15" className="animate-sparkle-2" />
-       <polygon points="25,-5 27,0 32,0 28,3 29,8 25,5 21,8 22,3 18,0 23,0" className="animate-sparkle-3" />
+       <path d="M10,0 h5 v5 h-5 z M5,5 h15 v5 h-15 z M10,10 h5 v5 h-5 z" className="animate-sparkle-1" />
+       <path d="M45,10 h5 v5 h-5 z M40,15 h15 v5 h-15 z M45,20 h5 v5 h-5 z" className="animate-sparkle-2" />
+       <path d="M25,-5 h5 v5 h-5 z M20,0 h15 v5 h-15 z M25,5 h5 v5 h-5 z" className="animate-sparkle-3" />
     </g>
 
     {/* Back of Bucket Lip */}
-    <ellipse cx="30" cy="42" rx="16" ry="6" fill="#1b5e20" />
+    <path d="M10,40 h40 v5 h-40 z" fill="#1b5e20" />
     
-    {/* Overflowing Veggie Scraps */}
-    <path d="M20,40 Q12,30 25,28 Q32,35 25,42" fill="#7cb342" />
-    <path d="M40,38 Q48,25 35,28 Q28,35 35,42" fill="#81c784" />
-    <path d="M26,32 Q30,15 40,25 Q38,38 30,42" fill="#4caf50" />
-    <path d="M18,36 L24,25 L26,35 Z" fill="#ffb300" />
-    <path d="M42,38 L45,30 L38,34 Z" fill="#e53935" />
+    {/* Overflowing Veggie Scraps (Blocky) */}
+    <path d="M15,35 h15 v10 h-15 z M20,30 h15 v5 h-15 z" fill="#7cb342" />
+    <path d="M35,35 h10 v10 h-10 z M30,40 h15 v5 h-15 z M35,25 h5 v10 h-5 z" fill="#81c784" />
+    <path d="M12,40 h10 v5 h-10 z M15,30 h5 v10 h-5 z" fill="#e53935" />
+    <path d="M40,30 h5 v15 h-5 z M45,35 h5 v10 h-5 z" fill="#ffb300" />
     
     {/* Bucket Body */}
-    <path d="M15,45 L18,85 Q30,90 42,85 L45,45 Z" fill="#2e7d32" />
-    <ellipse cx="30" cy="45" rx="15" ry="5" fill="#2e7d32" />
+    <path d="M10,45 h40 v25 h-5 v15 h-30 v-15 h-5 z" fill="#2e7d32" />
     
     {/* Bucket Front Lip Highlight */}
-    <path d="M14,42 A16,6 0 0,0 46,42 A16,6 0 0,1 14,42" fill="#4caf50" />
+    <path d="M5,40 h50 v5 h-50 z" fill="#4caf50" />
     
     {/* Detail Lines */}
-    <line x1="22" y1="50" x2="25" y2="82" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
-    <line x1="30" y1="52" x2="30" y2="84" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
-    <line x1="38" y1="50" x2="35" y2="82" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
+    <path d="M20,45 h5 v35 h-5 z M35,45 h5 v35 h-5 z" fill="#1b5e20" />
   </svg>
 );
 
 const BrownsBucketSprite = () => (
-  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="geometricPrecision">
+  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="crispEdges">
     {/* Back of Bucket Lip */}
-    <ellipse cx="30" cy="42" rx="16" ry="6" fill="#3e2723" />
+    <path d="M10,40 h40 v5 h-40 z" fill="#3e2723" />
     
-    {/* Leaves and Twigs on top */}
-    {/* Twig */}
-    <line x1="18" y1="40" x2="10" y2="25" stroke="#4e342e" strokeWidth="3" strokeLinecap="round" />
-    <line x1="14" y1="32" x2="8" y2="35" stroke="#4e342e" strokeWidth="2" strokeLinecap="round" />
-    <line x1="42" y1="38" x2="48" y2="22" stroke="#4e342e" strokeWidth="2" strokeLinecap="round" />
+    {/* Leaves and Twigs on top (Blocky) */}
+    <path d="M15,20 h5 v25 h-5 z M10,30 h5 v5 h-5 z" fill="#4e342e" />
+    <path d="M42,25 h5 v20 h-5 z M47,32 h5 v5 h-5 z" fill="#4e342e" />
     
-    {/* Leaf 1 (Orange) */}
-    <path d="M18,38 Q10,25 22,22 Q30,30 18,38 Z" fill="#d84315" />
-    {/* Leaf 2 (Yellow/Brown) */}
-    <path d="M38,36 Q48,22 35,20 Q25,28 38,36 Z" fill="#f9a825" />
-    {/* Leaf 3 (Dark Orange) */}
-    <path d="M28,30 Q20,15 32,12 Q42,22 28,30 Z" fill="#ef6c00" />
-    {/* Leaf 4 (Brown) */}
-    <path d="M22,42 Q15,35 28,32 Q35,40 22,42 Z" fill="#6d4c41" />
-    {/* Leaf 5 (Reddish) */}
-    <path d="M35,40 Q45,35 38,28 Q28,35 35,40 Z" fill="#bf360c" />
+    <path d="M12,35 h15 v10 h-15 z M15,30 h10 v5 h-10 z" fill="#d84315" />
+    <path d="M30,35 h15 v10 h-15 z M35,25 h5 v10 h-5 z" fill="#f9a825" />
+    <path d="M22,25 h10 v15 h-10 z M25,20 h5 v5 h-5 z" fill="#ef6c00" />
+    <path d="M15,40 h30 v5 h-30 z" fill="#6d4c41" />
+    <path d="M28,20 h5 v10 h-5 z M30,15 h5 v5 h-5 z" fill="#bf360c" />
     
     {/* Bucket Body */}
-    <path d="M15,45 L18,85 Q30,90 42,85 L45,45 Z" fill="#5d4037" />
-    <ellipse cx="30" cy="45" rx="15" ry="5" fill="#5d4037" />
+    <path d="M10,45 h40 v25 h-5 v15 h-30 v-15 h-5 z" fill="#5d4037" />
     
     {/* Bucket Front Lip Highlight */}
-    <path d="M14,42 A16,6 0 0,0 46,42 A16,6 0 0,1 14,42" fill="#8d6e63" />
+    <path d="M5,40 h50 v5 h-50 z" fill="#8d6e63" />
     
     {/* Detail Lines */}
-    <line x1="22" y1="50" x2="25" y2="82" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
-    <line x1="30" y1="52" x2="30" y2="84" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
-    <line x1="38" y1="50" x2="35" y2="82" stroke="#3e2723" strokeWidth="2" strokeLinecap="round" />
+    <path d="M20,45 h5 v35 h-5 z M35,45 h5 v35 h-5 z" fill="#3e2723" />
   </svg>
 );
 
