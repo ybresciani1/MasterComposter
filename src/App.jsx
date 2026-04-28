@@ -1003,6 +1003,46 @@ const PrepStationSprite = ({ isPrepping }) => (
   </svg>
 );
 
+const CompostBucketSprite = () => (
+  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="geometricPrecision">
+    {/* Smell Lines */}
+    <g stroke="#65a30d" strokeWidth="3" fill="none" strokeLinecap="round" className="opacity-70">
+       <path className="animate-smell-1" d="M15,40 Q5,20 15,5 T15,-15" />
+       <path className="animate-smell-2" d="M30,40 Q20,20 30,5 T30,-15" />
+       <path className="animate-smell-3" d="M45,40 Q35,20 45,5 T45,-15" />
+    </g>
+    
+    {/* Glitter */}
+    <g fill="#facc15">
+       <polygon points="10,0 12,5 17,5 13,8 14,13 10,10 6,13 7,8 3,5 8,5" className="animate-sparkle-1" />
+       <polygon points="50,10 52,15 57,15 53,18 54,23 50,20 46,23 47,18 43,15 48,15" className="animate-sparkle-2" />
+       <polygon points="25,-5 27,0 32,0 28,3 29,8 25,5 21,8 22,3 18,0 23,0" className="animate-sparkle-3" />
+    </g>
+
+    {/* Back of Bucket Lip */}
+    <ellipse cx="30" cy="42" rx="16" ry="6" fill="#1b5e20" />
+    
+    {/* Overflowing Veggie Scraps */}
+    <path d="M20,40 Q12,30 25,28 Q32,35 25,42" fill="#7cb342" />
+    <path d="M40,38 Q48,25 35,28 Q28,35 35,42" fill="#81c784" />
+    <path d="M26,32 Q30,15 40,25 Q38,38 30,42" fill="#4caf50" />
+    <path d="M18,36 L24,25 L26,35 Z" fill="#ffb300" />
+    <path d="M42,38 L45,30 L38,34 Z" fill="#e53935" />
+    
+    {/* Bucket Body */}
+    <path d="M15,45 L18,85 Q30,90 42,85 L45,45 Z" fill="#2e7d32" />
+    <ellipse cx="30" cy="45" rx="15" ry="5" fill="#2e7d32" />
+    
+    {/* Bucket Front Lip Highlight */}
+    <path d="M14,42 A16,6 0 0,0 46,42 A16,6 0 0,1 14,42" fill="#4caf50" />
+    
+    {/* Detail Lines */}
+    <line x1="22" y1="50" x2="25" y2="82" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
+    <line x1="30" y1="52" x2="30" y2="84" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
+    <line x1="38" y1="50" x2="35" y2="82" stroke="#1b5e20" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
 const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
     {children}
@@ -1772,7 +1812,13 @@ export default function App() {
          if (!closest && dreamStage === 'MATCH_EXAMPLES' && matchPhase === 1) {
             EXAMPLE_BINS.forEach(bin => {
                if (!combinedBins.includes(bin.id) && Math.hypot(farmerPosRef.current.x + 20 - (bin.x + 40), farmerPosRef.current.y + 20 - (bin.y + 40)) < 60) {
-                  closest = { id: `held_${bin.id}`, name: bin.label, sprite: '📦', isBin: true };
+                  closest = { 
+                     id: `held_${bin.id}`, 
+                     name: bin.label, 
+                     sprite: bin.id === 'bin_n' ? null : '📦', 
+                     component: bin.id === 'bin_n' ? CompostBucketSprite : null,
+                     isBin: true 
+                  };
                }
             });
          }
@@ -2457,8 +2503,17 @@ export default function App() {
                         {EXAMPLE_BINS.map(bin => {
                            const isCombined = combinedBins.includes(bin.id);
                            return (
-                              <div key={bin.id} className={`absolute w-20 h-20 border-4 border-[#3e2723] flex flex-col items-center justify-center z-10 shadow-md transition-opacity duration-500 ${bin.color} ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
-                                <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
+                              <div key={bin.id} className={`absolute w-20 h-20 flex flex-col items-center justify-center z-10 transition-opacity duration-500 ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
+                                {bin.id === 'bin_n' ? (
+                                    <>
+                                      <div className="w-14 h-20 mt-2"><CompostBucketSprite /></div>
+                                      <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">{bin.label}</span>
+                                    </>
+                                ) : (
+                                    <div className={`w-full h-full border-4 border-[#3e2723] flex flex-col items-center justify-center shadow-md ${bin.color}`}>
+                                      <span className="text-white text-[9px] font-bold text-center leading-tight">{bin.label}</span>
+                                    </div>
+                                )}
                               </div>
                            );
                         })}
@@ -3130,6 +3185,26 @@ export default function App() {
         }
         .animate-snip-top { animation: snip-top 0.2s infinite ease-in-out; }
         .animate-snip-bottom { animation: snip-bottom 0.2s infinite ease-in-out; }
+
+        /* BUCKET SMELL & GLITTER */
+        @keyframes smell-waft {
+          0% { stroke-dashoffset: 100; opacity: 0; }
+          20% { opacity: 0.7; }
+          80% { opacity: 0.7; }
+          100% { stroke-dashoffset: -100; opacity: 0; }
+        }
+        .animate-smell-1 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0s; }
+        .animate-smell-2 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0.8s; }
+        .animate-smell-3 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 1.6s; }
+
+        @keyframes bucket-sparkle {
+          0% { transform: scale(0) rotate(0deg); opacity: 0; }
+          50% { transform: scale(1.2) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 2px #ffea00); }
+          100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+        .animate-sparkle-1 { transform-origin: 10px 8px; animation: bucket-sparkle 1.5s infinite alternate 0.2s; }
+        .animate-sparkle-2 { transform-origin: 50px 18px; animation: bucket-sparkle 1.5s infinite alternate 0.5s; }
+        .animate-sparkle-3 { transform-origin: 25px 3px; animation: bucket-sparkle 1.5s infinite alternate 0.8s; }
 
         /* OIIA CAT SPIN */
         @keyframes oiia-spin {
