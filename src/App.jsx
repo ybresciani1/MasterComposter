@@ -360,7 +360,7 @@ const InstructorSprite = () => (
 );
 
 const InstructorPortrait = () => (
-  <img src={`${BASE}/Teacher.png`} alt="Instructor" className="w-full h-full object-cover" />
+  <img src={`${BASE}/Teacher new puppet 300.png`} alt="Instructor" className="w-full h-full object-cover" />
 );
 
 const StudentBlondeSprite = () => (
@@ -413,7 +413,7 @@ const StudentPonytailSprite = () => (
 const StudentPortrait = () => {
   const [imgIdx, setImgIdx] = useState(0);
   const urls = [
-    `${BASE}/farmgirl.png`,
+    `${BASE}/farmgirl pupper 300.png`,
     `${BASE}/hero.png`
   ];
   
