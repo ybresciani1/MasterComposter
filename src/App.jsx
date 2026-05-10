@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const BASE = 'https://master-composter.vercel.app/assets';
 const backgroundMusic = `${BASE}/nastelbom-background-music-486996.mp3`;
 const wowSound = `${BASE}/anime-wow-sound-effect.mp3`;
-const endCreditsVideo = `${BASE}/End Credits-1080.mp4`;
+const endCreditsVideo = `${BASE}/Compost Class Credits-compressed.mp4`;
 const pitchforkSound = `${BASE}/Pitchfork Sound Final.mp3`;
 const hammerSound = `${BASE}/Hammer Sound Final.mp3`;
 const patDirtSound = `${BASE}/Pat Dirt Final Sound.mp3`;
@@ -21,12 +21,13 @@ const oiiaCatSound = `${BASE}/oiia-cat-remix TAP sound.mp3`;
 const wateringCanSound = `${BASE}/Watering Can.mp3`;
 const loseHeartSound = `${BASE}/Lose heart Sound.mp3`;
 const riotBeyonceTapSound = `${BASE}/RiotBeyonce Tap Sound.mp3`;
+const kittenTossSound = `${BASE}/Kitten toss sound.mp3`;
 
 const SOUND_URLS = [
   pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound,
   nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound,
   woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, wateringCanSound,
-  loseHeartSound, riotBeyonceTapSound,
+  loseHeartSound, riotBeyonceTapSound, kittenTossSound,
 ];
 
 // --- GAME DATA ---
@@ -1910,6 +1911,7 @@ export default function App() {
              if (Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y) < 110) {
                 setCauldron(prev => [...prev, heldItem.name || heldItem]); setHeldItem(null);
                 if ((heldItem.name || heldItem) === '✨ Magic') { playSfx(magicSound); }
+                else if ((heldItem.name || heldItem) === '🐱 Kittens') { playSfx(kittenTossSound); }
                 else { playSfx(tossBinSound); }
              } else showToast("Get closer to the mixing bin!");
          } else if (dreamStage === 'MATCH_EXAMPLES') {
