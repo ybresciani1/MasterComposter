@@ -1918,15 +1918,20 @@ export default function App() {
 
              if (matchPhase === 0) {
                let closestBin = null;
+               let distToClosestBin = Infinity;
                EXAMPLE_BINS.forEach(bin => {
-                  if (Math.hypot(farmerCenter.x - (bin.x + 40), farmerCenter.y - (bin.y + 40)) < 75) closestBin = bin;
+                  const d = Math.hypot(farmerCenter.x - (bin.x + 40), farmerCenter.y - (bin.y + 40));
+                  if (d < 75 && d < distToClosestBin) { closestBin = bin; distToClosestBin = d; }
                });
 
                const cuttingBoardCenter = { x: 100 + 32, y: 15 + 32 };
-               const nearCuttingBoard = Math.hypot(farmerCenter.x - cuttingBoardCenter.x, farmerCenter.y - cuttingBoardCenter.y) < 70;
+               const distToCuttingBoard = Math.hypot(farmerCenter.x - cuttingBoardCenter.x, farmerCenter.y - cuttingBoardCenter.y);
 
                const prepStationCenter = { x: 164 + 32, y: 15 + 32 };
-               const nearPrepStation = Math.hypot(farmerCenter.x - prepStationCenter.x, farmerCenter.y - prepStationCenter.y) < 70;
+               const distToPrepStation = Math.hypot(farmerCenter.x - prepStationCenter.x, farmerCenter.y - prepStationCenter.y);
+
+               const nearCuttingBoard = distToCuttingBoard < 70 && distToCuttingBoard <= distToPrepStation && distToCuttingBoard <= distToClosestBin;
+               const nearPrepStation = distToPrepStation < 70 && distToPrepStation < distToCuttingBoard && distToPrepStation <= distToClosestBin;
 
                if (nearCuttingBoard) {
                   if (heldItem.id === 'ex_n2' && !heldItem.isChopped) {
