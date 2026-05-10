@@ -30,8 +30,8 @@ const SOUND_URLS = [
 ];
 
 // --- GAME DATA ---
-const SOIL_COMPONENTS = ['🍃 Nitrogen (Greens)', '🍂 Carbon (Browns)', '💧 Water', '💨 Air'];
-const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🪨 Gravel'];
+const SOIL_COMPONENTS = ['🌿 Organic Materials', '🪨 Minerals', '💧 Water', '💨 Air'];
+const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🐱 Kittens'];
 
 const EXAMPLE_ITEMS = [
   { id: 'ex_n1', name: 'Grass Clippings', sprite: '🥬', comp: '🍃 Nitrogen (Greens)' },
@@ -2477,7 +2477,7 @@ export default function App() {
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
                {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
                  <div className="text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse text-center">
-                   {dreamStage === 'CRAFT_SOIL' && "Gather Nitrogen, Carbon, Water, and Air!"}
+                   {dreamStage === 'CRAFT_SOIL' && "Gather Minerals, Organic Material, Water, and Air."}
                    {dreamStage === 'MATCH_EXAMPLES' && (
                      matchPhase === 0 ? "Chop veggies, remove tape from cardboard, then sort into Greens & Browns!" :
                      matchPhase === 1 ? "Pick up the full bins and dump them into the center compost pile!" :
@@ -2631,7 +2631,9 @@ export default function App() {
                        <FarmerSprite />
                        {heldItem && (
                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
-                            <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
+                            {(heldItem.component || heldItem.sprite) && (
+                              <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
+                            )}
                             <span>{heldItem.name}</span>
                          </div>
                        )}
@@ -2643,7 +2645,7 @@ export default function App() {
 
 
                 <DialogBox name="Wallace" text={
-                   dreamStage === 'CRAFT_SOIL' ? "Toss those four elements into the compost bin!" :
+                   dreamStage === 'CRAFT_SOIL' ? "First, let's investigate what soil is made of! Toss those four components into the soil bin!" :
                    dreamStage === 'MATCH_EXAMPLES' ? (
                      matchPhase === 0 ? "Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!" :
                      matchPhase === 1 ? "Now bring those full bins to the center pile!" :
