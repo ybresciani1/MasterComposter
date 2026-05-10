@@ -1087,19 +1087,22 @@ const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal',
     <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up`}>
       <PixelBox className="flex gap-4 items-start relative shadow-2xl bg-[rgba(244,226,184,0.85)]">
         {(portrait || name === 'Wallace') && (
-          <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl shrink-0 overflow-hidden relative">
-            {name === 'Wallace' ? (
-              <>
-                <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
-                {emotion === 'angry' && <div className="absolute top-1 right-1 text-2xl animate-bounce drop-shadow-md">💢</div>}
-              </>
-            ) : (
-              <div className={`w-full h-full flex items-center justify-center ${name === 'You' || name === 'Instructor' ? '' : 'p-2'}`}>{portrait}</div>
-            )}
+          <div className="flex flex-col items-center shrink-0">
+            <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl overflow-hidden relative">
+              {name === 'Wallace' ? (
+                <>
+                  <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
+                  {emotion === 'angry' && <div className="absolute top-1 right-1 text-2xl animate-bounce drop-shadow-md">💢</div>}
+                </>
+              ) : (
+                <div className={`w-full h-full flex items-center justify-center ${name === 'You' || name === 'Instructor' ? '' : 'p-2'}`}>{portrait}</div>
+              )}
+            </div>
+            {name && <span className="text-xs font-bold text-[#5d4037] mt-1">{name}</span>}
           </div>
         )}
         <div className="flex-1">
-          {name && <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>}
+          {name && !(portrait || name === 'Wallace') && <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>}
           <p className="text-sm md:text-base leading-relaxed break-words">{text}</p>
         </div>
         {!hideNext && (
@@ -2647,7 +2650,7 @@ export default function App() {
                 <DialogBox name="Wallace" text={
                    dreamStage === 'CRAFT_SOIL' ? "First, let's investigate what soil is made of! Toss those four components into the soil bin!" :
                    dreamStage === 'MATCH_EXAMPLES' ? (
-                     matchPhase === 0 ? "Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!" :
+                     matchPhase === 0 ? "We need more organic material. Let's make some compost! Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!" :
                      matchPhase === 1 ? "Now bring those full bins to the center pile!" :
                      matchPhase === 2 ? "Needs some moisture! Give it a good watering." :
                      "Last step, let's get some air in there. Pitchfork time!"
