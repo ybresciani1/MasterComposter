@@ -1575,7 +1575,7 @@ export default function App() {
     { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Living Coast Discovery Center." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "...and that concludes our section on soil properties and compost components!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
-    { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 compost components, how to manage soil problems, and the optimal plant soils!)" }
+    { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 soil components, how to create compost, how to manage soil problems, and the optimal plant soils!)" }
   ];
 
   const badWakeUpStory = [
@@ -2915,9 +2915,10 @@ export default function App() {
           <div className="text-lg bg-[#d7ccc8] p-6 border-4 border-[#8b5a2b] text-left leading-relaxed shadow-inner mb-8">
             <p className="font-bold mb-4 text-[#5d4037]">You successfully learned:</p>
             <ul className="list-disc list-inside space-y-2 text-[#3e2723] font-medium">
-              <li key="learned-1">Compost Components: Nitrogen (Greens), Carbon (Browns), Water, Air</li>
-              <li key="learned-2">Managing Compaction, Erosion, and Drainage</li>
-              <li key="learned-3">Optimal soil pairings for your garden</li>
+              <li key="learned-1">Soil Components: Organic Material, Minerals, Water, Air</li>
+              <li key="learned-2">Compost Steps: Nitrogen (Greens), Carbon (Browns), Water, Air</li>
+              <li key="learned-3">Managing Compaction, Erosion, and Drainage</li>
+              <li key="learned-4">Optimal soil pairings for your garden</li>
             </ul>
           </div>
           <button onClick={() => setGameState('END_CREDITS')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Continue</button>
