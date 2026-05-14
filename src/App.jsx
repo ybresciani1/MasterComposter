@@ -1548,9 +1548,9 @@ export default function App() {
   ];
 
   const classStory = [
-    "6:00 PM - The Classroom.",
+    "10:00 AM - The Classroom.",
     "The instructor is talking about soil profiles. You're trying your best to pay attention.",
-    "Without your medication, your eyelids grow incredibly heavy.",
+    "With the little sleep you got last night, your eyelids grow incredibly heavy.",
     "The instructor's voice fades into a low hum... Zzzzz..."
   ];
 
