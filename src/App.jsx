@@ -1540,11 +1540,11 @@ export default function App() {
   }, [gameState, dreamStage, audioDismissed, isMusicPlaying]);
 
   const introStory = [
-    "5:00 PM. You hold the familiar orange pill bottle in your hand.",
-    "You pop the white plastic cap off, peer inside, and tip it upside down. Nothing. Just a dusting of powder falls out.",
-    "Ugh, completely out of my ADHD medication... My brain feels like a browser with 40 tabs open and music playing from an unknown source.",
-    "But tonight is important. It's the Chula Vista Master Composter class at 6:00 PM.",
-    "You grab your keys, hop in your car, and hit the I-5."
+    "9:00 AM Saturday: You wake up and look around the room. You see a big red circle on today's date on your calendar.",
+    "You couldn't sleep well. Dogs were barking, the neighbors were having a party, and the babies—oh, the sweet babies—were crying throughout the night.",
+    "Ugh, I'm exhausted... My brain feels like a browser with 40 tabs open and with terrible Wi-Fi.",
+    "But today is important. It's the Master Composter class at 10:00 AM.",
+    "You grab a quick breakfast bar, hop in the car, and get going to class."
   ];
 
   const classStory = [
@@ -1572,14 +1572,14 @@ export default function App() {
   ];
 
   const wakeUpStory = [
-    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Living Coast Discovery Center." },
+    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Master Composting class." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "...and that concludes our section on soil properties and compost components!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Whoa... I actually understood all of that. The dream made perfect sense!)" },
     { name: "You", portrait: <StudentPortrait />, text: "(I know the 4 soil components, how to create compost, how to manage soil problems, and the optimal plant soils!)" }
   ];
 
   const badWakeUpStory = [
-    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Living Coast Discovery Center, sweating." },
+    { name: "Reality", portrait: null, text: "You jolt awake in your chair at the Master Composting class, sweating." },
     { name: "Instructor", portrait: <InstructorPortrait />, text: "Hey! Are you sleeping in my class? Soil properties are NOT nap material!" },
     { name: "You", portrait: <StudentPortrait />, text: "(Oh no... I got caught... and that nightmare was awful. I didn't learn a thing.)" },
     { name: "You", portrait: <StudentPortrait />, text: "(I need to pay better attention next time...)" }
