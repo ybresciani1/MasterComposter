@@ -1681,7 +1681,7 @@ const KittenSprite = React.memo(({ gray = false }) => {
       <path d="M3,9 h2 v2 h-2 z M6,9 h2 v2 h-2 z M9,9 h2 v2 h-2 z M1,5 h1 v3 h-1 z M2,8 h1 v1 h-1 z M5,5 h1 v1 h-1 z M7,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill={shade} />
       {/* Ears, nose & eyes */}
       <path d="M9,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M13,4 h1 v1 h-1 z" fill="#f48fb1" />
-      <path d="M9,3 h1 v1 h-1 z M11,3 h1 v1 h-1 z" fill="#43a047" />
+      <path d="M10,3 h1 v1 h-1 z M12,3 h1 v1 h-1 z" fill="#43a047" />
     </svg>
   );
 });
@@ -3208,6 +3208,12 @@ export default function App() {
                     {dreamStage === 'CRAFT_SOIL' && (
                       <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 z-10">
                          <ComposterSprite />
+                         {cauldron.includes('🐱 Kittens') && (
+                            <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] overflow-hidden pointer-events-none">
+                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk"><div className="w-full h-full animate-kitten-trot"><KittenSprite /></div></div>
+                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk" style={{ animationDelay: '-4.5s' }}><div className="w-full h-full animate-kitten-trot"><KittenSprite gray /></div></div>
+                            </div>
+                         )}
                          {/* Sits over the composter's open top */}
                          <div className={`absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] flex flex-wrap items-center content-center justify-center overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow' : ''}`}>
                             {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
@@ -3223,13 +3229,6 @@ export default function App() {
                             )}
                          </div>
                          {isStirring && <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] bg-black/40 flex items-center justify-center z-40"><div className="w-10 h-14 animate-stir"><PitchforkSprite/></div></div>}
-
-                         {cauldron.includes('🐱 Kittens') && (
-                            <>
-                              <div className="absolute top-0 left-0 w-7 h-5 pointer-events-none animate-kitten-walk"><div className="w-full h-full animate-kitten-trot"><KittenSprite /></div></div>
-                              <div className="absolute top-0 left-0 w-7 h-5 pointer-events-none animate-kitten-walk" style={{ animationDelay: '-4.5s' }}><div className="w-full h-full animate-kitten-trot"><KittenSprite gray /></div></div>
-                            </>
-                         )}
                       </div>
                     )}
 
@@ -3768,15 +3767,15 @@ export default function App() {
         }
         .animate-wallace-wobble { animation: wallace-wobble 0.4s ease-in-out infinite alternate; }
 
-        /* KITTENS CIRCLING THE COMPOST BIN (path runs around the 112px bin box) */
+        /* KITTENS PADDING AROUND INSIDE THE COMPOST BIN (path loops inside the 80x64px opening) */
         @keyframes kitten-walk {
-          0% { transform: translate(-28px, 92px) scaleX(1); }
-          30% { transform: translate(104px, 92px) scaleX(1); }
-          40% { transform: translate(104px, -6px) scaleX(1); }
-          44% { transform: translate(104px, -6px) scaleX(-1); }
-          74% { transform: translate(-28px, -6px) scaleX(-1); }
-          86% { transform: translate(-28px, 92px) scaleX(-1); }
-          90%, 100% { transform: translate(-28px, 92px) scaleX(1); }
+          0% { transform: translate(0px, 44px) scaleX(1); }
+          30% { transform: translate(52px, 44px) scaleX(1); }
+          40% { transform: translate(52px, 0px) scaleX(1); }
+          44% { transform: translate(52px, 0px) scaleX(-1); }
+          74% { transform: translate(0px, 0px) scaleX(-1); }
+          86% { transform: translate(0px, 44px) scaleX(-1); }
+          90%, 100% { transform: translate(0px, 44px) scaleX(1); }
         }
         .animate-kitten-walk { animation: kitten-walk 9s linear infinite; }
         @keyframes kitten-trot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
