@@ -1669,12 +1669,23 @@ const BlueberryBushSprite = React.memo(() => (
   </svg>
 ));
 
-const KittenSprite = React.memo(({ gray = false }) => {
+const KittenSprite = React.memo(({ gray = false, hat = null }) => {
   const fur = gray ? "#bdbdbd" : "#ffb74d";
   const shade = gray ? "#9e9e9e" : "#fb8c00";
+  // Wizard hat colours: [cone, cone shade, brim]
+  const hatColors = hat === 'purple' ? ["#7e57c2", "#5e35b1", "#4527a0"] : ["#42a5f5", "#1e88e5", "#1565c0"];
 
   return (
-    <svg viewBox="0 0 14 11" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <svg viewBox="0 0 14 11" className="w-full h-full drop-shadow-sm" overflow="visible" shapeRendering="crispEdges">
+      {hat && (
+        <>
+          {/* Wizard hat (the cone rises above the sprite box) */}
+          <path d="M7,0 h8 v1 h-8 z" fill={hatColors[2]} />
+          <path d="M8,-1 h6 v1 h-6 z M9,-2 h5 v1 h-5 z M9,-3 h4 v1 h-4 z M10,-4 h3 v1 h-3 z M10,-5 h2 v1 h-2 z M11,-6 h1 v1 h-1 z" fill={hatColors[0]} />
+          <path d="M13,-2 h1 v2 h-1 z M12,-4 h1 v2 h-1 z M11,-5 h1 v1 h-1 z" fill={hatColors[1]} />
+          <path d="M11,-3 h1 v3 h-1 z M10,-2 h3 v1 h-3 z M10,-4 h1 v1 h-1 z" fill="#fdd835" />
+        </>
+      )}
       {/* Head, ears & body */}
       <path d="M9,0 h1 v1 h-1 z M12,0 h1 v1 h-1 z M8,1 h6 v3 h-6 z M4,4 h9 v1 h-9 z M3,5 h11 v1 h-11 z M3,6 h10 v2 h-10 z M3,8 h9 v1 h-9 z" fill={fur} />
       {/* Legs, tail & tabby stripes */}
@@ -3210,8 +3221,9 @@ export default function App() {
                          <ComposterSprite />
                          {cauldron.includes('🐱 Kittens') && (
                             <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] overflow-hidden pointer-events-none">
-                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk"><div className="w-full h-full animate-kitten-trot"><KittenSprite /></div></div>
-                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk" style={{ animationDelay: '-4.5s' }}><div className="w-full h-full animate-kitten-trot"><KittenSprite gray /></div></div>
+                              {/* Magic in the bin turns them into wizard kittens */}
+                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk"><div className="w-full h-full animate-kitten-trot"><KittenSprite hat={cauldron.includes('✨ Magic') ? 'purple' : null} /></div></div>
+                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk" style={{ animationDelay: '-4.5s' }}><div className="w-full h-full animate-kitten-trot"><KittenSprite gray hat={cauldron.includes('✨ Magic') ? 'blue' : null} /></div></div>
                             </div>
                          )}
                          {/* Sits over the composter's open top */}
@@ -3771,9 +3783,9 @@ export default function App() {
         @keyframes kitten-walk {
           0% { transform: translate(0px, 44px) scaleX(1); }
           30% { transform: translate(52px, 44px) scaleX(1); }
-          40% { transform: translate(52px, 0px) scaleX(1); }
-          44% { transform: translate(52px, 0px) scaleX(-1); }
-          74% { transform: translate(0px, 0px) scaleX(-1); }
+          40% { transform: translate(52px, 12px) scaleX(1); }
+          44% { transform: translate(52px, 12px) scaleX(-1); }
+          74% { transform: translate(0px, 12px) scaleX(-1); }
           86% { transform: translate(0px, 44px) scaleX(-1); }
           90%, 100% { transform: translate(0px, 44px) scaleX(1); }
         }
