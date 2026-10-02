@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .superpowers/
+
+# Claude Code local preview config
+.claude/launch.json
