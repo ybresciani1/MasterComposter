@@ -143,14 +143,15 @@ export const StudentPonytailSprite = React.memo(() => (
     <path d="M28,2 h2 v1 h-2 z M29,3 h1 v1 h-1 z" fill="#ffeb3b" />
     <path d="M28,3 h1 v1 h-1 z" fill="#f9a825" />
     {/* Face & hands */}
-    <path d="M14,6 h2 v3 h-2 z M18,6 h4 v3 h-4 z M24,6 h2 v3 h-2 z M14,9 h1 v1 h-1 z M16,9 h8 v1 h-8 z M25,9 h1 v1 h-1 z M14,10 h5 v1 h-5 z M21,10 h5 v1 h-5 z M16,11 h8 v1 h-8 z M11,24 h3 v1 h-3 z M26,24 h3 v1 h-3 z M12,25 h2 v1 h-2 z M26,25 h2 v1 h-2 z" fill="#ffe0b2" />
+    <path d="M14,6 h12 v1 h-12 z M14,7 h2 v2 h-2 z M18,7 h4 v2 h-4 z M24,7 h2 v2 h-2 z M14,9 h1 v1 h-1 z M16,9 h8 v1 h-8 z M25,9 h1 v1 h-1 z M14,10 h5 v1 h-5 z M21,10 h5 v1 h-5 z M16,11 h8 v1 h-8 z M11,24 h3 v1 h-3 z M26,24 h3 v1 h-3 z M12,25 h2 v1 h-2 z M26,25 h2 v1 h-2 z" fill="#ffe0b2" />
     <path d="M15,11 h1 v1 h-1 z M24,11 h1 v1 h-1 z M17,12 h6 v1 h-6 z M18,13 h4 v1 h-4 z M20,14 h1 v1 h-1 z M11,25 h1 v1 h-1 z M28,25 h1 v1 h-1 z" fill="#f0c48a" />
     <path d="M15,9 h1 v1 h-1 z M24,9 h1 v1 h-1 z" fill="#ffab91" />
     <path d="M19,10 h2 v1 h-2 z" fill="#d2706a" />
     {/* Eyes */}
-    <path d="M16,6 h2 v1 h-2 z M22,6 h2 v1 h-2 z" fill="#ffffff" />
-    <path d="M16,7 h1 v1 h-1 z M23,7 h1 v1 h-1 z M16,8 h2 v1 h-2 z M22,8 h2 v1 h-2 z" fill="#81d4fa" />
-    <path d="M17,7 h1 v1 h-1 z M22,7 h1 v1 h-1 z" fill="#01579b" />
+    <path d="M16,7 h1 v1 h-1 z M22,7 h1 v1 h-1 z" fill="#ffffff" />
+    <path d="M17,7 h1 v1 h-1 z M23,7 h1 v1 h-1 z" fill="#263238" />
+    <path d="M16,8 h1 v1 h-1 z M22,8 h1 v1 h-1 z" fill="#546e7a" />
+    <path d="M17,8 h1 v1 h-1 z M23,8 h1 v1 h-1 z" fill="#78909c" />
     {/* Sweater */}
     <path d="M14,13 h2 v1 h-2 z M24,13 h2 v1 h-2 z M12,14 h6 v1 h-6 z M23,14 h5 v1 h-5 z M11,15 h18 v1 h-18 z M10,16 h20 v1 h-20 z M10,17 h3 v5 h-3 z M14,17 h12 v5 h-12 z M27,17 h3 v5 h-3 z M11,22 h3 v1 h-3 z M26,22 h3 v1 h-3 z" fill="#ff4081" />
     <path d="M13,17 h1 v5 h-1 z M26,17 h1 v5 h-1 z M10,22 h1 v1 h-1 z M29,22 h1 v1 h-1 z" fill="#d81b60" />
