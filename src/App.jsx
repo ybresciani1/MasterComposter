@@ -1,1783 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
-const BASE = 'https://master-composter.vercel.app/assets';
-const backgroundMusic = `${BASE}/nastelbom-background-music-486996.mp3`;
-const wowSound = `${BASE}/anime-wow-sound-effect.mp3`;
-const endCreditsVideo = `${BASE}/Compost Class Credits-compressed.mp4`;
-const pitchforkSound = `${BASE}/Pitchfork Sound Final.mp3`;
-const hammerSound = `${BASE}/Hammer Sound Final.mp3`;
-const patDirtSound = `${BASE}/Pat Dirt Final Sound.mp3`;
-const magicSound = `${BASE}/Magic Sound Final.mp3`;
-const wakeUpSound = `${BASE}/Wake up Sound Final.mp3`;
-const nightmareSound = `${BASE}/Nightmare sound.mp3`;
-const tossBinSound = `${BASE}/Toss Bin Final Sound.mp3`;
-const questSound = `${BASE}/Quest sound.mp3`;
-const introAnxietySound = `${BASE}/Intro anxiety.mp3`;
-const sakuraSound = `${BASE}/Master tap sakura flowers.mp3`;
-const woodliceSound = `${BASE}/Woodlice touch sound.mp3`;
-const beeTapSound = `${BASE}/bee tap.mp3`;
-const butterflyTapSound = `${BASE}/Butterfly tap.mp3`;
-const frogTapSound = `${BASE}/Frog tap.mp3`;
-const oiiaCatSound = `${BASE}/oiia-cat-remix TAP sound.mp3`;
-const wateringCanSound = `${BASE}/Watering Can.mp3`;
-const loseHeartSound = `${BASE}/Lose heart Sound.mp3`;
-const riotBeyonceTapSound = `${BASE}/RiotBeyonce Tap Sound.mp3`;
-const kittenTossSound = `${BASE}/Kitten toss sound.mp3`;
+import { ClassroomScene } from './components/ClassroomScene.jsx';
+import { CrowOverlay } from './components/CrowOverlay.jsx';
+import { CompostKittens } from './components/CompostKittens.jsx';
+import { MovingActor } from './components/MovingActor.jsx';
+import { PeckingHens } from './components/PeckingHens.jsx';
+import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
+import { PixelBox, DialogBox } from './components/ui.jsx';
+import { backgroundMusic, wowSound, endCreditsVideo, pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound, nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound, woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, oiiaCatSound, wateringCanSound, loseHeartSound, riotBeyonceTapSound, kittenTossSound, SOUND_URLS } from './data/assets.js';
+import { DREAM_LEVELS, SOIL_COMPONENTS, FALSE_COMPONENTS, INGREDIENT_ICONS, EXAMPLE_ITEMS, EXAMPLE_BINS, NO_COMPOST_ITEMS, SOIL_PROBLEMS, COMPOST_PROBLEMS, WORM_BEDDING_ITEMS, WORM_FOODS, PLANTS, BED_SPOTS } from './data/gameData.js';
+import { PolishHenSprite, CowSprite, PigSprite, ChickenSprite, RoosterSprite, ChickSprite, SheepSprite, GoatSprite, FrogSprite, RabbitSprite, CatSprite, DogSprite } from './sprites/animals.jsx';
+import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
+import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite } from './sprites/critters.jsx';
+import { CanopySprite } from './sprites/garden.jsx';
+import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite } from './sprites/props.jsx';
+import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite } from './sprites/plants.jsx';
+import { PondSprite, BarnSprite, SiloSprite } from './sprites/scenery.jsx';
+import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
-const SOUND_URLS = [
-  pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound,
-  nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound,
-  woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, wateringCanSound,
-  loseHeartSound, riotBeyonceTapSound, kittenTossSound,
-];
+const PLAYABLE_STAGES = DREAM_LEVELS.map(l => l.stage);
+const dayOf = (stage) => { const i = PLAYABLE_STAGES.indexOf(stage); return i >= 0 ? i + 1 : PLAYABLE_STAGES.length + 1; };
 
-// --- GAME DATA ---
-const SOIL_COMPONENTS = ['🌿 Organic Materials', '🪨 Minerals', '💧 Water', '💨 Air'];
-const FALSE_COMPONENTS = ['🥤 Plastic', '✨ Magic', '🐱 Kittens'];
-
-const EXAMPLE_ITEMS = [
-  { id: 'ex_n1', name: 'Grass Clippings', sprite: '🥬', comp: '🍃 Nitrogen (Greens)' },
-  { id: 'ex_n2', name: 'Vegetable Scraps', sprite: '🥦', comp: '🍃 Nitrogen (Greens)' },
-  { id: 'ex_n3', name: 'Coffee Grounds', sprite: '☕', comp: '🍃 Nitrogen (Greens)' },
-  { id: 'ex_c1', name: 'Dry Leaves', sprite: '🍂', comp: '🍂 Carbon (Browns)' },
-  { id: 'ex_c2', name: 'Cardboard', sprite: '📦', comp: '🍂 Carbon (Browns)' },
-  { id: 'ex_c3', name: 'Twigs', sprite: '🪵', comp: '🍂 Carbon (Browns)' },
-  { id: 'ex_w', name: 'Watering Can', type: 'tool', sprite: '🚿', comp: '💧 Water' },
-  { id: 'ex_a', name: 'Pitchfork', type: 'tool', sprite: '', comp: '💨 Air' }
-];
-
-const EXAMPLE_BINS = [
-  { id: 'bin_n', x: 20, y: 15, comp: '🍃 Nitrogen (Greens)', color: 'bg-green-700', label: 'Greens Bin' },
-  { id: 'bin_c', x: 240, y: 15, comp: '🍂 Carbon (Browns)', color: 'bg-[#8d6e63]', label: 'Browns Bin' },
-];
-
-const SOIL_PROBLEMS = [
-  {
-    id: 'compaction',
-    name: "Compacted Plot",
-    x: 30, y: 50,
-    description: "The soil is packed too tightly, suffocating roots and blocking water.",
-    hint: "Yikes, that dirt is hard as a rock! We need to poke some holes to let air in and mix in some compost.",
-    options: [
-      { text: "Aerate with Pitchfork & add Organic Matter", correct: true },
-      { text: "Flood it with water until it's mud", correct: false },
-      { text: "Roll over it with heavy machinery", correct: false }
-    ]
-  },
-  {
-    id: 'erosion',
-    name: "Eroding Plot",
-    x: 135, y: 50,
-    description: "Wind and rain are washing the precious topsoil away!",
-    hint: "The wind and rain are stealing our soil! We should cover it up and give it some roots to hold onto.",
-    options: [
-      { text: "Remove all plants to clear the area", correct: false },
-      { text: "Plant Cover Crops & apply Mulch", correct: true },
-      { text: "Spray it down with a high-pressure hose", correct: false }
-    ]
-  },
-  {
-    id: 'drainage',
-    name: "Flooded Plot",
-    x: 240, y: 50,
-    description: "Water pools on the surface. The roots are drowning!",
-    hint: "That's a swamp, not a garden! We need to raise the beds so the water can flow away.",
-    options: [
-      { text: "Pave over it with concrete", correct: false },
-      { text: "Build Raised Beds & improve grading", correct: true },
-      { text: "Dig a deep hole and wait", correct: false }
-    ]
-  }
-];
-
-const PLANTS = [
-  { id: 'tomato', name: 'Tomatoes', sprite: '🍅', soil: 'Loamy, well-draining, nutrient-rich soil' },
-  { id: 'succulent', name: 'Succulents', sprite: '🌵', soil: 'Sandy, highly porous, fast-draining soil' },
-  { id: 'blueberry', name: 'Blueberries', sprite: '🫐', soil: 'Acidic, well-draining loamy soil' },
-  { id: 'fern', name: 'Ferns', sprite: '🌿', soil: 'Moist, shady soil rich in organic matter' },
-];
-
-// --- REUSABLE UI COMPONENTS ---
-const FarmerSprite = React.memo(() => (
-  <svg viewBox="0 0 24 27" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hat & flower */}
-    <path d="M9,0 h6 v1 h-6 z M8,1 h1 v1 h-1 z M11,1 h5 v1 h-5 z M10,2 h6 v1 h-6 z M4,4 h16 v1 h-16 z" fill="#f48fb1" />
-    <path d="M9,1 h2 v1 h-2 z M9,2 h1 v1 h-1 z" fill="#f8bbd0" />
-    <path d="M4,5 h16 v1 h-16 z" fill="#ec407a" />
-    <path d="M8,3 h8 v1 h-8 z" fill="#d81b60" />
-    <path d="M7,1 h1 v1 h-1 z M6,2 h1 v1 h-1 z M8,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#ff4081" />
-    <path d="M7,2 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Hair & braids */}
-    <path d="M7,6 h10 v1 h-10 z M6,7 h1 v1 h-1 z M17,7 h1 v1 h-1 z M7,8 h1 v1 h-1 z M16,8 h1 v1 h-1 z M6,9 h1 v1 h-1 z M17,9 h1 v1 h-1 z M7,10 h1 v1 h-1 z M16,10 h1 v1 h-1 z M6,11 h1 v1 h-1 z M17,11 h1 v1 h-1 z M7,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z M6,13 h1 v1 h-1 z M17,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z M6,15 h1 v1 h-1 z M17,15 h1 v1 h-1 z M7,16 h1 v1 h-1 z M16,16 h1 v1 h-1 z M7,18 h1 v2 h-1 z M16,18 h1 v2 h-1 z" fill="#d84315" />
-    <path d="M6,6 h1 v1 h-1 z M17,6 h1 v1 h-1 z M7,7 h1 v1 h-1 z M16,7 h1 v1 h-1 z M6,8 h1 v1 h-1 z M17,8 h1 v1 h-1 z M7,9 h1 v1 h-1 z M16,9 h1 v1 h-1 z M6,10 h1 v1 h-1 z M17,10 h1 v1 h-1 z M7,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M6,12 h1 v1 h-1 z M17,12 h1 v1 h-1 z M7,13 h1 v1 h-1 z M16,13 h1 v1 h-1 z M6,14 h1 v1 h-1 z M17,14 h1 v1 h-1 z M7,15 h1 v1 h-1 z M16,15 h1 v1 h-1 z M6,16 h1 v1 h-1 z M17,16 h1 v1 h-1 z M6,18 h1 v1 h-1 z M17,18 h1 v1 h-1 z" fill="#bf360c" />
-    <path d="M6,17 h2 v1 h-2 z M16,17 h2 v1 h-2 z" fill="#4caf50" />
-    {/* Face & hands */}
-    <path d="M8,7 h8 v1 h-8 z M8,8 h1 v3 h-1 z M11,8 h2 v2 h-2 z M15,8 h1 v3 h-1 z M10,10 h4 v1 h-4 z M8,11 h3 v1 h-3 z M13,11 h3 v1 h-3 z M4,17 h2 v1 h-2 z M18,17 h2 v1 h-2 z M5,18 h1 v1 h-1 z M18,18 h1 v1 h-1 z" fill="#ffccaa" />
-    <path d="M11,12 h2 v1 h-2 z M4,18 h1 v1 h-1 z M19,18 h1 v1 h-1 z" fill="#eeb38f" />
-    <path d="M9,10 h1 v1 h-1 z M14,10 h1 v1 h-1 z" fill="#ff8a80" />
-    <path d="M11,11 h2 v1 h-2 z" fill="#c2705a" />
-    <path d="M9,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M10,8 h1 v1 h-1 z M14,8 h1 v1 h-1 z M9,9 h2 v1 h-2 z M13,9 h2 v1 h-2 z" fill="#3e2723" />
-    {/* Shirt & overalls */}
-    <path d="M4,12 h2 v4 h-2 z M8,12 h1 v6 h-1 z M10,12 h1 v1 h-1 z M13,12 h1 v1 h-1 z M15,12 h1 v6 h-1 z M18,12 h2 v4 h-2 z" fill="#e53935" />
-    <path d="M4,16 h2 v1 h-2 z M18,16 h2 v1 h-2 z" fill="#c62828" />
-    <path d="M10,13 h4 v2 h-4 z M9,15 h2 v2 h-2 z M13,15 h2 v2 h-2 z M9,17 h6 v1 h-6 z M8,18 h8 v2 h-8 z M8,20 h3 v4 h-3 z M13,20 h3 v4 h-3 z" fill="#1e88e5" />
-    <path d="M9,12 h1 v2 h-1 z M14,12 h1 v2 h-1 z M11,15 h2 v2 h-2 z M7,20 h1 v4 h-1 z M16,20 h1 v4 h-1 z" fill="#1565c0" />
-    <path d="M9,14 h1 v1 h-1 z M14,14 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Boots */}
-    <path d="M7,24 h4 v1 h-4 z M13,24 h4 v1 h-4 z M6,25 h5 v1 h-5 z M13,25 h5 v1 h-5 z" fill="#8b5a2b" />
-    <path d="M6,24 h1 v1 h-1 z M17,24 h1 v1 h-1 z" fill="#a1887f" />
-    <path d="M6,26 h5 v1 h-5 z M13,26 h5 v1 h-5 z" fill="#5d4037" />
-  </svg>
-));
-
-const WormSprite = React.memo(() => (
-  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M2,11 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
-    <path d="M4,9 h1 v2 h-1 z M7,11 h1 v1 h-1 z M10,8 h1 v3 h-1 z M13,9 h1 v1 h-1 z" fill="#d81b60" />
-    <path d="M12,6 h4 v4 h-4 z" fill="#f48fb1" />
-    <path d="M13,7 h1 v1 h-1 z M15,7 h1 v1 h-1 z" fill="#3e2723" />
-  </svg>
-));
-
-const WallaceFollowerSprite = React.memo(() => (
-  <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    <path d="M12,6 h4 v4 h-4 z" fill="#c8960c" />
-    <path d="M12,9 h4 v1 h-4 z" fill="#5d4037" />
-    <path d="M10,10 h6 v1 h-6 z" fill="#e8c44a" />
-    <path d="M12,10 h4 v4 h-4 z" fill="#f48fb1" />
-    <path d="M12,11 h2 v2 h-2 z M14,11 h2 v2 h-2 z" fill="white" />
-    <path d="M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M2,15 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
-    <path d="M4,13 h1 v2 h-1 z M7,15 h1 v1 h-1 z M10,12 h1 v3 h-1 z M13,13 h1 v1 h-1 z" fill="#d81b60" />
-  </svg>
-));
-
-const SakuraSprite = React.memo(() => (
-  <svg viewBox="0 0 10 10" className="w-full h-full drop-shadow-sm opacity-90" shapeRendering="geometricPrecision">
-    <path d="M5,0 C8,0 10,4 5,10 C0,4 2,0 5,0 Z" fill="#f8bbd0" />
-    <path d="M5,2 C7,2 8,4 5,8 C2,4 3,2 5,2 Z" fill="#f48fb1" />
-  </svg>
-));
-
-const MonarchSprite = React.memo(() => (
-  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M7,3 h2 v10 h-2 z" fill="#212121" />
-    <path d="M1,2 h6 v6 h-6 z M9,2 h6 v6 h-6 z" fill="#ff9800" />
-    <path d="M2,8 h5 v6 h-5 z M9,8 h5 v6 h-5 z" fill="#e65100" />
-    <path d="M1,2 h6 v1 h-6 z M9,2 h6 v1 h-6 z M1,2 h1 v6 h-1 z M14,2 h1 v6 h-1 z M2,13 h5 v1 h-5 z M9,13 h5 v1 h-5 z M2,8 h1 v6 h-1 z M13,8 h1 v6 h-1 z" fill="#212121" />
-    <path d="M1,3 h1 v1 h-1 z M14,3 h1 v1 h-1 z M2,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z" fill="#ffffff" />
-  </svg>
-));
-
-const PaintedLadySprite = React.memo(() => (
-  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M7,4 h2 v8 h-2 z" fill="#3e2723" />
-    <path d="M2,3 h5 v5 h-5 z M9,3 h5 v5 h-5 z" fill="#ffb74d" />
-    <path d="M3,8 h4 v5 h-4 z M9,8 h4 v5 h-4 z" fill="#fb8c00" />
-    <path d="M2,3 h2 v2 h-2 z M12,3 h2 v2 h-2 z" fill="#000000" />
-    <path d="M2,4 h1 v1 h-1 z M13,4 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M4,5 h2 v1 h-2 z M10,5 h2 v1 h-2 z" fill="#000000" opacity="0.6"/>
-    <path d="M4,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M10,12 h1 v1 h-1 z" fill="#000000" opacity="0.8"/>
-  </svg>
-));
-
-const DogfaceSprite = React.memo(() => (
-  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M7,5 h2 v6 h-2 z" fill="#4e342e" />
-    <path d="M2,3 h5 v5 h-5 z M9,3 h5 v5 h-5 z" fill="#ffeb3b" />
-    <path d="M4,8 h3 v4 h-3 z M9,8 h3 v4 h-3 z" fill="#fdd835" />
-    <path d="M2,3 h3 v2 h-3 z M11,3 h3 v2 h-3 z M2,5 h1 v2 h-1 z M13,5 h1 v2 h-1 z" fill="#000000" />
-    <path d="M4,4 h1 v1 h-1 z M11,4 h1 v1 h-1 z" fill="#ec407a" />
-  </svg>
-));
-
-const WoodlouseSprite = React.memo(() => (
-  <svg viewBox="0 0 10 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M2,2 h6 v4 h-6 z" fill="#d1c4e9" />
-    <path d="M3,1 h4 v1 h-4 z M3,6 h4 v1 h-4 z" fill="#b39ddb" />
-    <path d="M4,2 h1 v4 h-1 z M6,2 h1 v4 h-1 z" fill="#9575cd" />
-    <path d="M2,6 h1 v1 h-1 z M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M8,6 h1 v1 h-1 z" fill="#512da8" />
-    <path d="M1,3 h1 v2 h-1 z M8,3 h1 v2 h-1 z" fill="#b39ddb" />
-  </svg>
-));
-
-const RolledWoodlouseSprite = React.memo(() => (
-  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M2,1 h4 v6 h-4 z" fill="#d1c4e9" />
-    <path d="M1,2 h6 v4 h-6 z" fill="#d1c4e9" />
-    <path d="M3,1 h2 v6 h-2 z" fill="#b39ddb" />
-    <path d="M2,3 h4 v1 h-4 z M2,5 h4 v1 h-4 z" fill="#9575cd" />
-  </svg>
-));
-
-const LightningSprite = React.memo(({ color = "#ab47bc" }) => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" shapeRendering="crispEdges">
-    {/* Bolt */}
-    <path d="M18,0 h6 v1 h-6 z M17,1 h3 v2 h-3 z M22,1 h2 v2 h-2 z M16,3 h3 v1 h-3 z M21,3 h2 v1 h-2 z M16,4 h2 v1 h-2 z M20,4 h3 v1 h-3 z M15,5 h2 v2 h-2 z M19,5 h3 v1 h-3 z M19,6 h2 v1 h-2 z M14,7 h2 v2 h-2 z M18,7 h2 v2 h-2 z M13,9 h2 v1 h-2 z M17,9 h7 v1 h-7 z M13,10 h3 v1 h-3 z M20,10 h4 v1 h-4 z M13,11 h7 v1 h-7 z M22,11 h2 v1 h-2 z M18,12 h3 v1 h-3 z M23,12 h2 v1 h-2 z M18,13 h2 v1 h-2 z M22,13 h3 v1 h-3 z M17,14 h2 v2 h-2 z M21,14 h3 v1 h-3 z M21,15 h2 v1 h-2 z M16,16 h2 v2 h-2 z M20,16 h2 v2 h-2 z M15,18 h2 v2 h-2 z M19,18 h2 v2 h-2 z M14,20 h2 v2 h-2 z M18,20 h2 v1 h-2 z M18,21 h1 v1 h-1 z M13,22 h2 v2 h-2 z M17,22 h1 v1 h-1 z M16,23 h1 v1 h-1 z M12,24 h2 v1 h-2 z M15,24 h1 v1 h-1 z M12,25 h3 v1 h-3 z M11,26 h3 v1 h-3 z M11,27 h2 v1 h-2 z M10,28 h2 v1 h-2 z M10,29 h1 v1 h-1 z M9,30 h1 v1 h-1 z" fill={color} />
-    {/* Core */}
-    <path d="M20,1 h2 v2 h-2 z M19,3 h2 v1 h-2 z M18,4 h2 v1 h-2 z M17,5 h2 v2 h-2 z M16,7 h2 v2 h-2 z M15,9 h2 v1 h-2 z M16,10 h4 v1 h-4 z M20,11 h2 v1 h-2 z M21,12 h2 v1 h-2 z M20,13 h2 v1 h-2 z M19,14 h2 v2 h-2 z M18,16 h2 v2 h-2 z M17,18 h2 v2 h-2 z M16,20 h2 v2 h-2 z M15,22 h2 v1 h-2 z M15,23 h1 v1 h-1 z M14,24 h1 v1 h-1 z" fill="#ffffff" opacity="0.85" />
-  </svg>
-));
-
-const TumbleweedSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Tumbleweed */}
-    <path d="M12,3 h1 v1 h-1 z M11,4 h1 v1 h-1 z M13,4 h5 v1 h-5 z M7,5 h1 v1 h-1 z M9,5 h6 v1 h-6 z M16,5 h1 v1 h-1 z M20,5 h1 v1 h-1 z M8,6 h4 v1 h-4 z M13,6 h3 v1 h-3 z M24,6 h1 v1 h-1 z M7,7 h4 v1 h-4 z M12,7 h4 v1 h-4 z M6,8 h8 v1 h-8 z M19,8 h1 v1 h-1 z M6,9 h7 v1 h-7 z M23,9 h1 v1 h-1 z M6,10 h6 v1 h-6 z M14,10 h1 v1 h-1 z M27,10 h1 v1 h-1 z M4,11 h7 v1 h-7 z M18,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M7,12 h1 v1 h-1 z M9,12 h1 v1 h-1 z M22,12 h1 v1 h-1 z M4,13 h3 v3 h-3 z M8,13 h1 v1 h-1 z M13,13 h1 v1 h-1 z M26,13 h1 v1 h-1 z M17,14 h1 v1 h-1 z M8,15 h1 v1 h-1 z M21,15 h1 v1 h-1 z M4,16 h2 v1 h-2 z M12,16 h1 v1 h-1 z M25,16 h1 v1 h-1 z M3,17 h2 v1 h-2 z M16,17 h1 v1 h-1 z M29,17 h1 v1 h-1 z M7,18 h1 v1 h-1 z M20,18 h1 v1 h-1 z M11,19 h1 v1 h-1 z M24,19 h1 v1 h-1 z M15,20 h1 v1 h-1 z M28,20 h1 v1 h-1 z M6,21 h1 v1 h-1 z M19,21 h1 v1 h-1 z M10,22 h1 v1 h-1 z M23,22 h1 v1 h-1 z M14,23 h1 v1 h-1 z M27,23 h1 v1 h-1 z M5,24 h1 v1 h-1 z M18,24 h1 v1 h-1 z M9,25 h1 v1 h-1 z M22,25 h1 v1 h-1 z M13,26 h1 v1 h-1 z M17,27 h1 v1 h-1 z M21,28 h1 v1 h-1 z M12,29 h1 v1 h-1 z" fill="#bcaaa4" />
-    <path d="M19,4 h2 v1 h-2 z M17,5 h3 v1 h-3 z M21,5 h2 v1 h-2 z M16,6 h2 v1 h-2 z M20,6 h4 v1 h-4 z M16,7 h5 v1 h-5 z M22,7 h3 v1 h-3 z M14,8 h4 v1 h-4 z M21,8 h3 v1 h-3 z M25,8 h1 v1 h-1 z M13,9 h10 v1 h-10 z M24,9 h3 v1 h-3 z M12,10 h2 v1 h-2 z M15,10 h6 v1 h-6 z M23,10 h1 v1 h-1 z M25,10 h2 v1 h-2 z M12,11 h3 v1 h-3 z M16,11 h2 v1 h-2 z M19,11 h9 v1 h-9 z M10,12 h12 v1 h-12 z M23,12 h5 v1 h-5 z M9,13 h4 v1 h-4 z M14,13 h3 v1 h-3 z M18,13 h8 v1 h-8 z M27,13 h1 v2 h-1 z M8,14 h2 v1 h-2 z M11,14 h6 v1 h-6 z M18,14 h5 v1 h-5 z M24,14 h2 v1 h-2 z M7,15 h1 v1 h-1 z M9,15 h4 v1 h-4 z M14,15 h5 v1 h-5 z M20,15 h1 v1 h-1 z M22,15 h1 v1 h-1 z M24,15 h4 v1 h-4 z M6,16 h2 v1 h-2 z M9,16 h1 v1 h-1 z M11,16 h1 v1 h-1 z M13,16 h3 v1 h-3 z M17,16 h7 v1 h-7 z M26,16 h2 v1 h-2 z M6,17 h10 v1 h-10 z M17,17 h2 v1 h-2 z M20,17 h8 v1 h-8 z M4,18 h3 v1 h-3 z M8,18 h1 v1 h-1 z M10,18 h6 v1 h-6 z M17,18 h3 v1 h-3 z M21,18 h1 v1 h-1 z M23,18 h2 v1 h-2 z M26,18 h2 v2 h-2 z M4,19 h7 v1 h-7 z M12,19 h11 v1 h-11 z M4,20 h6 v1 h-6 z M11,20 h4 v1 h-4 z M17,20 h5 v1 h-5 z M23,20 h3 v1 h-3 z M27,20 h1 v1 h-1 z M5,21 h1 v1 h-1 z M7,21 h2 v1 h-2 z M10,21 h9 v1 h-9 z M20,21 h7 v1 h-7 z M5,22 h5 v1 h-5 z M12,22 h11 v1 h-11 z M24,22 h3 v1 h-3 z M6,23 h8 v1 h-8 z M16,23 h10 v1 h-10 z M7,24 h1 v1 h-1 z M9,24 h3 v1 h-3 z M13,24 h5 v1 h-5 z M19,24 h1 v1 h-1 z M21,24 h4 v1 h-4 z M8,25 h1 v1 h-1 z M10,25 h1 v1 h-1 z M12,25 h1 v1 h-1 z M14,25 h7 v1 h-7 z M23,25 h1 v1 h-1 z M9,26 h4 v1 h-4 z M15,26 h8 v1 h-8 z M11,27 h6 v1 h-6 z M18,27 h3 v1 h-3 z" fill="#a1887f" />
-    <path d="M12,2 h8 v1 h-8 z M10,3 h2 v1 h-2 z M13,3 h9 v1 h-9 z M8,4 h3 v1 h-3 z M12,4 h1 v1 h-1 z M18,4 h1 v1 h-1 z M21,4 h3 v1 h-3 z M8,5 h1 v1 h-1 z M15,5 h1 v1 h-1 z M23,5 h2 v1 h-2 z M6,6 h2 v1 h-2 z M19,6 h1 v1 h-1 z M25,6 h1 v1 h-1 z M5,7 h2 v1 h-2 z M21,7 h1 v1 h-1 z M25,7 h2 v1 h-2 z M5,8 h1 v1 h-1 z M18,8 h1 v1 h-1 z M20,8 h1 v1 h-1 z M24,8 h1 v1 h-1 z M26,8 h2 v1 h-2 z M4,9 h2 v1 h-2 z M3,10 h2 v1 h-2 z M21,10 h2 v1 h-2 z M24,10 h1 v1 h-1 z M28,10 h1 v2 h-1 z M3,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M15,11 h1 v1 h-1 z M2,12 h3 v1 h-3 z M8,12 h1 v1 h-1 z M28,12 h2 v5 h-2 z M2,13 h2 v4 h-2 z M7,13 h1 v1 h-1 z M23,14 h1 v2 h-1 z M26,14 h1 v1 h-1 z M13,15 h1 v1 h-1 z M19,15 h1 v1 h-1 z M10,16 h1 v1 h-1 z M16,16 h1 v1 h-1 z M24,16 h1 v1 h-1 z M2,17 h1 v1 h-1 z M5,17 h1 v1 h-1 z M28,17 h1 v1 h-1 z M2,18 h2 v2 h-2 z M16,18 h1 v1 h-1 z M22,18 h1 v1 h-1 z M25,18 h1 v2 h-1 z M28,18 h2 v2 h-2 z M3,20 h1 v1 h-1 z M26,20 h1 v1 h-1 z M3,21 h2 v1 h-2 z M27,21 h2 v1 h-2 z M4,22 h1 v1 h-1 z M27,22 h1 v1 h-1 z M4,23 h2 v1 h-2 z M15,23 h1 v1 h-1 z M26,23 h1 v1 h-1 z M6,24 h1 v1 h-1 z M8,24 h1 v1 h-1 z M20,24 h1 v1 h-1 z M25,24 h2 v1 h-2 z M6,25 h2 v1 h-2 z M13,25 h1 v1 h-1 z M21,25 h1 v1 h-1 z M24,25 h2 v1 h-2 z M7,26 h2 v1 h-2 z M14,26 h1 v1 h-1 z M23,26 h2 v1 h-2 z M8,27 h3 v1 h-3 z M21,27 h3 v1 h-3 z M10,28 h4 v1 h-4 z M15,28 h5 v1 h-5 z M13,29 h7 v1 h-7 z" fill="#5d4037" />
-    <path d="M12,6 h1 v1 h-1 z M18,6 h1 v1 h-1 z M11,7 h1 v1 h-1 z M4,8 h1 v1 h-1 z M27,9 h1 v1 h-1 z M5,10 h1 v1 h-1 z M6,12 h1 v1 h-1 z M17,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M10,14 h1 v1 h-1 z M8,16 h1 v1 h-1 z M19,17 h1 v1 h-1 z M9,18 h1 v1 h-1 z M23,19 h1 v1 h-1 z M10,20 h1 v1 h-1 z M16,20 h1 v1 h-1 z M22,20 h1 v1 h-1 z M9,21 h1 v1 h-1 z M11,22 h1 v1 h-1 z M12,24 h1 v1 h-1 z M11,25 h1 v1 h-1 z M14,28 h1 v1 h-1 z M20,28 h1 v1 h-1 z" fill="#3e2723" />
-  </svg>
-));
-
-const FireSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Logs */}
-    <path d="M4,26 h24 v1 h-24 z M4,27 h6 v1 h-6 z M12,27 h16 v1 h-16 z M3,28 h26 v1 h-26 z" fill="#795548" />
-    <path d="M6,25 h20 v1 h-20 z M2,28 h1 v1 h-1 z M29,28 h1 v1 h-1 z M2,29 h18 v1 h-18 z M22,29 h8 v1 h-8 z M2,30 h28 v1 h-28 z" fill="#4e342e" />
-    <path d="M10,27 h2 v1 h-2 z M20,29 h2 v1 h-2 z" fill="#3e2723" />
-    {/* Flames */}
-    <path d="M15,6 h1 v1 h-1 z M23,6 h1 v1 h-1 z M11,7 h5 v1 h-5 z M22,7 h1 v1 h-1 z M8,8 h1 v1 h-1 z M10,8 h7 v1 h-7 z M9,9 h1 v1 h-1 z M11,9 h7 v1 h-7 z M11,10 h4 v1 h-4 z M16,10 h3 v1 h-3 z M13,11 h2 v1 h-2 z M19,11 h3 v1 h-3 z M12,12 h3 v1 h-3 z M21,12 h3 v1 h-3 z M11,13 h5 v1 h-5 z M22,13 h3 v1 h-3 z M11,14 h4 v1 h-4 z M21,14 h4 v1 h-4 z M10,15 h4 v1 h-4 z M21,15 h3 v3 h-3 z M9,16 h3 v1 h-3 z M7,17 h3 v1 h-3 z M5,18 h3 v1 h-3 z M20,18 h4 v1 h-4 z M5,19 h4 v1 h-4 z M20,19 h5 v1 h-5 z M6,20 h4 v1 h-4 z M21,20 h4 v1 h-4 z M7,21 h3 v2 h-3 z M23,21 h3 v1 h-3 z M25,22 h2 v1 h-2 z M6,23 h3 v1 h-3 z M25,23 h3 v1 h-3 z M5,24 h4 v1 h-4 z M25,24 h4 v1 h-4 z M5,25 h1 v1 h-1 z M26,25 h3 v1 h-3 z" fill="#d32f2f" />
-    <path d="M15,10 h1 v1 h-1 z M19,10 h1 v1 h-1 z M12,11 h1 v1 h-1 z M15,11 h4 v1 h-4 z M15,12 h6 v1 h-6 z M16,13 h6 v1 h-6 z M15,14 h6 v1 h-6 z M14,15 h3 v1 h-3 z M18,15 h3 v2 h-3 z M12,16 h3 v1 h-3 z M10,17 h2 v1 h-2 z M17,17 h4 v1 h-4 z M8,18 h4 v1 h-4 z M17,18 h3 v2 h-3 z M9,19 h3 v1 h-3 z M10,20 h3 v3 h-3 z M18,20 h3 v1 h-3 z M19,21 h4 v1 h-4 z M21,22 h4 v1 h-4 z M9,23 h4 v2 h-4 z M22,23 h3 v2 h-3 z" fill="#f57c00" />
-    <path d="M17,15 h1 v1 h-1 z M15,16 h3 v1 h-3 z M12,17 h5 v3 h-5 z M13,20 h1 v1 h-1 z M15,20 h3 v1 h-3 z M13,21 h3 v4 h-3 z M17,21 h2 v1 h-2 z M19,22 h2 v1 h-2 z M20,23 h2 v2 h-2 z" fill="#fbc02d" />
-    <path d="M14,20 h1 v1 h-1 z M16,21 h1 v1 h-1 z M16,22 h3 v1 h-3 z M16,23 h4 v2 h-4 z" fill="#fff176" />
-  </svg>
-));
-
-const PitchforkSprite = React.memo(() => (
-  <svg viewBox="0 0 22 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Handle */}
-    <path d="M8,0 h1 v22 h-1 z" fill="#a1887f" />
-    <path d="M9,0 h4 v22 h-4 z" fill="#8b5a2b" />
-    <path d="M13,0 h1 v22 h-1 z" fill="#5d4037" />
-    {/* Tines */}
-    <path d="M4,22 h14 v1 h-14 z M4,26 h1 v4 h-1 z M10,26 h1 v4 h-1 z M16,26 h1 v4 h-1 z" fill="#bdbdbd" />
-    <path d="M4,23 h14 v2 h-14 z M5,26 h1 v5 h-1 z M11,26 h1 v5 h-1 z M17,26 h1 v5 h-1 z" fill="#9e9e9e" />
-    <path d="M4,25 h14 v1 h-14 z M4,30 h1 v1 h-1 z M10,30 h1 v1 h-1 z M16,30 h1 v1 h-1 z M5,31 h1 v1 h-1 z M11,31 h1 v1 h-1 z M17,31 h1 v1 h-1 z" fill="#757575" />
-  </svg>
-));
-
-const WateringCanSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Can */}
-    <path d="M9,8 h9 v12 h-9 z M26,8 h1 v1 h-1 z M25,9 h2 v1 h-2 z M24,10 h2 v1 h-2 z M23,11 h2 v1 h-2 z M19,12 h4 v1 h-4 z M20,13 h2 v1 h-2 z M8,20 h10 v1 h-10 z" fill="#0288d1" />
-    <path d="M7,7 h12 v1 h-12 z M26,7 h1 v1 h-1 z M7,8 h2 v12 h-2 z M25,8 h1 v1 h-1 z M24,9 h1 v1 h-1 z M23,10 h1 v1 h-1 z M21,11 h2 v1 h-2 z M7,20 h1 v1 h-1 z" fill="#4fc3f7" />
-    <path d="M8,1 h10 v1 h-10 z M8,2 h2 v4 h-2 z M16,2 h2 v4 h-2 z M27,4 h5 v1 h-5 z M27,5 h1 v5 h-1 z M31,5 h1 v5 h-1 z M6,6 h14 v1 h-14 z M6,7 h1 v14 h-1 z M19,7 h1 v1 h-1 z M18,8 h2 v4 h-2 z M26,10 h6 v1 h-6 z M25,11 h1 v1 h-1 z M18,12 h1 v1 h-1 z M23,12 h2 v1 h-2 z M18,13 h2 v1 h-2 z M22,13 h2 v1 h-2 z M18,14 h4 v1 h-4 z M18,15 h2 v6 h-2 z M6,21 h14 v1 h-14 z" fill="#01579b" />
-    <path d="M28,5 h3 v5 h-3 z" fill="#b3e5fc" />
-  </svg>
-));
-
-const CompostBagSprite = React.memo(() => (
-  <svg viewBox="0 0 20 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bag */}
-    <path d="M8,0 h4 v1 h-4 z M7,1 h6 v1 h-6 z M8,2 h4 v1 h-4 z M5,4 h1 v1 h-1 z M4,5 h1 v16 h-1 z" fill="#a1887f" />
-    <path d="M7,2 h1 v1 h-1 z M12,2 h1 v1 h-1 z M4,21 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M6,4 h8 v1 h-8 z M5,5 h10 v2 h-10 z M5,7 h1 v5 h-1 z M13,7 h2 v1 h-2 z M14,8 h1 v3 h-1 z M13,11 h2 v1 h-2 z M5,12 h10 v9 h-10 z M5,21 h9 v1 h-9 z" fill="#795548" />
-    <path d="M14,4 h1 v1 h-1 z M15,5 h1 v16 h-1 z M14,21 h2 v1 h-2 z M4,22 h12 v1 h-12 z" fill="#5d4037" />
-    <path d="M6,3 h8 v1 h-8 z M5,23 h10 v1 h-10 z" fill="#3e2723" />
-    {/* Label */}
-    <path d="M6,7 h7 v1 h-7 z M6,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z M11,8 h3 v1 h-3 z M6,9 h3 v1 h-3 z M12,9 h2 v1 h-2 z M6,10 h1 v1 h-1 z M13,10 h1 v1 h-1 z M6,11 h7 v1 h-7 z" fill="#efe6d5" />
-    <path d="M7,8 h2 v1 h-2 z M7,10 h3 v1 h-3 z M11,10 h2 v1 h-2 z" fill="#8d6e63" />
-    <path d="M10,8 h1 v1 h-1 z M9,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z" fill="#66bb6a" />
-    <path d="M10,9 h1 v2 h-1 z" fill="#388e3c" />
-  </svg>
-));
-
-const MulchSprite = React.memo(() => (
-  <svg viewBox="0 0 24 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Wood chips */}
-    <path d="M10,0 h1 v1 h-1 z M9,1 h3 v1 h-3 z M8,2 h3 v1 h-3 z M9,3 h4 v1 h-4 z M7,4 h1 v1 h-1 z M9,4 h2 v1 h-2 z M6,5 h4 v1 h-4 z M13,5 h1 v2 h-1 z M6,6 h2 v1 h-2 z M11,6 h1 v1 h-1 z M6,7 h3 v1 h-3 z M14,7 h2 v1 h-2 z M4,8 h1 v1 h-1 z M6,8 h1 v1 h-1 z M8,8 h2 v1 h-2 z M13,8 h1 v1 h-1 z M3,9 h2 v1 h-2 z M7,9 h1 v1 h-1 z M11,9 h2 v1 h-2 z M16,9 h1 v2 h-1 z M2,10 h5 v1 h-5 z M10,10 h1 v1 h-1 z M14,10 h1 v1 h-1 z M2,11 h1 v1 h-1 z M4,11 h2 v1 h-2 z M9,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M17,11 h2 v1 h-2 z M1,12 h1 v1 h-1 z M3,12 h1 v1 h-1 z M5,12 h1 v1 h-1 z M11,12 h2 v1 h-2 z M16,12 h1 v1 h-1 z M0,13 h2 v1 h-2 z M5,13 h2 v1 h-2 z M10,13 h1 v1 h-1 z M14,13 h2 v1 h-2 z M19,13 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M13,0 h1 v1 h-1 z M12,1 h1 v1 h-1 z M11,2 h2 v1 h-2 z M14,2 h2 v1 h-2 z M13,3 h1 v1 h-1 z M15,3 h1 v1 h-1 z M11,4 h3 v1 h-3 z M16,4 h1 v1 h-1 z M10,5 h1 v1 h-1 z M12,5 h1 v2 h-1 z M14,5 h2 v2 h-2 z M8,6 h2 v1 h-2 z M17,6 h2 v1 h-2 z M9,7 h2 v1 h-2 z M12,7 h2 v1 h-2 z M16,7 h1 v1 h-1 z M18,7 h1 v1 h-1 z M7,8 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M14,8 h3 v1 h-3 z M19,8 h1 v1 h-1 z M6,9 h1 v1 h-1 z M8,9 h3 v1 h-3 z M13,9 h1 v1 h-1 z M15,9 h1 v2 h-1 z M17,9 h2 v2 h-2 z M7,10 h1 v1 h-1 z M9,10 h1 v1 h-1 z M11,10 h2 v1 h-2 z M20,10 h2 v1 h-2 z M6,11 h2 v2 h-2 z M10,11 h1 v1 h-1 z M12,11 h2 v1 h-2 z M15,11 h2 v1 h-2 z M19,11 h1 v1 h-1 z M21,11 h1 v1 h-1 z M4,12 h1 v1 h-1 z M9,12 h2 v1 h-2 z M13,12 h1 v1 h-1 z M15,12 h1 v1 h-1 z M17,12 h3 v1 h-3 z M22,12 h1 v1 h-1 z M3,13 h2 v1 h-2 z M7,13 h1 v1 h-1 z M9,13 h1 v1 h-1 z M11,13 h3 v1 h-3 z M16,13 h1 v1 h-1 z M18,13 h1 v1 h-1 z M20,13 h2 v1 h-2 z" fill="#795548" />
-    <path d="M11,0 h2 v1 h-2 z M13,1 h2 v1 h-2 z M13,2 h1 v1 h-1 z M8,3 h1 v2 h-1 z M14,3 h1 v1 h-1 z M14,4 h2 v1 h-2 z M11,5 h1 v1 h-1 z M16,5 h2 v1 h-2 z M5,6 h1 v4 h-1 z M10,6 h1 v1 h-1 z M16,6 h1 v1 h-1 z M11,7 h1 v2 h-1 z M17,7 h1 v1 h-1 z M17,8 h2 v1 h-2 z M14,9 h1 v1 h-1 z M19,9 h2 v1 h-2 z M8,10 h1 v4 h-1 z M13,10 h1 v1 h-1 z M19,10 h1 v1 h-1 z M3,11 h1 v1 h-1 z M14,11 h1 v2 h-1 z M20,11 h1 v1 h-1 z M2,12 h1 v3 h-1 z M20,12 h2 v1 h-2 z M17,13 h1 v1 h-1 z M22,13 h2 v1 h-2 z M4,14 h1 v1 h-1 z M6,14 h3 v1 h-3 z M11,14 h1 v1 h-1 z M13,14 h1 v1 h-1 z M15,14 h2 v1 h-2 z M19,14 h1 v1 h-1 z M21,14 h2 v1 h-2 z M1,15 h3 v1 h-3 z M6,15 h1 v1 h-1 z M8,15 h1 v1 h-1 z M10,15 h2 v1 h-2 z M14,15 h1 v1 h-1 z M16,15 h2 v1 h-2 z M19,15 h2 v1 h-2 z M23,15 h1 v1 h-1 z" fill="#5d4037" />
-    <path d="M0,14 h2 v1 h-2 z M3,14 h1 v1 h-1 z M5,14 h1 v1 h-1 z M9,14 h2 v1 h-2 z M12,14 h1 v1 h-1 z M14,14 h1 v1 h-1 z M17,14 h2 v1 h-2 z M20,14 h1 v1 h-1 z M23,14 h1 v1 h-1 z M0,15 h1 v1 h-1 z M4,15 h2 v1 h-2 z M7,15 h1 v1 h-1 z M9,15 h1 v1 h-1 z M12,15 h2 v1 h-2 z M15,15 h1 v1 h-1 z M18,15 h1 v1 h-1 z M21,15 h2 v1 h-2 z" fill="#3e2723" />
-  </svg>
-));
-
-const HammerSprite = React.memo(() => (
-  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Head */}
-    <path d="M6,0 h14 v1 h-14 z M6,1 h1 v4 h-1 z M19,1 h1 v5 h-1 z" fill="#bdbdbd" />
-    <path d="M7,1 h12 v4 h-12 z M6,5 h13 v1 h-13 z M6,6 h14 v1 h-14 z" fill="#9e9e9e" />
-    <path d="M6,7 h14 v1 h-14 z" fill="#757575" />
-    <path d="M4,2 h2 v6 h-2 z M3,8 h1 v2 h-1 z M5,8 h1 v3 h-1 z M2,10 h1 v1 h-1 z" fill="#424242" />
-    <path d="M4,0 h2 v2 h-2 z" fill="#616161" />
-    {/* Handle */}
-    <path d="M9,10 h1 v12 h-1 z" fill="#a1887f" />
-    <path d="M10,10 h2 v12 h-2 z" fill="#8d6e63" />
-    <path d="M12,10 h1 v12 h-1 z M9,22 h4 v2 h-4 z" fill="#6d4c41" />
-  </svg>
-));
-
-const CrowSprite = React.memo(({ hasHeart = true }) => (
-  <svg viewBox="0 0 64 40" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    {/* Wing (matches body color, scaleY flap around SVG center) */}
-    <g className="animate-crow-flap" style={{ transformOrigin: '28px 20px' }}>
-      {/* Wing */}
-      <path d="M28,0 h2 v1 h-2 z M27,1 h4 v1 h-4 z M26,2 h6 v1 h-6 z M25,3 h8 v1 h-8 z M24,4 h9 v1 h-9 z M23,5 h10 v1 h-10 z M22,6 h12 v1 h-12 z M22,7 h13 v1 h-13 z M21,8 h14 v1 h-14 z M21,9 h15 v1 h-15 z M20,10 h17 v1 h-17 z M20,11 h18 v1 h-18 z M20,12 h19 v1 h-19 z M20,13 h20 v1 h-20 z M21,14 h20 v1 h-20 z M22,15 h18 v1 h-18 z" fill="#0c0e14" />
-      <path d="M33,4 h1 v1 h-1 z M33,5 h2 v1 h-2 z M34,6 h1 v1 h-1 z M35,7 h1 v1 h-1 z M35,8 h2 v1 h-2 z M36,9 h2 v1 h-2 z M37,10 h1 v1 h-1 z M38,11 h1 v1 h-1 z M39,12 h1 v1 h-1 z" fill="#1a3040" />
-    </g>
-    {/* Body, tail & head */}
-    <path d="M40,13 h5 v1 h-5 z M38,14 h12 v1 h-12 z M10,15 h5 v1 h-5 z M36,15 h17 v1 h-17 z M8,16 h8 v1 h-8 z M20,16 h37 v1 h-37 z M8,17 h45 v1 h-45 z M8,18 h41 v1 h-41 z M8,19 h3 v1 h-3 z M13,19 h36 v1 h-36 z M8,20 h4 v1 h-4 z M14,20 h40 v1 h-40 z M8,21 h47 v1 h-47 z M8,22 h48 v1 h-48 z M9,23 h43 v1 h-43 z M10,24 h38 v1 h-38 z M12,25 h28 v1 h-28 z M14,26 h12 v1 h-12 z" fill="#0c0e14" />
-    <path d="M53,17 h6 v1 h-6 z M49,18 h11 v1 h-11 z M49,19 h13 v1 h-13 z M54,20 h9 v1 h-9 z M55,21 h6 v1 h-6 z" fill="#1a3040" />
-    {/* Beak, eye & legs */}
-    <path d="M4,18 h4 v1 h-4 z M5,19 h3 v1 h-3 z M6,20 h2 v1 h-2 z M30,26 h2 v1 h-2 z M36,26 h2 v1 h-2 z M31,27 h2 v1 h-2 z M37,27 h2 v1 h-2 z M32,28 h3 v1 h-3 z M38,28 h3 v1 h-3 z" fill="#e8b820" />
-    <path d="M11,19 h2 v1 h-2 z M12,20 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M13,20 h1 v1 h-1 z" fill="#000000" />
-    {/* Heart in beak */}
-    {hasHeart && <>
-      {/* Heart */}
-      <path d="M0,14 h2 v1 h-2 z M3,14 h2 v1 h-2 z M0,15 h1 v1 h-1 z M2,15 h4 v1 h-4 z M0,16 h6 v1 h-6 z M1,17 h4 v1 h-4 z M2,18 h2 v1 h-2 z" fill="#e53935" />
-      <path d="M1,15 h1 v1 h-1 z" fill="#ffcdd2" />
-    </>}
-  </svg>
-));
-
-const CrowOverlay = ({ crow }) => {
-  const [pos, setPos] = React.useState({ left: window.innerWidth + 50, top: crow.targetY });
-  const [transition, setTransition] = React.useState('none');
-  const [hasHeart, setHasHeart] = React.useState(false);
-
-  React.useEffect(() => {
-    // Next frame: trigger approach transition toward the heart
-    const approachFrame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTransition('left 1.4s cubic-bezier(0.25,0.1,0.25,1), top 1.0s cubic-bezier(0.25,0.1,0.25,1)');
-        setPos({ left: crow.targetX, top: crow.targetY });
-      });
-    });
-
-    // After arriving, grab the heart and escape left
-    const escapeTimer = setTimeout(() => {
-      setHasHeart(true);
-      setTransition('left 1.6s cubic-bezier(0.4,0,0.6,1), top 1.2s ease-in');
-      setPos({ left: -150, top: crow.targetY - 60 });
-    }, 1700);
-
-    return () => {
-      cancelAnimationFrame(approachFrame);
-      clearTimeout(escapeTimer);
-    };
-  }, []);
-
-  return (
-    <div className="fixed z-[300] pointer-events-none drop-shadow-2xl"
-         style={{ width: '80px', height: '80px', left: pos.left, top: pos.top, transition }}>
-      <div className="relative w-full h-full">
-        <CrowSprite hasHeart={hasHeart} />
-      </div>
-    </div>
-  );
+// Saved progress lives in this browser only; storage can be unavailable, so every access is guarded
+const SAVE_KEY = 'mc-save';
+const readSave = () => {
+  try {
+    const save = JSON.parse(localStorage.getItem(SAVE_KEY));
+    return save && PLAYABLE_STAGES.includes(save.stage) && save.lives > 0 ? save : null;
+  } catch { return null; }
 };
+const writeSave = (save) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch { /* storage unavailable */ } };
+const clearSave = () => { try { localStorage.removeItem(SAVE_KEY); } catch { /* storage unavailable */ } };
 
-const InstructorSprite = React.memo(() => (
-  <svg viewBox="0 0 48 52" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Floor shadow */}
-    <path d="M5,51 h20 v1 h-20 z" fill="#000000" opacity="0.2" />
-    {/* Pointer */}
-    <path d="M46,0 h1 v1 h-1 z M45,1 h2 v1 h-2 z M44,2 h2 v1 h-2 z M43,3 h2 v1 h-2 z M42,4 h2 v1 h-2 z M41,5 h2 v1 h-2 z M40,6 h2 v1 h-2 z M39,7 h2 v1 h-2 z M38,8 h2 v1 h-2 z M37,9 h2 v1 h-2 z M36,10 h2 v1 h-2 z M35,11 h2 v1 h-2 z M34,12 h2 v1 h-2 z M33,13 h2 v1 h-2 z M33,14 h1 v1 h-1 z" fill="#e0c9a6" />
-    <path d="M47,0 h1 v1 h-1 z" fill="#e53935" />
-    {/* Shaggy hair */}
-    <path d="M9,4 h2 v1 h-2 z M13,4 h3 v1 h-3 z M18,4 h2 v1 h-2 z M8,5 h14 v1 h-14 z M7,6 h2 v1 h-2 z M10,6 h6 v1 h-6 z M17,6 h6 v1 h-6 z M6,7 h4 v1 h-4 z M11,7 h7 v1 h-7 z M19,7 h5 v1 h-5 z M6,8 h18 v1 h-18 z M6,9 h2 v1 h-2 z M9,9 h2 v1 h-2 z M19,9 h2 v1 h-2 z M22,9 h2 v1 h-2 z M6,10 h3 v1 h-3 z M21,10 h3 v1 h-3 z M6,11 h1 v1 h-1 z M8,11 h1 v1 h-1 z M21,11 h1 v1 h-1 z M23,11 h1 v1 h-1 z M6,12 h3 v1 h-3 z M21,12 h3 v1 h-3 z M7,13 h2 v2 h-2 z M21,13 h2 v2 h-2 z M8,15 h1 v1 h-1 z M21,15 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M8,9 h1 v1 h-1 z M21,9 h1 v1 h-1 z M9,10 h1 v1 h-1 z M20,10 h1 v1 h-1 z M7,11 h1 v1 h-1 z M22,11 h1 v1 h-1 z M6,13 h1 v2 h-1 z M23,13 h1 v2 h-1 z M7,15 h1 v1 h-1 z M22,15 h1 v1 h-1 z M8,16 h1 v1 h-1 z M21,16 h1 v1 h-1 z" fill="#4e342e" />
-    <path d="M9,6 h1 v1 h-1 z M16,6 h1 v1 h-1 z M10,7 h1 v1 h-1 z M18,7 h1 v1 h-1 z" fill="#a1887f" />
-    {/* Face & hands */}
-    <path d="M11,9 h8 v1 h-8 z M10,10 h10 v1 h-10 z M9,11 h1 v1 h-1 z M13,11 h4 v1 h-4 z M20,11 h1 v1 h-1 z M14,13 h2 v1 h-2 z M9,14 h1 v2 h-1 z M13,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z M20,14 h1 v2 h-1 z M30,14 h3 v2 h-3 z M11,15 h8 v1 h-8 z M9,16 h3 v1 h-3 z M13,16 h4 v1 h-4 z M18,16 h3 v1 h-3 z M9,17 h4 v1 h-4 z M17,17 h4 v1 h-4 z M11,18 h8 v1 h-8 z M5,35 h4 v1 h-4 z M6,36 h3 v1 h-3 z" fill="#ffccaa" />
-    <path d="M14,14 h2 v1 h-2 z M10,18 h1 v1 h-1 z M19,18 h1 v1 h-1 z M12,19 h6 v1 h-6 z" fill="#e6a57e" />
-    <path d="M10,15 h1 v1 h-1 z M19,15 h1 v1 h-1 z" fill="#ffab91" />
-    <path d="M12,16 h1 v1 h-1 z M17,16 h1 v1 h-1 z M13,17 h4 v1 h-4 z" fill="#8e2c2c" />
-    {/* Glasses */}
-    <path d="M10,11 h3 v1 h-3 z M17,11 h3 v1 h-3 z M9,12 h1 v2 h-1 z M13,12 h4 v1 h-4 z M20,12 h1 v2 h-1 z M13,13 h1 v1 h-1 z M16,13 h1 v1 h-1 z M10,14 h3 v1 h-3 z M17,14 h3 v1 h-3 z" fill="#3e2723" />
-    <path d="M10,12 h1 v2 h-1 z M12,12 h1 v2 h-1 z M17,12 h1 v2 h-1 z M19,12 h1 v2 h-1 z" fill="#d6ecf7" />
-    <path d="M11,12 h1 v2 h-1 z M18,12 h1 v2 h-1 z" fill="#212121" />
-    {/* Tweed jacket */}
-    <path d="M28,17 h4 v1 h-4 z M27,18 h1 v1 h-1 z M29,18 h2 v1 h-2 z M26,19 h4 v1 h-4 z M9,20 h3 v1 h-3 z M18,20 h3 v1 h-3 z M25,20 h4 v1 h-4 z M6,21 h5 v1 h-5 z M19,21 h9 v1 h-9 z M5,22 h6 v1 h-6 z M19,22 h7 v1 h-7 z M5,23 h2 v1 h-2 z M8,23 h4 v1 h-4 z M18,23 h6 v1 h-6 z M5,24 h4 v4 h-4 z M10,24 h3 v1 h-3 z M17,24 h4 v1 h-4 z M10,25 h4 v1 h-4 z M16,25 h5 v1 h-5 z M10,26 h2 v1 h-2 z M13,26 h2 v1 h-2 z M16,26 h2 v1 h-2 z M19,26 h2 v1 h-2 z M10,27 h5 v3 h-5 z M16,27 h5 v3 h-5 z M5,28 h1 v1 h-1 z M7,28 h2 v1 h-2 z M5,29 h4 v5 h-4 z M10,30 h2 v1 h-2 z M13,30 h2 v1 h-2 z M16,30 h3 v1 h-3 z M20,30 h1 v1 h-1 z M10,31 h5 v2 h-5 z M16,31 h5 v2 h-5 z" fill="#795548" />
-    <path d="M28,18 h1 v1 h-1 z M11,21 h1 v1 h-1 z M18,21 h1 v1 h-1 z M11,22 h2 v1 h-2 z M17,22 h2 v1 h-2 z M12,23 h2 v1 h-2 z M16,23 h2 v1 h-2 z M9,24 h1 v9 h-1 z M13,24 h1 v1 h-1 z M16,24 h1 v1 h-1 z M15,26 h1 v2 h-1 z M15,29 h1 v1 h-1 z M15,31 h1 v2 h-1 z M9,33 h12 v1 h-12 z" fill="#5d4037" />
-    <path d="M7,23 h1 v1 h-1 z M12,26 h1 v1 h-1 z M18,26 h1 v1 h-1 z M6,28 h1 v1 h-1 z M12,30 h1 v1 h-1 z M19,30 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M15,28 h1 v1 h-1 z M15,30 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Shirt & tie */}
-    <path d="M29,16 h3 v1 h-3 z M12,20 h2 v2 h-2 z M16,20 h2 v2 h-2 z M13,22 h1 v1 h-1 z M16,22 h1 v1 h-1 z M5,34 h4 v1 h-4 z" fill="#efe6d5" />
-    <path d="M14,20 h2 v5 h-2 z" fill="#2e7d32" />
-    <path d="M14,25 h2 v1 h-2 z" fill="#1b5e20" />
-    {/* Trousers & shoes */}
-    <path d="M9,34 h12 v2 h-12 z M9,36 h5 v12 h-5 z M16,36 h5 v12 h-5 z" fill="#455a64" />
-    <path d="M14,36 h2 v2 h-2 z M9,48 h5 v1 h-5 z M16,48 h5 v1 h-5 z" fill="#37474f" />
-    <path d="M8,49 h6 v1 h-6 z M16,49 h6 v1 h-6 z M7,50 h7 v1 h-7 z M16,50 h7 v1 h-7 z" fill="#3e2723" />
-  </svg>
-));
+const shuffled = (list) => [...list].sort(() => Math.random() - 0.5);
 
-const InstructorPortrait = () => (
-  <img src={`${BASE}/Teacher new puppet 300.png`} alt="Instructor" className="w-full h-full object-cover" />
-);
+// Centres of the drop-off spots in the 340x300 field (used for both drawing and distance checks)
+const NO_COMPOST_SPOTS = { compost: { x: 82, y: 64 }, trash: { x: 266, y: 62 } };
+const WORM_BIN_SPOTS = { bin: { x: 174, y: 65 }, compost: { x: 288, y: 62 } };
 
-const StudentBlondeSprite = React.memo(() => (
-  <svg viewBox="0 0 40 26" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hair */}
-    <path d="M15,0 h10 v1 h-10 z M13,1 h3 v1 h-3 z M20,1 h7 v1 h-7 z M12,2 h2 v2 h-2 z M17,2 h10 v1 h-10 z M15,3 h12 v1 h-12 z M12,4 h15 v1 h-15 z M12,5 h2 v3 h-2 z M16,5 h2 v1 h-2 z M26,5 h1 v1 h-1 z M26,7 h1 v2 h-1 z M13,8 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M27,2 h1 v4 h-1 z M14,5 h2 v1 h-2 z M18,5 h1 v1 h-1 z M24,5 h2 v1 h-2 z M14,6 h1 v1 h-1 z M26,6 h2 v1 h-2 z M27,7 h1 v2 h-1 z M12,8 h1 v1 h-1 z M13,9 h1 v1 h-1 z M26,9 h1 v1 h-1 z" fill="#fbc02d" />
-    <path d="M16,1 h4 v1 h-4 z M14,2 h3 v1 h-3 z M14,3 h1 v1 h-1 z" fill="#fff59d" />
-    {/* Face & arms */}
-    <path d="M19,5 h5 v1 h-5 z M15,6 h11 v1 h-11 z M14,7 h2 v2 h-2 z M18,7 h4 v2 h-4 z M24,7 h2 v2 h-2 z M14,9 h1 v1 h-1 z M16,9 h8 v1 h-8 z M25,9 h1 v1 h-1 z M14,10 h5 v1 h-5 z M21,10 h5 v1 h-5 z M16,11 h8 v1 h-8 z M10,19 h3 v2 h-3 z M27,19 h3 v2 h-3 z M10,21 h2 v2 h-2 z M28,21 h2 v2 h-2 z M10,23 h3 v1 h-3 z M27,23 h3 v1 h-3 z M11,24 h3 v1 h-3 z M26,24 h3 v1 h-3 z M12,25 h2 v1 h-2 z M26,25 h2 v1 h-2 z" fill="#ffccaa" />
-    <path d="M15,11 h1 v1 h-1 z M24,11 h1 v1 h-1 z M17,12 h6 v1 h-6 z M18,13 h4 v1 h-4 z M20,14 h1 v1 h-1 z M12,21 h1 v2 h-1 z M27,21 h1 v2 h-1 z M11,25 h1 v1 h-1 z M28,25 h1 v1 h-1 z" fill="#eeb38f" />
-    <path d="M15,9 h1 v1 h-1 z M24,9 h1 v1 h-1 z" fill="#ffab91" />
-    <path d="M19,10 h2 v1 h-2 z" fill="#c2705a" />
-    {/* Eyes */}
-    <path d="M16,7 h1 v1 h-1 z M22,7 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M17,7 h1 v1 h-1 z M23,7 h1 v1 h-1 z M16,8 h2 v1 h-2 z M22,8 h2 v1 h-2 z" fill="#3e2723" />
-    {/* T-shirt */}
-    <path d="M14,13 h2 v1 h-2 z M24,13 h2 v1 h-2 z M12,14 h6 v1 h-6 z M23,14 h5 v1 h-5 z M11,15 h18 v1 h-18 z M10,16 h20 v1 h-20 z M10,17 h3 v1 h-3 z M14,17 h12 v1 h-12 z M27,17 h3 v1 h-3 z M13,18 h14 v1 h-14 z M14,19 h12 v3 h-12 z" fill="#4caf50" />
-    <path d="M13,17 h1 v1 h-1 z M26,17 h1 v1 h-1 z M10,18 h3 v1 h-3 z M27,18 h3 v1 h-3 z M13,19 h1 v3 h-1 z M26,19 h1 v3 h-1 z" fill="#388e3c" />
-    <path d="M16,13 h2 v1 h-2 z M22,13 h2 v1 h-2 z M18,14 h2 v1 h-2 z M21,14 h2 v1 h-2 z" fill="#81c784" />
-  </svg>
-));
+const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
-const StudentBrownHairSprite = React.memo(() => (
-  <svg viewBox="0 0 40 26" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Long hair */}
-    <path d="M15,0 h10 v1 h-10 z M13,1 h4 v1 h-4 z M20,1 h7 v1 h-7 z M12,2 h3 v1 h-3 z M17,2 h11 v1 h-11 z M12,3 h16 v1 h-16 z M12,4 h8 v1 h-8 z M21,4 h7 v1 h-7 z M12,5 h5 v1 h-5 z M23,5 h5 v1 h-5 z M12,6 h3 v1 h-3 z M25,6 h3 v1 h-3 z M12,7 h2 v4 h-2 z M26,7 h2 v4 h-2 z M12,11 h3 v1 h-3 z M25,11 h3 v1 h-3 z M11,12 h5 v1 h-5 z M24,12 h5 v1 h-5 z M10,13 h6 v1 h-6 z M24,13 h6 v1 h-6 z M10,14 h5 v1 h-5 z M25,14 h5 v1 h-5 z M10,15 h4 v1 h-4 z M26,15 h4 v1 h-4 z M10,16 h3 v1 h-3 z M27,16 h3 v1 h-3 z M11,17 h2 v1 h-2 z M27,17 h2 v1 h-2 z M12,18 h1 v1 h-1 z M27,18 h1 v1 h-1 z M13,19 h1 v1 h-1 z M26,19 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M20,4 h1 v1 h-1 z M17,5 h1 v1 h-1 z M22,5 h1 v1 h-1 z M15,6 h1 v1 h-1 z M24,6 h1 v1 h-1 z M14,7 h1 v4 h-1 z M25,7 h1 v4 h-1 z M15,11 h1 v1 h-1 z M24,11 h1 v1 h-1 z M16,12 h1 v1 h-1 z M23,12 h1 v1 h-1 z M14,15 h1 v1 h-1 z M25,15 h1 v1 h-1 z M13,16 h1 v3 h-1 z M26,16 h1 v3 h-1 z M12,19 h1 v1 h-1 z M27,19 h1 v1 h-1 z M13,20 h1 v1 h-1 z M26,20 h1 v1 h-1 z" fill="#5d4037" />
-    <path d="M17,1 h3 v1 h-3 z M15,2 h2 v1 h-2 z" fill="#8d6e63" />
-    {/* Face & hands */}
-    <path d="M18,5 h4 v1 h-4 z M16,6 h8 v1 h-8 z M15,7 h1 v2 h-1 z M18,7 h4 v2 h-4 z M24,7 h1 v2 h-1 z M16,9 h8 v1 h-8 z M15,10 h4 v1 h-4 z M21,10 h4 v1 h-4 z M16,11 h8 v1 h-8 z M11,24 h3 v1 h-3 z M26,24 h3 v1 h-3 z M12,25 h2 v1 h-2 z M26,25 h2 v1 h-2 z" fill="#ffb74d" />
-    <path d="M17,12 h6 v1 h-6 z M18,13 h4 v1 h-4 z M11,25 h1 v1 h-1 z M28,25 h1 v1 h-1 z" fill="#f09a3a" />
-    <path d="M15,9 h1 v1 h-1 z M24,9 h1 v1 h-1 z" fill="#ff8a65" />
-    <path d="M19,10 h2 v1 h-2 z" fill="#b5533c" />
-    {/* Eyes */}
-    <path d="M16,7 h1 v1 h-1 z M22,7 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M17,7 h1 v1 h-1 z M23,7 h1 v1 h-1 z M16,8 h2 v1 h-2 z M22,8 h2 v1 h-2 z" fill="#4e342e" />
-    {/* Sweater */}
-    <path d="M16,13 h1 v1 h-1 z M23,13 h1 v1 h-1 z M15,14 h3 v1 h-3 z M22,14 h3 v1 h-3 z M15,15 h10 v1 h-10 z M14,16 h12 v3 h-12 z M10,18 h1 v1 h-1 z M29,18 h1 v1 h-1 z M10,19 h2 v2 h-2 z M15,19 h10 v2 h-10 z M28,19 h2 v2 h-2 z M10,21 h3 v1 h-3 z M14,21 h12 v1 h-12 z M27,21 h3 v1 h-3 z M11,22 h3 v1 h-3 z M26,22 h3 v1 h-3 z" fill="#ab47bc" />
-    <path d="M10,17 h1 v1 h-1 z M29,17 h1 v1 h-1 z M11,18 h1 v1 h-1 z M28,18 h1 v1 h-1 z M14,19 h1 v2 h-1 z M25,19 h1 v2 h-1 z M12,20 h1 v1 h-1 z M27,20 h1 v1 h-1 z M13,21 h1 v1 h-1 z M26,21 h1 v1 h-1 z M10,22 h1 v1 h-1 z M29,22 h1 v1 h-1 z" fill="#8e24aa" />
-    <path d="M17,13 h1 v1 h-1 z M22,13 h1 v1 h-1 z M18,14 h4 v1 h-4 z M11,23 h3 v1 h-3 z M26,23 h3 v1 h-3 z" fill="#ce93d8" />
-  </svg>
-));
-
-const StudentPonytailSprite = React.memo(() => (
-  <svg viewBox="0 0 40 26" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hair & ponytail */}
-    <path d="M15,0 h10 v1 h-10 z M13,1 h3 v1 h-3 z M20,1 h7 v1 h-7 z M12,2 h2 v2 h-2 z M17,2 h11 v1 h-11 z M15,3 h13 v1 h-13 z M30,3 h2 v1 h-2 z M12,4 h16 v1 h-16 z M29,4 h1 v1 h-1 z M31,4 h2 v1 h-2 z M12,5 h3 v1 h-3 z M16,5 h3 v1 h-3 z M20,5 h3 v1 h-3 z M24,5 h4 v1 h-4 z M30,5 h1 v1 h-1 z M32,5 h2 v1 h-2 z M12,6 h2 v2 h-2 z M26,6 h2 v2 h-2 z M31,6 h1 v2 h-1 z M33,6 h1 v2 h-1 z M13,8 h1 v2 h-1 z M26,8 h1 v2 h-1 z M31,8 h3 v2 h-3 z M32,10 h2 v1 h-2 z M32,11 h1 v1 h-1 z" fill="#212121" />
-    <path d="M12,8 h1 v1 h-1 z M27,8 h1 v1 h-1 z M33,11 h1 v2 h-1 z" fill="#000000" />
-    <path d="M16,1 h4 v1 h-4 z M14,2 h3 v1 h-3 z M14,3 h1 v1 h-1 z M30,4 h1 v1 h-1 z M15,5 h1 v1 h-1 z M19,5 h1 v1 h-1 z M23,5 h1 v1 h-1 z M31,5 h1 v1 h-1 z M32,6 h1 v2 h-1 z" fill="#455a64" />
-    {/* Scrunchie */}
-    <path d="M28,2 h2 v1 h-2 z M29,3 h1 v1 h-1 z" fill="#ffeb3b" />
-    <path d="M28,3 h1 v1 h-1 z" fill="#f9a825" />
-    {/* Face & hands */}
-    <path d="M14,6 h2 v3 h-2 z M18,6 h4 v3 h-4 z M24,6 h2 v3 h-2 z M14,9 h1 v1 h-1 z M16,9 h8 v1 h-8 z M25,9 h1 v1 h-1 z M14,10 h5 v1 h-5 z M21,10 h5 v1 h-5 z M16,11 h8 v1 h-8 z M11,24 h3 v1 h-3 z M26,24 h3 v1 h-3 z M12,25 h2 v1 h-2 z M26,25 h2 v1 h-2 z" fill="#ffe0b2" />
-    <path d="M15,11 h1 v1 h-1 z M24,11 h1 v1 h-1 z M17,12 h6 v1 h-6 z M18,13 h4 v1 h-4 z M20,14 h1 v1 h-1 z M11,25 h1 v1 h-1 z M28,25 h1 v1 h-1 z" fill="#f0c48a" />
-    <path d="M15,9 h1 v1 h-1 z M24,9 h1 v1 h-1 z" fill="#ffab91" />
-    <path d="M19,10 h2 v1 h-2 z" fill="#d2706a" />
-    {/* Eyes */}
-    <path d="M16,6 h2 v1 h-2 z M22,6 h2 v1 h-2 z" fill="#ffffff" />
-    <path d="M16,7 h1 v1 h-1 z M23,7 h1 v1 h-1 z M16,8 h2 v1 h-2 z M22,8 h2 v1 h-2 z" fill="#81d4fa" />
-    <path d="M17,7 h1 v1 h-1 z M22,7 h1 v1 h-1 z" fill="#01579b" />
-    {/* Sweater */}
-    <path d="M14,13 h2 v1 h-2 z M24,13 h2 v1 h-2 z M12,14 h6 v1 h-6 z M23,14 h5 v1 h-5 z M11,15 h18 v1 h-18 z M10,16 h20 v1 h-20 z M10,17 h3 v5 h-3 z M14,17 h12 v5 h-12 z M27,17 h3 v5 h-3 z M11,22 h3 v1 h-3 z M26,22 h3 v1 h-3 z" fill="#ff4081" />
-    <path d="M13,17 h1 v5 h-1 z M26,17 h1 v5 h-1 z M10,22 h1 v1 h-1 z M29,22 h1 v1 h-1 z" fill="#d81b60" />
-    <path d="M16,13 h2 v1 h-2 z M22,13 h2 v1 h-2 z M18,14 h2 v1 h-2 z M21,14 h2 v1 h-2 z M11,23 h3 v1 h-3 z M26,23 h3 v1 h-3 z" fill="#ff80ab" />
-  </svg>
-));
-
-const SeatedFarmerSprite = React.memo(({ eyes = 'open' }) => (
-  <svg viewBox="0 0 40 38" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hat & flower */}
-    <path d="M15,0 h10 v1 h-10 z M14,1 h1 v1 h-1 z M17,1 h9 v1 h-9 z M13,2 h1 v2 h-1 z M16,2 h11 v1 h-11 z M15,3 h1 v1 h-1 z M17,3 h10 v1 h-10 z M8,6 h24 v1 h-24 z M9,7 h24 v1 h-24 z" fill="#f48fb1" />
-    <path d="M15,1 h2 v1 h-2 z M14,2 h2 v1 h-2 z M14,3 h1 v1 h-1 z M7,7 h2 v1 h-2 z" fill="#f8bbd0" />
-    <path d="M8,8 h24 v1 h-24 z" fill="#ec407a" />
-    <path d="M13,4 h2 v1 h-2 z M18,4 h9 v1 h-9 z M13,5 h3 v1 h-3 z M17,5 h10 v1 h-10 z" fill="#d81b60" />
-    <path d="M16,3 h1 v1 h-1 z M15,4 h1 v1 h-1 z M17,4 h1 v1 h-1 z M16,5 h1 v1 h-1 z" fill="#ff4081" />
-    <path d="M16,4 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Hair & braids */}
-    <path d="M13,9 h14 v1 h-14 z M13,10 h2 v1 h-2 z M17,10 h1 v1 h-1 z M22,10 h1 v1 h-1 z M25,10 h2 v1 h-2 z M13,11 h1 v4 h-1 z M26,11 h1 v4 h-1 z M12,15 h1 v1 h-1 z M14,15 h1 v1 h-1 z M25,15 h1 v1 h-1 z M27,15 h1 v1 h-1 z M13,16 h1 v2 h-1 z M26,16 h1 v2 h-1 z M15,17 h1 v1 h-1 z M24,17 h1 v1 h-1 z M14,18 h1 v1 h-1 z M25,18 h1 v1 h-1 z M13,19 h1 v1 h-1 z M15,19 h1 v1 h-1 z M24,19 h1 v1 h-1 z M26,19 h1 v1 h-1 z M14,20 h1 v1 h-1 z M25,20 h1 v1 h-1 z M13,21 h1 v1 h-1 z M15,21 h1 v1 h-1 z M24,21 h1 v1 h-1 z M26,21 h1 v1 h-1 z M14,22 h1 v1 h-1 z M25,22 h1 v1 h-1 z M14,24 h1 v2 h-1 z M25,24 h1 v2 h-1 z" fill="#d84315" />
-    <path d="M12,9 h1 v6 h-1 z M27,9 h1 v6 h-1 z M14,14 h1 v1 h-1 z M25,14 h1 v1 h-1 z M13,15 h1 v1 h-1 z M26,15 h1 v1 h-1 z M12,16 h1 v1 h-1 z M14,16 h1 v2 h-1 z M25,16 h1 v2 h-1 z M27,16 h1 v1 h-1 z M13,18 h1 v1 h-1 z M15,18 h1 v1 h-1 z M24,18 h1 v1 h-1 z M26,18 h1 v1 h-1 z M14,19 h1 v1 h-1 z M25,19 h1 v1 h-1 z M13,20 h1 v1 h-1 z M15,20 h1 v1 h-1 z M24,20 h1 v1 h-1 z M26,20 h1 v1 h-1 z M14,21 h1 v1 h-1 z M25,21 h1 v1 h-1 z M13,22 h1 v1 h-1 z M15,22 h1 v1 h-1 z M24,22 h1 v1 h-1 z M26,22 h1 v1 h-1 z M13,24 h1 v1 h-1 z M15,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z M26,24 h1 v1 h-1 z" fill="#bf360c" />
-    <path d="M13,23 h3 v1 h-3 z M24,23 h3 v1 h-3 z" fill="#4caf50" />
-    {/* Face */}
-    <path d="M15,10 h2 v1 h-2 z M18,10 h4 v1 h-4 z M23,10 h2 v1 h-2 z M14,11 h12 v2 h-12 z M14,13 h1 v1 h-1 z M16,13 h8 v1 h-8 z M25,13 h1 v1 h-1 z M15,14 h4 v1 h-4 z M21,14 h4 v1 h-4 z M16,15 h8 v1 h-8 z" fill="#ffccaa" />
-    <path d="M18,16 h4 v2 h-4 z" fill="#eeb38f" />
-    <path d="M15,13 h1 v1 h-1 z M24,13 h1 v1 h-1 z" fill="#ff8a80" />
-    <path d="M19,14 h2 v1 h-2 z" fill="#c2705a" />
-    {/* Shirt & overalls */}
-    <path d="M11,17 h2 v8 h-2 z M17,17 h1 v1 h-1 z M22,17 h1 v1 h-1 z M27,17 h2 v8 h-2 z M11,25 h3 v1 h-3 z M15,25 h1 v1 h-1 z M24,25 h1 v1 h-1 z M26,25 h3 v1 h-3 z M11,26 h5 v12 h-5 z M24,26 h5 v12 h-5 z" fill="#e53935" />
-    <path d="M17,18 h6 v2 h-6 z M16,20 h8 v1 h-8 z M16,21 h2 v3 h-2 z M22,21 h2 v3 h-2 z M19,22 h2 v1 h-2 z M16,24 h8 v14 h-8 z" fill="#1e88e5" />
-    <path d="M16,17 h1 v2 h-1 z M23,17 h1 v2 h-1 z M18,21 h4 v1 h-4 z M18,22 h1 v1 h-1 z M21,22 h1 v1 h-1 z M18,23 h4 v1 h-4 z" fill="#1565c0" />
-    <path d="M16,19 h1 v1 h-1 z M23,19 h1 v1 h-1 z" fill="#fdd835" />
-    {/* Eyes droop as she dozes off */}
-    {eyes === 'open' && <>
-      <path d="M16,11 h1 v1 h-1 z M22,11 h1 v1 h-1 z" fill="#ffffff" />
-      <path d="M17,11 h1 v1 h-1 z M16,12 h2 v1 h-2 z M23,11 h1 v1 h-1 z M22,12 h2 v1 h-2 z" fill="#3e2723" />
-    </>}
-    {eyes === 'heavy' && <>
-      <path d="M16,11 h2 v1 h-2 z M22,11 h2 v1 h-2 z" fill="#eeb38f" />
-      <path d="M16,12 h2 v1 h-2 z M22,12 h2 v1 h-2 z" fill="#3e2723" />
-    </>}
-    {eyes === 'closed' && <path d="M15,12 h3 v1 h-3 z M22,12 h3 v1 h-3 z" fill="#3e2723" />}
-  </svg>
-));
-
-const ClassDeskSprite = React.memo(({ paper = "#ffffff" }) => (
-  <svg viewBox="0 0 40 18" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Floor shadow */}
-    <path d="M3,14 h34 v4 h-34 z M0,17 h1 v1 h-1 z M39,17 h1 v1 h-1 z" fill="#000000" opacity="0.25" />
-    {/* Desk top */}
-    <path d="M1,0 h38 v1 h-38 z M0,1 h14 v4 h-14 z M25,1 h15 v1 h-15 z M25,2 h6 v1 h-6 z M36,2 h4 v1 h-4 z M25,3 h5 v1 h-5 z M32,3 h8 v1 h-8 z M25,4 h15 v1 h-15 z" fill="#795548" />
-    <path d="M0,5 h40 v1 h-40 z" fill="#6d4c41" />
-    {/* Notebook */}
-    <path d="M15,1 h10 v1 h-10 z M15,2 h1 v1 h-1 z M23,2 h2 v1 h-2 z M15,3 h10 v1 h-10 z M15,4 h1 v1 h-1 z M23,4 h2 v1 h-2 z" fill={paper} />
-    <path d="M16,2 h7 v1 h-7 z M16,4 h7 v1 h-7 z" fill="#b0bec5" />
-    <path d="M14,1 h1 v4 h-1 z" fill="#78909c" />
-    {/* Pencil */}
-    <path d="M31,2 h4 v1 h-4 z M31,3 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M35,2 h1 v1 h-1 z" fill="#f48fb1" />
-    <path d="M30,3 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Front panel & legs */}
-    <path d="M0,6 h40 v1 h-40 z" fill="#a1887f" />
-    <path d="M0,7 h40 v1 h-40 z M2,9 h36 v1 h-36 z M2,10 h1 v2 h-1 z M37,10 h1 v2 h-1 z M2,12 h36 v1 h-36 z M1,14 h2 v4 h-2 z M37,14 h2 v4 h-2 z" fill="#3e2723" />
-    <path d="M1,8 h38 v1 h-38 z M1,9 h1 v4 h-1 z M38,9 h1 v4 h-1 z M1,13 h38 v1 h-38 z" fill="#4e342e" />
-    <path d="M3,10 h34 v2 h-34 z" fill="#5d4037" />
-  </svg>
-));
-
-const ClassroomBackdropSprite = React.memo(() => (
-  <svg viewBox="0 0 242 167" className="w-full h-full" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges">
-    {/* Wall */}
-    <path d="M0,0 h242 v97 h-242 z" fill="#d7ccc8" />
-    <path d="M0,0 h242 v3 h-242 z" fill="#bcaaa4" />
-    <path d="M0,3 h242 v1 h-242 z" fill="#a1887f" />
-    <path d="M0,4 h242 v1 h-242 z" fill="#e4dbd7" />
-    <path d="M0,72 h242 v21 h-242 z" fill="#cbbeb8" />
-    <path d="M0,72 h242 v1 h-242 z" fill="#efe7e3" />
-    <path d="M0,73 h242 v1 h-242 z" fill="#a1887f" />
-    <path d="M9,75 h1 v17 h-1 z M25,75 h1 v17 h-1 z M41,75 h1 v17 h-1 z M57,75 h1 v17 h-1 z M73,75 h1 v17 h-1 z M89,75 h1 v17 h-1 z M105,75 h1 v17 h-1 z M121,75 h1 v17 h-1 z M137,75 h1 v17 h-1 z M153,75 h1 v17 h-1 z M169,75 h1 v17 h-1 z M185,75 h1 v17 h-1 z M201,75 h1 v17 h-1 z M217,75 h1 v17 h-1 z M233,75 h1 v17 h-1 z" fill="#b9aaa3" />
-    <path d="M0,93 h242 v4 h-242 z" fill="#6d4c41" />
-    <path d="M0,93 h242 v1 h-242 z" fill="#8d6e63" />
-    <path d="M0,96 h242 v1 h-242 z" fill="#4e342e" />
-    {/* Floor */}
-    <path d="M0,97 h242 v70 h-242 z" fill="#8d6e63" />
-    <path d="M0,97 h242 v2 h-242 z M0,108 h242 v1 h-242 z M0,118 h242 v1 h-242 z M0,128 h242 v1 h-242 z M0,138 h242 v1 h-242 z M0,148 h242 v1 h-242 z M0,158 h242 v1 h-242 z M22,99 h1 v9 h-1 z M102,99 h1 v9 h-1 z M182,99 h1 v9 h-1 z M62,109 h1 v9 h-1 z M142,109 h1 v9 h-1 z M222,109 h1 v9 h-1 z M22,119 h1 v9 h-1 z M102,119 h1 v9 h-1 z M182,119 h1 v9 h-1 z M62,129 h1 v9 h-1 z M142,129 h1 v9 h-1 z M222,129 h1 v9 h-1 z M22,139 h1 v9 h-1 z M102,139 h1 v9 h-1 z M182,139 h1 v9 h-1 z M62,149 h1 v9 h-1 z M142,149 h1 v9 h-1 z M222,149 h1 v9 h-1 z M22,159 h1 v8 h-1 z M102,159 h1 v8 h-1 z M182,159 h1 v8 h-1 z" fill="#7b5e54" />
-    <path d="M8,103 h7 v1 h-7 z M48,113 h9 v1 h-9 z M96,102 h6 v1 h-6 z M150,104 h8 v1 h-8 z M206,112 h7 v1 h-7 z M30,124 h8 v1 h-8 z M120,123 h6 v1 h-6 z M184,133 h9 v1 h-9 z M70,143 h7 v1 h-7 z M226,144 h6 v1 h-6 z M14,153 h8 v1 h-8 z M140,154 h7 v1 h-7 z M100,163 h9 v1 h-9 z M196,162 h6 v1 h-6 z" fill="#997a6e" />
-    {/* Window */}
-    <path d="M5,12 h31 v47 h-31 z" fill="#f5efe6" />
-    <path d="M7,14 h27 v14 h-27 z" fill="#90caf9" />
-    <path d="M7,28 h27 v14 h-27 z" fill="#bbdefb" />
-    <path d="M7,42 h27 v9 h-27 z" fill="#e3f2fd" />
-    <path d="M11,46 h3 v1 h-3 z M24,46 h2 v1 h-2 z M10,47 h2 v1 h-2 z M13,47 h2 v1 h-2 z M22,47 h2 v1 h-2 z M26,47 h1 v1 h-1 z M31,47 h2 v1 h-2 z M9,48 h2 v1 h-2 z M14,48 h2 v1 h-2 z M21,48 h1 v1 h-1 z M26,48 h2 v1 h-2 z M30,48 h1 v1 h-1 z M33,48 h1 v1 h-1 z M8,49 h2 v1 h-2 z M15,49 h3 v1 h-3 z M20,49 h2 v1 h-2 z M27,49 h4 v1 h-4 z M7,50 h3 v1 h-3 z M16,50 h5 v1 h-5 z M29,50 h1 v1 h-1 z" fill="#66bb6a" />
-    <path d="M12,47 h1 v1 h-1 z M24,47 h2 v1 h-2 z M11,48 h3 v1 h-3 z M22,48 h4 v1 h-4 z M31,48 h2 v1 h-2 z M10,49 h5 v1 h-5 z M22,49 h5 v1 h-5 z M31,49 h3 v1 h-3 z M10,50 h6 v1 h-6 z M21,50 h8 v1 h-8 z M30,50 h4 v1 h-4 z" fill="#43a047" />
-    <path d="M7,51 h27 v6 h-27 z" fill="#81c784" />
-    <path d="M11,18 h3 v1 h-3 z M10,19 h5 v1 h-5 z M16,19 h1 v1 h-1 z M9,20 h9 v1 h-9 z M10,21 h7 v1 h-7 z M26,30 h3 v1 h-3 z M25,31 h5 v1 h-5 z" fill="#ffffff" />
-    <path d="M13,23 h1 v1 h-1 z M12,24 h1 v1 h-1 z M11,25 h1 v1 h-1 z M10,26 h1 v1 h-1 z M9,27 h1 v1 h-1 z M30,38 h1 v1 h-1 z M29,39 h1 v1 h-1 z M28,40 h1 v1 h-1 z M27,41 h1 v1 h-1 z" fill="#ffffff" opacity="0.55" />
-    <path d="M20,14 h1 v43 h-1 z M7,35 h27 v1 h-27 z M3,59 h35 v2 h-35 z" fill="#f5efe6" />
-    <path d="M35,12 h1 v47 h-1 z M33,14 h1 v43 h-1 z M7,56 h27 v1 h-27 z" fill="#cfc4bd" />
-    <path d="M12,51 h1 v1 h-1 z M14,51 h1 v1 h-1 z M11,52 h2 v1 h-2 z M14,52 h2 v1 h-2 z M12,53 h3 v1 h-3 z M13,54 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M10,55 h7 v1 h-7 z M24,55 h7 v1 h-7 z" fill="#d9825b" />
-    <path d="M11,56 h5 v2 h-5 z M25,56 h5 v2 h-5 z" fill="#c2693f" />
-    <path d="M12,58 h3 v1 h-3 z M26,58 h3 v1 h-3 z" fill="#a85a36" />
-    <path d="M27,49 h1 v3 h-1 z M25,50 h1 v2 h-1 z M30,51 h1 v2 h-1 z M25,52 h3 v1 h-3 z M27,53 h1 v2 h-1 z M29,53 h2 v1 h-2 z" fill="#66bb6a" />
-    <path d="M28,50 h1 v5 h-1 z" fill="#388e3c" />
-    <path d="M3,61 h35 v1 h-35 z" fill="#bcaaa4" />
-    <path d="M4,62 h33 v1 h-33 z" fill="#c5b8b2" />
-    {/* Chalkboard */}
-    <path d="M58,10 h134 v54 h-134 z M56,65 h138 v2 h-138 z" fill="#5d4037" />
-    <path d="M58,10 h134 v1 h-134 z M58,10 h1 v54 h-1 z" fill="#795548" />
-    <path d="M58,63 h134 v1 h-134 z M191,10 h1 v54 h-1 z" fill="#3e2723" />
-    <path d="M61,13 h128 v48 h-128 z" fill="#1b5e20" />
-    <path d="M61,13 h128 v1 h-128 z M61,13 h1 v48 h-1 z" fill="#174f1b" />
-    <path d="M56,64 h138 v1 h-138 z M168,62 h8 v1 h-8 z" fill="#a1887f" />
-    <path d="M57,67 h136 v1 h-136 z" fill="#c5b8b2" />
-    <path d="M96,63 h5 v1 h-5 z" fill="#ffffff" />
-    <path d="M104,63 h4 v1 h-4 z" fill="#fff59d" />
-    <path d="M111,63 h3 v1 h-3 z" fill="#f8bbd0" />
-    <path d="M168,63 h8 v1 h-8 z" fill="#424242" />
-    {/* Chalk: COMPOST = greens + browns + water + air */}
-    <path d="M75,17 h3 v1 h-3 z M81,17 h3 v1 h-3 z M86,17 h1 v1 h-1 z M90,17 h1 v1 h-1 z M92,17 h4 v1 h-4 z M99,17 h3 v1 h-3 z M105,17 h4 v1 h-4 z M110,17 h5 v1 h-5 z M74,18 h1 v5 h-1 z M78,18 h1 v1 h-1 z M80,18 h1 v5 h-1 z M84,18 h1 v5 h-1 z M86,18 h2 v1 h-2 z M89,18 h2 v1 h-2 z M92,18 h1 v2 h-1 z M96,18 h1 v2 h-1 z M98,18 h1 v5 h-1 z M102,18 h1 v5 h-1 z M104,18 h1 v2 h-1 z M112,18 h1 v6 h-1 z M86,19 h1 v5 h-1 z M88,19 h1 v2 h-1 z M90,19 h1 v5 h-1 z M92,20 h4 v1 h-4 z M105,20 h3 v1 h-3 z M92,21 h1 v3 h-1 z M108,21 h1 v2 h-1 z M78,22 h1 v1 h-1 z M75,23 h3 v1 h-3 z M81,23 h3 v1 h-3 z M99,23 h3 v1 h-3 z M104,23 h4 v1 h-4 z M119,19 h5 v1 h-5 z M119,22 h5 v1 h-5 z" fill="#f5f5f5" />
-    <path d="M132,17 h2 v1 h-2 z M130,18 h4 v1 h-4 z M129,19 h5 v1 h-5 z M129,20 h4 v1 h-4 z M128,21 h4 v1 h-4 z M129,22 h2 v1 h-2 z M128,23 h1 v1 h-1 z" fill="#a5d6a7" />
-    <path d="M138,19 h1 v1 h-1 z M137,20 h3 v1 h-3 z M138,21 h1 v1 h-1 z M152,19 h1 v1 h-1 z M151,20 h3 v1 h-3 z M152,21 h1 v1 h-1 z M166,19 h1 v1 h-1 z M165,20 h3 v1 h-3 z M166,21 h1 v1 h-1 z M173,17 h2 v1 h-2 z M175,18 h1 v1 h-1 z M170,19 h5 v1 h-5 z M170,21 h6 v1 h-6 z M176,22 h1 v1 h-1 z M174,23 h2 v1 h-2 z" fill="#f5f5f5" />
-    <path d="M146,17 h2 v1 h-2 z M144,18 h4 v1 h-4 z M143,19 h5 v1 h-5 z M143,20 h4 v1 h-4 z M142,21 h4 v1 h-4 z M143,22 h2 v1 h-2 z M142,23 h1 v1 h-1 z" fill="#e6a15c" />
-    <path d="M159,17 h1 v2 h-1 z M158,19 h3 v1 h-3 z M157,20 h5 v3 h-5 z M158,23 h3 v1 h-3 z" fill="#90caf9" />
-    <path d="M74,27 h101 v1 h-101 z" fill="#f5f5f5" opacity="0.5" />
-    {/* Chalk: soil layers diagram */}
-    <path d="M84,31 h1 v1 h-1 z M86,31 h1 v1 h-1 z M85,32 h1 v2 h-1 z" fill="#a5d6a7" />
-    <path d="M73,34 h26 v4 h-26 z" fill="#6d4c41" />
-    <path d="M73,38 h26 v6 h-26 z" fill="#a1887f" />
-    <path d="M73,44 h26 v6 h-26 z" fill="#e6a15c" />
-    <path d="M73,50 h26 v7 h-26 z" fill="#bdbdbd" />
-    <path d="M85,34 h1 v6 h-1 z M83,37 h2 v1 h-2 z M86,38 h2 v1 h-2 z" fill="#f5f5f5" opacity="0.7" />
-    <path d="M91,39 h2 v1 h-2 z M90,40 h1 v1 h-1 z M93,40 h1 v1 h-1 z M95,40 h1 v1 h-1 z M94,41 h1 v1 h-1 z" fill="#f8bbd0" />
-    <path d="M77,52 h2 v1 h-2 z M83,52 h2 v1 h-2 z M90,52 h1 v1 h-1 z M76,53 h3 v1 h-3 z M82,53 h3 v1 h-3 z M87,53 h1 v2 h-1 z M89,53 h3 v1 h-3 z M77,54 h1 v1 h-1 z M90,54 h1 v1 h-1 z" fill="#757575" />
-    <path d="M72,33 h28 v1 h-28 z M72,57 h28 v1 h-28 z M72,33 h1 v25 h-1 z M99,33 h1 v25 h-1 z M68,33 h1 v1 h-1 z M67,34 h1 v3 h-1 z M69,34 h1 v3 h-1 z M68,37 h1 v1 h-1 z M68,39 h1 v1 h-1 z M67,40 h1 v1 h-1 z M69,40 h1 v1 h-1 z M67,41 h3 v1 h-3 z M67,42 h1 v2 h-1 z M69,42 h1 v2 h-1 z M67,45 h2 v1 h-2 z M67,46 h1 v1 h-1 z M69,46 h1 v1 h-1 z M67,47 h2 v1 h-2 z M67,48 h1 v1 h-1 z M69,48 h1 v1 h-1 z M67,49 h2 v1 h-2 z M68,52 h2 v1 h-2 z M67,53 h1 v3 h-1 z M68,56 h2 v1 h-2 z" fill="#f5f5f5" />
-    <path d="M105,34 h2 v1 h-2 z M109,34 h1 v1 h-1 z M112,34 h3 v1 h-3 z M116,34 h1 v4 h-1 z M104,35 h1 v1 h-1 z M108,35 h1 v3 h-1 z M110,35 h1 v3 h-1 z M113,35 h1 v3 h-1 z M105,36 h1 v1 h-1 z M106,37 h1 v1 h-1 z M104,38 h2 v1 h-2 z M109,38 h1 v1 h-1 z M112,38 h3 v1 h-3 z M116,38 h3 v1 h-3 z M104,41 h1 v4 h-1 z M109,41 h1 v1 h-1 z M112,41 h1 v2 h-1 z M114,41 h1 v2 h-1 z M116,41 h3 v1 h-3 z M120,41 h2 v1 h-2 z M125,41 h2 v1 h-2 z M108,42 h1 v1 h-1 z M110,42 h1 v1 h-1 z M116,42 h1 v1 h-1 z M120,42 h1 v1 h-1 z M122,42 h1 v1 h-1 z M124,42 h1 v1 h-1 z M108,43 h3 v1 h-3 z M113,43 h1 v3 h-1 z M116,43 h2 v1 h-2 z M120,43 h2 v1 h-2 z M125,43 h1 v1 h-1 z M108,44 h1 v2 h-1 z M110,44 h1 v2 h-1 z M116,44 h1 v1 h-1 z M120,44 h1 v2 h-1 z M122,44 h1 v2 h-1 z M126,44 h1 v1 h-1 z M104,45 h3 v1 h-3 z M116,45 h3 v1 h-3 z M124,45 h2 v1 h-2 z" fill="#fff59d" />
-    {/* Chalk: ingredient list */}
-    <path d="M138,33 h2 v2 h-2 z M144,32 h2 v1 h-2 z M147,32 h2 v1 h-2 z M151,32 h3 v1 h-3 z M155,32 h3 v1 h-3 z M159,32 h2 v1 h-2 z M164,32 h2 v1 h-2 z M143,33 h1 v3 h-1 z M147,33 h1 v1 h-1 z M149,33 h1 v1 h-1 z M151,33 h1 v1 h-1 z M155,33 h1 v1 h-1 z M159,33 h1 v4 h-1 z M161,33 h1 v4 h-1 z M163,33 h1 v1 h-1 z M145,34 h1 v2 h-1 z M147,34 h2 v1 h-2 z M151,34 h2 v1 h-2 z M155,34 h2 v1 h-2 z M164,34 h1 v1 h-1 z M147,35 h1 v2 h-1 z M149,35 h1 v2 h-1 z M151,35 h1 v1 h-1 z M155,35 h1 v1 h-1 z M165,35 h1 v1 h-1 z M144,36 h2 v1 h-2 z M151,36 h3 v1 h-3 z M155,36 h3 v1 h-3 z M163,36 h2 v1 h-2 z" fill="#a5d6a7" />
-    <path d="M138,40 h2 v2 h-2 z M143,39 h2 v1 h-2 z M147,39 h2 v1 h-2 z M152,39 h1 v1 h-1 z M155,39 h1 v2 h-1 z M157,39 h1 v2 h-1 z M159,39 h2 v1 h-2 z M164,39 h2 v1 h-2 z M143,40 h1 v1 h-1 z M145,40 h1 v1 h-1 z M147,40 h1 v1 h-1 z M149,40 h1 v1 h-1 z M151,40 h1 v3 h-1 z M153,40 h1 v3 h-1 z M159,40 h1 v4 h-1 z M161,40 h1 v4 h-1 z M163,40 h1 v1 h-1 z M143,41 h2 v1 h-2 z M147,41 h2 v1 h-2 z M155,41 h3 v2 h-3 z M164,41 h1 v1 h-1 z M143,42 h1 v1 h-1 z M145,42 h1 v1 h-1 z M147,42 h1 v2 h-1 z M149,42 h1 v2 h-1 z M165,42 h1 v1 h-1 z M143,43 h2 v1 h-2 z M152,43 h1 v1 h-1 z M155,43 h1 v1 h-1 z M157,43 h1 v1 h-1 z M163,43 h2 v1 h-2 z" fill="#e6a15c" />
-    <path d="M138,47 h2 v2 h-2 z M143,46 h1 v2 h-1 z M145,46 h1 v2 h-1 z M148,46 h1 v1 h-1 z M151,46 h3 v1 h-3 z M155,46 h3 v1 h-3 z M159,46 h2 v1 h-2 z M147,47 h1 v1 h-1 z M149,47 h1 v1 h-1 z M152,47 h1 v4 h-1 z M155,47 h1 v1 h-1 z M159,47 h1 v1 h-1 z M161,47 h1 v1 h-1 z M143,48 h3 v2 h-3 z M147,48 h3 v1 h-3 z M155,48 h2 v1 h-2 z M159,48 h2 v1 h-2 z M147,49 h1 v2 h-1 z M149,49 h1 v2 h-1 z M155,49 h1 v1 h-1 z M159,49 h1 v2 h-1 z M161,49 h1 v2 h-1 z M143,50 h1 v1 h-1 z M145,50 h1 v1 h-1 z M155,50 h3 v1 h-3 z" fill="#90caf9" />
-    <path d="M138,54 h2 v2 h-2 z M144,53 h1 v1 h-1 z M147,53 h3 v1 h-3 z M151,53 h2 v1 h-2 z M143,54 h1 v1 h-1 z M145,54 h1 v1 h-1 z M148,54 h1 v3 h-1 z M151,54 h1 v1 h-1 z M153,54 h1 v1 h-1 z M143,55 h3 v1 h-3 z M151,55 h2 v1 h-2 z M143,56 h1 v2 h-1 z M145,56 h1 v2 h-1 z M151,56 h1 v2 h-1 z M153,56 h1 v2 h-1 z M147,57 h3 v1 h-3 z" fill="#f5f5f5" />
-    {/* Clock (10:00) */}
-    <path d="M201,7 h5 v1 h-5 z M199,8 h2 v1 h-2 z M206,8 h2 v1 h-2 z M198,9 h1 v2 h-1 z M208,9 h1 v2 h-1 z M197,11 h1 v5 h-1 z M209,11 h1 v5 h-1 z M198,16 h1 v2 h-1 z M208,16 h1 v2 h-1 z M199,18 h2 v1 h-2 z M206,18 h2 v1 h-2 z M201,19 h5 v1 h-5 z" fill="#5d4037" />
-    <path d="M201,8 h5 v1 h-5 z M199,9 h4 v2 h-4 z M204,9 h4 v2 h-4 z M198,11 h5 v1 h-5 z M204,11 h5 v2 h-5 z M198,12 h2 v1 h-2 z M201,12 h2 v1 h-2 z M199,13 h2 v1 h-2 z M204,13 h4 v1 h-4 z M198,14 h11 v2 h-11 z M199,16 h9 v1 h-9 z M199,17 h4 v1 h-4 z M204,17 h4 v1 h-4 z M201,18 h5 v1 h-5 z" fill="#fffdf2" />
-    <path d="M203,9 h1 v1 h-1 z M198,13 h1 v1 h-1 z M208,13 h1 v1 h-1 z M203,17 h1 v1 h-1 z" fill="#9e9e9e" />
-    <path d="M203,10 h1 v3 h-1 z M200,12 h1 v1 h-1 z M201,13 h2 v1 h-2 z" fill="#3e2723" />
-    <path d="M203,13 h1 v1 h-1 z" fill="#e53935" />
-    {/* Worm poster */}
-    <path d="M214,6 h22 v28 h-22 z" fill="#d7c9a8" />
-    <path d="M215,7 h20 v26 h-20 z" fill="#fff8e1" />
-    <path d="M224,5 h2 v2 h-2 z M230,16 h1 v1 h-1 z M232,16 h1 v1 h-1 z M229,17 h5 v1 h-5 z M230,18 h3 v1 h-3 z M231,19 h1 v1 h-1 z" fill="#e53935" />
-    <path d="M216,9 h1 v2 h-1 z M218,9 h1 v2 h-1 z M221,9 h1 v1 h-1 z M224,9 h2 v1 h-2 z M228,9 h1 v1 h-1 z M230,9 h1 v1 h-1 z M233,9 h2 v1 h-2 z M220,10 h1 v3 h-1 z M222,10 h1 v3 h-1 z M224,10 h1 v1 h-1 z M226,10 h1 v1 h-1 z M228,10 h3 v2 h-3 z M232,10 h1 v1 h-1 z M216,11 h3 v2 h-3 z M224,11 h2 v1 h-2 z M233,11 h1 v1 h-1 z M224,12 h1 v2 h-1 z M226,12 h1 v2 h-1 z M228,12 h1 v2 h-1 z M230,12 h1 v2 h-1 z M234,12 h1 v1 h-1 z M216,13 h1 v1 h-1 z M218,13 h1 v1 h-1 z M221,13 h1 v1 h-1 z M232,13 h2 v1 h-2 z" fill="#5d4037" />
-    <path d="M221,15 h4 v1 h-4 z M220,16 h6 v1 h-6 z M220,17 h1 v1 h-1 z M222,17 h2 v1 h-2 z M225,17 h1 v1 h-1 z M220,18 h2 v1 h-2 z M224,18 h2 v1 h-2 z M221,19 h4 v1 h-4 z M223,21 h4 v1 h-4 z M224,22 h4 v1 h-4 z M223,24 h4 v1 h-4 z M222,25 h4 v1 h-4 z M221,27 h4 v1 h-4 z" fill="#f48fb1" />
-    <path d="M222,18 h2 v1 h-2 z M222,20 h4 v1 h-4 z M224,23 h4 v1 h-4 z M221,26 h4 v1 h-4 z" fill="#d81b60" />
-    <path d="M221,17 h1 v1 h-1 z M224,17 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M231,24 h1 v1 h-1 z M233,24 h1 v1 h-1 z M232,25 h1 v2 h-1 z" fill="#66bb6a" />
-    <path d="M215,27 h6 v1 h-6 z M225,27 h10 v1 h-10 z M215,28 h12 v1 h-12 z M228,28 h7 v1 h-7 z M215,29 h2 v1 h-2 z M218,29 h13 v1 h-13 z M232,29 h3 v1 h-3 z M215,30 h7 v1 h-7 z M223,30 h12 v1 h-12 z" fill="#8d6e63" />
-    <path d="M217,26 h2 v1 h-2 z M227,26 h2 v1 h-2 z M227,28 h1 v1 h-1 z M217,29 h1 v1 h-1 z M231,29 h1 v1 h-1 z M222,30 h1 v1 h-1 z M215,31 h20 v1 h-20 z" fill="#6d4c41" />
-    {/* Bookshelf */}
-    <path d="M198,48 h40 v49 h-40 z" fill="#6d4c41" />
-    <path d="M200,50 h36 v43 h-36 z" fill="#3e2723" />
-    <path d="M198,48 h1 v49 h-1 z M198,48 h40 v1 h-40 z M200,63 h36 v1 h-36 z M200,78 h36 v1 h-36 z M200,93 h36 v1 h-36 z M227,67 h3 v11 h-3 z" fill="#8d6e63" />
-    <path d="M237,48 h1 v49 h-1 z M200,64 h36 v1 h-36 z M200,79 h36 v1 h-36 z" fill="#5d4037" />
-    <path d="M198,95 h40 v2 h-40 z M203,72 h4 v5 h-4 z" fill="#4e342e" />
-    <path d="M201,52 h3 v11 h-3 z M225,59 h9 v2 h-9 z M230,66 h2 v12 h-2 z" fill="#c62828" />
-    <path d="M201,54 h3 v1 h-3 z" fill="#fff8e1" />
-    <path d="M204,53 h2 v10 h-2 z M229,82 h3 v11 h-3 z" fill="#ef6c00" />
-    <path d="M206,51 h3 v12 h-3 z M224,61 h10 v2 h-10 z M232,68 h3 v10 h-3 z" fill="#1565c0" />
-    <path d="M206,53 h3 v1 h-3 z" fill="#fff8e1" />
-    <path d="M209,54 h2 v9 h-2 z M224,57 h9 v2 h-9 z" fill="#f9a825" />
-    <path d="M211,52 h3 v11 h-3 z M224,66 h3 v12 h-3 z" fill="#2e7d32" />
-    <path d="M211,54 h3 v1 h-3 z" fill="#fff8e1" />
-    <path d="M214,51 h2 v12 h-2 z M232,81 h3 v12 h-3 z" fill="#6a1b9a" />
-    <path d="M217,53 h3 v10 h-3 z" fill="#00838f" />
-    <path d="M217,55 h3 v1 h-3 z M224,68 h3 v1 h-3 z M230,68 h2 v1 h-2 z" fill="#fff8e1" />
-    <path d="M220,52 h2 v11 h-2 z" fill="#ad1457" />
-    <path d="M203,70 h4 v1 h-4 z M210,70 h4 v1 h-4 z M217,70 h4 v1 h-4 z" fill="#9e9e9e" />
-    <path d="M202,71 h6 v1 h-6 z M202,72 h1 v5 h-1 z M207,72 h1 v5 h-1 z M202,77 h6 v1 h-6 z M209,71 h6 v1 h-6 z M209,72 h1 v5 h-1 z M214,72 h1 v5 h-1 z M209,77 h6 v1 h-6 z M216,71 h6 v1 h-6 z M216,72 h1 v5 h-1 z M221,72 h1 v5 h-1 z M216,77 h6 v1 h-6 z" fill="#cfd8dc" />
-    <path d="M210,72 h4 v5 h-4 z" fill="#d7b98a" />
-    <path d="M217,72 h4 v5 h-4 z" fill="#b5651d" />
-    <path d="M202,84 h16 v9 h-16 z" fill="#c49a6c" />
-    <path d="M202,84 h16 v1 h-16 z" fill="#ddb98b" />
-    <path d="M202,88 h16 v1 h-16 z" fill="#a67c52" />
-    <path d="M208,85 h4 v2 h-4 z M204,47 h6 v1 h-6 z" fill="#5d4037" />
-    <path d="M221,81 h4 v12 h-4 z" fill="#455a64" />
-    <path d="M221,83 h4 v1 h-4 z" fill="#fff8e1" />
-    <path d="M225,81 h4 v12 h-4 z" fill="#37474f" />
-    <path d="M225,83 h4 v1 h-4 z M232,83 h3 v1 h-3 z" fill="#fff8e1" />
-    <path d="M205,37 h4 v1 h-4 z M204,38 h1 v1 h-1 z M207,38 h3 v1 h-3 z M203,39 h1 v1 h-1 z M207,39 h4 v1 h-4 z M203,40 h2 v1 h-2 z M206,40 h2 v1 h-2 z M210,40 h1 v2 h-1 z M203,41 h4 v1 h-4 z M203,42 h1 v1 h-1 z M205,42 h3 v1 h-3 z M209,42 h2 v1 h-2 z M204,43 h1 v1 h-1 z M206,43 h4 v1 h-4 z M205,44 h4 v1 h-4 z" fill="#42a5f5" />
-    <path d="M205,38 h2 v1 h-2 z M204,39 h3 v1 h-3 z M205,40 h1 v1 h-1 z M208,40 h2 v1 h-2 z M207,41 h3 v1 h-3 z M204,42 h1 v1 h-1 z M208,42 h1 v1 h-1 z M205,43 h1 v1 h-1 z M229,38 h1 v2 h-1 z M227,39 h1 v1 h-1 z M232,39 h1 v1 h-1 z M226,40 h1 v2 h-1 z M228,40 h2 v1 h-2 z M231,40 h1 v1 h-1 z M229,41 h1 v1 h-1 z M232,41 h1 v1 h-1 z M234,41 h1 v1 h-1 z M227,42 h1 v1 h-1 z M232,42 h2 v1 h-2 z M228,43 h1 v1 h-1 z M232,43 h1 v1 h-1 z" fill="#66bb6a" />
-    <path d="M206,45 h2 v2 h-2 z" fill="#c9a227" />
-    <path d="M230,38 h1 v3 h-1 z M227,40 h1 v1 h-1 z M232,40 h1 v1 h-1 z M227,41 h2 v1 h-2 z M230,41 h2 v1 h-2 z M228,42 h4 v1 h-4 z M234,42 h1 v1 h-1 z M229,43 h3 v1 h-3 z" fill="#388e3c" />
-    <path d="M226,44 h8 v1 h-8 z" fill="#d9825b" />
-    <path d="M227,45 h6 v2 h-6 z M228,47 h4 v1 h-4 z" fill="#c2693f" />
-    {/* Compost bin */}
-    <path d="M15,68 h2 v1 h-2 z M23,68 h1 v1 h-1 z M12,69 h3 v1 h-3 z M16,69 h4 v1 h-4 z M21,69 h5 v1 h-5 z M9,70 h4 v1 h-4 z M14,70 h6 v1 h-6 z M21,70 h3 v1 h-3 z M25,70 h4 v1 h-4 z M7,71 h2 v1 h-2 z M10,71 h5 v1 h-5 z M16,71 h4 v1 h-4 z M21,71 h7 v1 h-7 z M29,71 h3 v1 h-3 z M5,72 h5 v1 h-5 z M11,72 h7 v1 h-7 z M19,72 h5 v1 h-5 z M25,72 h5 v1 h-5 z M31,72 h4 v1 h-4 z M4,73 h2 v1 h-2 z M7,73 h7 v1 h-7 z M15,73 h5 v1 h-5 z M21,73 h8 v1 h-8 z M30,73 h6 v1 h-6 z" fill="#4e342e" />
-    <path d="M13,70 h1 v1 h-1 z M20,71 h1 v1 h-1 z M10,72 h1 v1 h-1 z M30,72 h1 v1 h-1 z M14,73 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M15,69 h1 v1 h-1 z M24,70 h1 v1 h-1 z M15,71 h1 v1 h-1 z M24,72 h1 v1 h-1 z M6,73 h1 v1 h-1 z M29,73 h1 v1 h-1 z" fill="#7cb342" />
-    <path d="M20,69 h1 v1 h-1 z M9,71 h1 v1 h-1 z M28,71 h1 v1 h-1 z M20,73 h1 v1 h-1 z" fill="#ef6c00" />
-    <path d="M20,70 h1 v1 h-1 z M18,72 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M3,74 h34 v1 h-34 z" fill="#66bb6a" />
-    <path d="M3,75 h34 v1 h-34 z" fill="#388e3c" />
-    <path d="M3,76 h34 v1 h-34 z M33,77 h3 v25 h-3 z M5,102 h30 v1 h-30 z" fill="#1b5e20" />
-    <path d="M4,77 h2 v25 h-2 z" fill="#43a047" />
-    <path d="M6,77 h27 v25 h-27 z" fill="#2e7d32" />
-    <path d="M4,78 h32 v1 h-32 z" fill="#1b5e20" />
-    <path d="M6,81 h29 v7 h-29 z" fill="#f5ecd7" />
-    <path d="M8,82 h2 v1 h-2 z M12,82 h1 v1 h-1 z M15,82 h1 v1 h-1 z M17,82 h1 v1 h-1 z M19,82 h2 v1 h-2 z M24,82 h1 v1 h-1 z M28,82 h2 v1 h-2 z M31,82 h3 v1 h-3 z M7,83 h1 v3 h-1 z M11,83 h1 v3 h-1 z M13,83 h1 v3 h-1 z M15,83 h3 v2 h-3 z M19,83 h1 v1 h-1 z M21,83 h1 v1 h-1 z M23,83 h1 v3 h-1 z M25,83 h1 v3 h-1 z M27,83 h1 v1 h-1 z M32,83 h1 v4 h-1 z M19,84 h2 v1 h-2 z M28,84 h1 v1 h-1 z M15,85 h1 v2 h-1 z M17,85 h1 v2 h-1 z M19,85 h1 v2 h-1 z M29,85 h1 v1 h-1 z M8,86 h2 v1 h-2 z M12,86 h1 v1 h-1 z M24,86 h1 v1 h-1 z M27,86 h2 v1 h-2 z M4,100 h32 v1 h-32 z" fill="#1b5e20" />
-    <path d="M21,91 h2 v1 h-2 z M19,92 h4 v1 h-4 z M18,93 h5 v1 h-5 z M18,94 h4 v1 h-4 z M17,95 h4 v1 h-4 z M18,96 h2 v1 h-2 z M17,97 h1 v1 h-1 z" fill="#a5d6a7" />
-    <path d="M3,103 h34 v1 h-34 z" fill="#000000" opacity="0.2" />
-  </svg>
-));
-
-const StudentPortrait = () => {
-  const [imgIdx, setImgIdx] = useState(0);
-  const urls = [
-    `${BASE}/farmgirl pupper 300.png`,
-    `${BASE}/hero.png`
-  ];
-  
-  return (
-    <img 
-      src={urls[imgIdx]} 
-      alt="Student" 
-      className="w-full h-full object-cover" 
-      onError={() => { if(imgIdx < urls.length - 1) setImgIdx(imgIdx + 1); }} 
-    />
-  );
-};
-
-const PolishHenSprite = React.memo(({ name }) => {
-  const isRiot = name === 'Riot';
-  
-  // Riot is a Buff Laced Polish (Gold/Buff body, White lacing)
-  // Beyonce is a Golden Laced Polish (Black body, Copper/Gold lacing)
-  const baseColor = isRiot ? "#fbc02d" : "#1a1a1a"; 
-  const laceColor1 = isRiot ? "#ffffff" : "#d84315"; 
-  const laceColor2 = isRiot ? "#fff9c4" : "#ff9800"; 
-  const legColor = "#78909c"; 
-  const beakColor = isRiot ? "#d7ccc8" : "#90a4ae";
-
-  return (
-    <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-      {/* Legs */}
-      <path d="M6,13 h1 v3 h-1 z M10,13 h1 v3 h-1 z M5,15 h2 v1 h-2 z M9,15 h2 v1 h-2 z" fill={legColor} />
-      
-      {/* Tail Base */}
-      <path d="M1,2 h4 v8 h-4 z M0,3 h2 v6 h-2 z M4,1 h2 v4 h-2 z" fill={baseColor} />
-      {/* Tail Lacing */}
-      <path d="M2,3 h1 v6 h-1 z M4,3 h1 v5 h-1 z M1,4 h1 v4 h-1 z M5,2 h1 v3 h-1 z" fill={laceColor1} />
-      
-      {/* Body Base */}
-      <path d="M3,8 h9 v5 h-9 z M4,13 h7 v1 h-7 z M10,7 h2 v2 h-2 z" fill={baseColor} />
-      {/* Body Feathers / Lacing */}
-      <path d="M4,9 h1 v1 h-1 z M6,9 h1 v1 h-1 z M8,9 h1 v1 h-1 z M10,9 h1 v1 h-1 z M5,10 h1 v1 h-1 z M7,10 h1 v1 h-1 z M9,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M4,11 h1 v1 h-1 z M6,11 h1 v1 h-1 z M8,11 h1 v1 h-1 z M10,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M7,12 h1 v1 h-1 z M9,12 h1 v1 h-1 z" fill={laceColor1} />
-      
-      {/* Neck */}
-      <path d="M8,5 h4 v4 h-4 z" fill={baseColor} />
-      
-      {/* Beak & Wattle */}
-      <path d="M13,6 h2 v1 h-2 z M14,7 h1 v1 h-1 z" fill={beakColor} />
-      <path d="M12,7 h1 v1 h-1 z" fill="#d32f2f" />
-      
-      {/* Giant Crest (Poof) Base */}
-      <path d="M7,1 h6 v5 h-6 z M8,0 h4 v1 h-4 z M6,2 h2 v4 h-2 z M13,2 h2 v3 h-2 z M12,1 h2 v1 h-2 z" fill={baseColor} />
-      {/* Giant Crest Lacing/Feather Details */}
-      <path d="M9,1 h1 v1 h-1 z M11,1 h1 v1 h-1 z M8,2 h1 v1 h-1 z M10,2 h1 v1 h-1 z M12,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z M9,3 h1 v1 h-1 z M11,3 h1 v1 h-1 z M13,3 h1 v1 h-1 z M8,4 h1 v1 h-1 z M10,4 h1 v1 h-1 z M12,4 h1 v1 h-1 z M14,4 h1 v1 h-1 z M7,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z M11,5 h1 v1 h-1 z M6,4 h1 v1 h-1 z" fill={laceColor2} />
-      <path d="M10,0 h1 v1 h-1 z M8,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M11,2 h1 v1 h-1 z M13,2 h1 v1 h-1 z M10,3 h1 v1 h-1 z M12,3 h1 v1 h-1 z M9,4 h1 v1 h-1 z M11,4 h1 v1 h-1 z M8,5 h1 v1 h-1 z M10,5 h1 v1 h-1 z" fill={laceColor1} />
-
-      {/* Eye */}
-      <path d="M12,5 h1 v1 h-1 z" fill="#000000" />
-    </svg>
-  );
-});
-
-const PixelHeartSprite = React.memo(() => (
-  <svg viewBox="0 0 7 6" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M1,0 h2 v1 h1 v-1 h2 v1 h1 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v-1 h-1 v-1 h-1 v-1 h-1 v-2 z" fill="#e53935" />
-    <path d="M1,1 h1 v1 h-1 z M2,2 h1 v1 h-1 z" fill="#ffcdd2" opacity="0.6" />
-  </svg>
-));
-
-const CornSprite = React.memo(() => (
-  <svg viewBox="0 0 24 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Silk */}
-    <path d="M10,0 h1 v1 h-1 z M12,0 h1 v1 h-1 z M9,1 h1 v1 h-1 z M11,1 h3 v1 h-3 z M9,2 h2 v1 h-2 z M13,2 h2 v1 h-2 z" fill="#ffe082" />
-    <path d="M11,0 h1 v1 h-1 z M10,1 h1 v1 h-1 z" fill="#fff8e1" />
-    {/* Kernels */}
-    <path d="M11,2 h2 v1 h-2 z M8,3 h2 v1 h-2 z M11,3 h1 v2 h-1 z M13,3 h1 v1 h-1 z M9,4 h1 v1 h-1 z M13,4 h2 v1 h-2 z M10,5 h1 v2 h-1 z M12,5 h1 v2 h-1 z M14,5 h1 v2 h-1 z M8,6 h1 v1 h-1 z M9,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z M8,8 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M9,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M13,9 h1 v1 h-1 z M8,10 h1 v1 h-1 z M10,10 h1 v1 h-1 z M12,10 h1 v1 h-1 z M9,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z M8,12 h1 v1 h-1 z M10,12 h1 v1 h-1 z M12,12 h1 v1 h-1 z M9,13 h1 v1 h-1 z M11,13 h1 v1 h-1 z M13,13 h1 v1 h-1 z M8,14 h1 v1 h-1 z M10,14 h1 v1 h-1 z M12,14 h1 v1 h-1 z M9,15 h1 v1 h-1 z M11,15 h1 v1 h-1 z M13,15 h1 v1 h-1 z M10,16 h1 v1 h-1 z M12,16 h1 v1 h-1 z" fill="#ffeb3b" />
-    <path d="M10,3 h1 v2 h-1 z M12,3 h1 v2 h-1 z M9,5 h1 v2 h-1 z M11,5 h1 v2 h-1 z M13,5 h1 v2 h-1 z M8,7 h1 v1 h-1 z M10,7 h1 v1 h-1 z M12,7 h1 v1 h-1 z M9,8 h1 v1 h-1 z M11,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z M8,9 h1 v1 h-1 z M10,9 h1 v1 h-1 z M12,9 h1 v1 h-1 z M9,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M13,10 h1 v1 h-1 z M8,11 h1 v1 h-1 z M10,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z M9,12 h1 v1 h-1 z M11,12 h1 v1 h-1 z M13,12 h1 v1 h-1 z M8,13 h1 v1 h-1 z M10,13 h1 v1 h-1 z M12,13 h1 v1 h-1 z M9,14 h1 v1 h-1 z M11,14 h1 v1 h-1 z M13,14 h1 v1 h-1 z M10,15 h1 v1 h-1 z M12,15 h1 v1 h-1 z M11,16 h1 v1 h-1 z" fill="#f9a825" />
-    <path d="M8,4 h1 v2 h-1 z" fill="#fff176" />
-    {/* Husk & stalk */}
-    <path d="M7,5 h1 v1 h-1 z M15,5 h1 v1 h-1 z M6,6 h2 v1 h-2 z M16,6 h1 v1 h-1 z M5,7 h1 v2 h-1 z M7,7 h1 v6 h-1 z M4,9 h2 v1 h-2 z M4,10 h1 v7 h-1 z M5,17 h1 v2 h-1 z M6,19 h1 v2 h-1 z M7,21 h1 v1 h-1 z M8,22 h1 v1 h-1 z M10,22 h1 v1 h-1 z M9,23 h1 v1 h-1 z M11,23 h1 v1 h-1 z M10,24 h1 v8 h-1 z" fill="#66bb6a" />
-    <path d="M15,6 h1 v1 h-1 z M6,7 h1 v3 h-1 z M14,7 h2 v4 h-2 z M5,10 h2 v3 h-2 z M14,11 h1 v3 h-1 z M5,13 h3 v2 h-3 z M5,15 h4 v1 h-4 z M5,16 h5 v1 h-5 z M13,16 h1 v1 h-1 z M6,17 h8 v2 h-8 z M7,19 h6 v1 h-6 z M7,20 h5 v1 h-5 z M8,21 h4 v1 h-4 z M9,22 h1 v1 h-1 z M11,22 h1 v1 h-1 z M10,23 h1 v1 h-1 z M11,24 h1 v8 h-1 z" fill="#4caf50" />
-    <path d="M16,7 h1 v2 h-1 z M16,9 h2 v8 h-2 z M16,17 h1 v2 h-1 z M15,19 h1 v2 h-1 z M14,21 h1 v1 h-1 z M13,22 h1 v1 h-1 z M12,24 h1 v8 h-1 z" fill="#388e3c" />
-    <path d="M15,11 h1 v3 h-1 z M14,14 h2 v5 h-2 z M13,19 h2 v1 h-2 z M12,20 h3 v1 h-3 z M12,21 h2 v1 h-2 z M12,22 h1 v2 h-1 z" fill="#2e7d32" />
-  </svg>
-));
-
-const CarrotSprite = React.memo(() => (
-  <svg viewBox="0 0 20 28" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Leaves */}
-    <path d="M7,0 h1 v1 h-1 z M11,0 h1 v1 h-1 z M6,1 h1 v1 h-1 z M9,1 h1 v2 h-1 z M13,1 h1 v1 h-1 z M5,2 h1 v2 h-1 z M14,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z M10,3 h1 v2 h-1 z M12,3 h1 v2 h-1 z M4,4 h1 v1 h-1 z M6,4 h2 v1 h-2 z M7,5 h1 v1 h-1 z M10,5 h2 v1 h-2 z M8,6 h1 v1 h-1 z M10,6 h1 v1 h-1 z" fill="#66bb6a" />
-    <path d="M7,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M6,2 h1 v2 h-1 z M13,2 h1 v3 h-1 z M9,3 h1 v4 h-1 z M5,4 h1 v1 h-1 z M6,5 h1 v1 h-1 z M12,5 h1 v1 h-1 z M7,6 h1 v1 h-1 z M11,6 h1 v1 h-1 z M9,7 h4 v1 h-4 z" fill="#4caf50" />
-    <path d="M8,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z" fill="#388e3c" />
-    {/* Carrot */}
-    <path d="M8,8 h5 v1 h-5 z M8,9 h6 v1 h-6 z M8,10 h7 v2 h-7 z M8,13 h7 v3 h-7 z M8,17 h6 v1 h-6 z M9,18 h4 v2 h-4 z M9,21 h3 v1 h-3 z M10,22 h2 v2 h-2 z M9,25 h2 v1 h-2 z M10,26 h1 v1 h-1 z" fill="#ff9800" />
-    <path d="M6,8 h2 v4 h-2 z M6,12 h1 v1 h-1 z M6,13 h2 v1 h-2 z M7,14 h1 v4 h-1 z M8,18 h1 v4 h-1 z M9,22 h1 v3 h-1 z" fill="#ffb74d" />
-    <path d="M13,8 h1 v1 h-1 z M14,9 h1 v1 h-1 z M15,10 h1 v6 h-1 z M14,16 h1 v2 h-1 z M13,18 h2 v2 h-2 z M13,20 h1 v1 h-1 z M12,21 h2 v3 h-2 z M12,24 h1 v1 h-1 z M11,25 h2 v2 h-2 z M10,27 h2 v1 h-2 z" fill="#ef6c00" />
-    <path d="M7,12 h8 v1 h-8 z M8,16 h6 v1 h-6 z M9,20 h4 v1 h-4 z M10,24 h2 v1 h-2 z" fill="#e65100" />
-  </svg>
-));
-
-const MelonSprite = React.memo(() => (
-  <svg viewBox="0 0 28 28" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem & leaf */}
-    <path d="M12,0 h1 v2 h-1 z M11,2 h2 v1 h-2 z" fill="#8b5a2b" />
-    <path d="M13,0 h1 v4 h-1 z" fill="#6d4c41" />
-    <path d="M14,1 h2 v1 h-2 z M14,2 h4 v1 h-4 z" fill="#66bb6a" />
-    {/* Melon */}
-    <path d="M4,7 h1 v2 h-1 z M3,9 h1 v2 h-1 z M2,11 h1 v5 h-1 z" fill="#81c784" />
-    <path d="M9,3 h4 v1 h-4 z M14,3 h5 v1 h-5 z M7,4 h2 v1 h-2 z M10,4 h4 v1 h-4 z M15,4 h4 v1 h-4 z M7,5 h1 v3 h-1 z M9,5 h4 v1 h-4 z M15,5 h3 v2 h-3 z M9,6 h5 v1 h-5 z M10,7 h3 v1 h-3 z M14,7 h4 v1 h-4 z M6,8 h2 v1 h-2 z M10,8 h7 v2 h-7 z M5,9 h2 v2 h-2 z M10,10 h6 v1 h-6 z M4,11 h3 v1 h-3 z M10,11 h5 v1 h-5 z M3,12 h5 v2 h-5 z M11,12 h4 v7 h-4 z M3,14 h4 v2 h-4 z M2,16 h4 v2 h-4 z M3,18 h3 v2 h-3 z M12,19 h3 v1 h-3 z M4,20 h2 v1 h-2 z M13,20 h3 v1 h-3 z M4,21 h1 v1 h-1 z M14,21 h2 v1 h-2 z M15,22 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M19,4 h1 v1 h-1 z M18,5 h2 v2 h-2 z M18,7 h1 v1 h-1 z M17,8 h2 v1 h-2 z M17,9 h1 v2 h-1 z M7,14 h1 v2 h-1 z M6,16 h2 v3 h-2 z M6,19 h3 v1 h-3 z M6,20 h4 v1 h-4 z M5,21 h6 v1 h-6 z M5,22 h7 v1 h-7 z M6,23 h7 v1 h-7 z M7,24 h8 v1 h-8 z M9,25 h9 v1 h-9 z M11,26 h6 v1 h-6 z" fill="#43a047" />
-    <path d="M9,4 h1 v1 h-1 z M20,4 h1 v1 h-1 z M8,5 h1 v3 h-1 z M20,5 h2 v1 h-2 z M20,6 h3 v1 h-3 z M19,7 h4 v1 h-4 z M9,8 h1 v4 h-1 z M19,8 h2 v1 h-2 z M7,9 h1 v3 h-1 z M18,9 h1 v2 h-1 z M20,9 h2 v1 h-2 z M16,10 h1 v1 h-1 z M20,10 h1 v1 h-1 z M15,11 h1 v9 h-1 z M17,11 h1 v14 h-1 z M19,11 h1 v8 h-1 z M8,12 h1 v7 h-1 z M10,12 h1 v7 h-1 z M9,19 h1 v1 h-1 z M11,19 h1 v1 h-1 z M10,20 h1 v1 h-1 z M12,20 h1 v1 h-1 z M11,21 h1 v1 h-1 z M13,21 h1 v1 h-1 z M12,22 h1 v1 h-1 z M14,22 h1 v1 h-1 z M13,23 h1 v1 h-1 z M15,23 h1 v2 h-1 z" fill="#2e7d32" />
-    <path d="M23,6 h1 v2 h-1 z M9,7 h1 v1 h-1 z M8,8 h1 v4 h-1 z M21,8 h3 v1 h-3 z M19,9 h1 v2 h-1 z M22,9 h3 v1 h-3 z M21,10 h4 v1 h-4 z M16,11 h1 v14 h-1 z M18,11 h1 v8 h-1 z M20,11 h6 v7 h-6 z M9,12 h1 v7 h-1 z M20,18 h5 v1 h-5 z M10,19 h1 v1 h-1 z M18,19 h7 v1 h-7 z M11,20 h1 v1 h-1 z M18,20 h6 v2 h-6 z M12,21 h1 v1 h-1 z M13,22 h1 v1 h-1 z M18,22 h5 v1 h-5 z M14,23 h1 v1 h-1 z M18,23 h4 v1 h-4 z M18,24 h3 v1 h-3 z M18,25 h1 v1 h-1 z" fill="#1b5e20" />
-    <path d="M14,4 h1 v1 h-1 z M6,5 h1 v1 h-1 z M13,5 h2 v1 h-2 z M5,6 h2 v2 h-2 z M14,6 h1 v1 h-1 z M13,7 h1 v1 h-1 z M5,8 h1 v1 h-1 z M4,9 h1 v2 h-1 z M3,11 h1 v1 h-1 z" fill="#a5d6a7" />
-  </svg>
-));
-
-const TreeSprite = React.memo(() => (
-  <svg viewBox="0 0 32 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Foliage */}
-    <path d="M12,4 h1 v1 h-1 z M11,5 h1 v1 h-1 z M10,6 h1 v1 h-1 z M9,11 h1 v1 h-1 z M7,12 h1 v1 h-1 z M6,13 h1 v1 h-1 z M6,18 h1 v1 h-1 z M5,19 h1 v1 h-1 z M3,20 h1 v1 h-1 z M4,25 h1 v1 h-1 z M3,26 h1 v1 h-1 z M2,27 h1 v1 h-1 z M0,28 h1 v1 h-1 z" fill="#43a047" />
-    <path d="M15,0 h1 v1 h-1 z M14,1 h1 v2 h-1 z M13,3 h2 v1 h-2 z M13,4 h1 v1 h-1 z M12,5 h1 v1 h-1 z M11,6 h2 v1 h-2 z M11,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z M12,8 h2 v1 h-2 z M11,9 h2 v1 h-2 z M10,10 h3 v1 h-3 z M10,11 h2 v1 h-2 z M8,12 h3 v1 h-3 z M7,13 h3 v1 h-3 z M7,14 h1 v1 h-1 z M11,14 h2 v1 h-2 z M10,15 h3 v1 h-3 z M9,16 h3 v1 h-3 z M7,17 h4 v2 h-4 z M6,19 h4 v1 h-4 z M4,20 h5 v1 h-5 z M4,21 h1 v1 h-1 z M8,21 h4 v2 h-4 z M7,23 h4 v1 h-4 z M5,24 h5 v1 h-5 z M5,25 h4 v1 h-4 z M4,26 h5 v1 h-5 z M3,27 h5 v1 h-5 z M1,28 h6 v1 h-6 z M1,29 h1 v1 h-1 z M5,29 h1 v1 h-1 z M9,29 h1 v1 h-1 z" fill="#388e3c" />
-    <path d="M15,1 h2 v1 h-2 z M15,2 h3 v1 h-3 z M15,3 h4 v1 h-4 z M14,4 h5 v1 h-5 z M13,5 h6 v1 h-6 z M13,6 h7 v1 h-7 z M12,7 h1 v1 h-1 z M14,7 h4 v2 h-4 z M13,9 h7 v2 h-7 z M12,11 h9 v1 h-9 z M11,12 h10 v1 h-10 z M10,13 h12 v1 h-12 z M8,14 h1 v1 h-1 z M13,14 h6 v1 h-6 z M13,15 h7 v1 h-7 z M12,16 h9 v1 h-9 z M11,17 h10 v1 h-10 z M11,18 h12 v1 h-12 z M10,19 h13 v1 h-13 z M9,20 h15 v1 h-15 z M5,21 h1 v1 h-1 z M12,21 h8 v1 h-8 z M12,22 h10 v1 h-10 z M11,23 h11 v1 h-11 z M10,24 h13 v1 h-13 z M9,25 h14 v1 h-14 z M9,26 h16 v1 h-16 z M8,27 h17 v1 h-17 z M7,28 h19 v1 h-19 z M2,29 h1 v1 h-1 z M6,29 h1 v1 h-1 z M10,29 h1 v1 h-1 z" fill="#2e7d32" />
-    <path d="M16,0 h1 v1 h-1 z M17,1 h1 v1 h-1 z M18,2 h1 v1 h-1 z M19,3 h1 v1 h-1 z M19,4 h2 v2 h-2 z M20,6 h2 v1 h-2 z M18,7 h3 v1 h-3 z M18,8 h2 v1 h-2 z M20,9 h2 v1 h-2 z M20,10 h3 v1 h-3 z M21,11 h3 v1 h-3 z M21,12 h4 v1 h-4 z M22,13 h4 v1 h-4 z M19,14 h2 v1 h-2 z M23,14 h2 v1 h-2 z M20,15 h3 v1 h-3 z M21,16 h3 v1 h-3 z M21,17 h4 v1 h-4 z M23,18 h4 v1 h-4 z M23,19 h5 v1 h-5 z M24,20 h5 v1 h-5 z M20,21 h3 v1 h-3 z M24,21 h2 v1 h-2 z M22,22 h3 v1 h-3 z M22,23 h4 v1 h-4 z M23,24 h4 v1 h-4 z M23,25 h5 v1 h-5 z M25,26 h5 v1 h-5 z M25,27 h6 v1 h-6 z M26,28 h6 v1 h-6 z M21,29 h2 v1 h-2 z M25,29 h2 v1 h-2 z M29,29 h2 v1 h-2 z" fill="#1b5e20" />
-    {/* Trunk */}
-    <path d="M13,29 h1 v11 h-1 z" fill="#795548" />
-    <path d="M14,29 h3 v11 h-3 z" fill="#5d4037" />
-    <path d="M17,29 h2 v11 h-2 z" fill="#3e2723" />
-  </svg>
-));
-
-const CowSprite = React.memo(() => (
-  <svg viewBox="0 0 48 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hide */}
-    <path d="M5,4 h1 v1 h-1 z M2,5 h4 v1 h-4 z M9,5 h3 v1 h-3 z M2,6 h10 v1 h-10 z M2,7 h2 v1 h-2 z M5,7 h4 v1 h-4 z M10,7 h2 v2 h-2 z M14,7 h29 v1 h-29 z M2,8 h1 v1 h-1 z M5,8 h3 v1 h-3 z M14,8 h3 v1 h-3 z M23,8 h21 v1 h-21 z M2,9 h10 v1 h-10 z M14,9 h2 v1 h-2 z M24,9 h20 v1 h-20 z M2,10 h14 v2 h-14 z M24,10 h8 v1 h-8 z M39,10 h5 v1 h-5 z M24,11 h7 v2 h-7 z M40,11 h4 v7 h-4 z M12,12 h4 v2 h-4 z M27,13 h4 v5 h-4 z M12,14 h6 v2 h-6 z M6,16 h12 v2 h-12 z M6,18 h5 v1 h-5 z M14,18 h4 v1 h-4 z M27,18 h7 v1 h-7 z M39,18 h5 v3 h-5 z M6,19 h4 v2 h-4 z M14,19 h5 v1 h-5 z M26,19 h8 v1 h-8 z M13,20 h21 v1 h-21 z M8,24 h3 v6 h-3 z M16,24 h3 v6 h-3 z M32,24 h3 v6 h-3 z M40,24 h3 v6 h-3 z" fill="#ffffff" />
-    <path d="M0,7 h2 v3 h-2 z M12,7 h2 v3 h-2 z M44,10 h2 v11 h-2 z M6,21 h40 v1 h-40 z M6,22 h38 v1 h-38 z M6,23 h20 v1 h-20 z M33,23 h11 v1 h-11 z M11,24 h1 v6 h-1 z M19,24 h1 v6 h-1 z M35,24 h1 v6 h-1 z M43,24 h1 v6 h-1 z" fill="#e0e0e0" />
-    <path d="M6,4 h3 v2 h-3 z M4,7 h1 v1 h-1 z M9,7 h1 v1 h-1 z M3,8 h2 v1 h-2 z M8,8 h2 v1 h-2 z M17,8 h6 v1 h-6 z M16,9 h8 v4 h-8 z M32,10 h7 v1 h-7 z M31,11 h9 v7 h-9 z M16,13 h11 v1 h-11 z M18,14 h9 v5 h-9 z M11,18 h3 v1 h-3 z M34,18 h5 v3 h-5 z M10,19 h4 v1 h-4 z M19,19 h7 v1 h-7 z M10,20 h3 v1 h-3 z M44,22 h3 v3 h-3 z M8,30 h4 v2 h-4 z M16,30 h4 v2 h-4 z M32,30 h4 v2 h-4 z M40,30 h4 v2 h-4 z" fill="#212121" />
-    {/* Muzzle & udder */}
-    <path d="M2,12 h10 v1 h-10 z M2,13 h2 v1 h-2 z M5,13 h4 v1 h-4 z M10,13 h2 v1 h-2 z M2,14 h10 v1 h-10 z M26,23 h7 v1 h-7 z M26,24 h6 v2 h-6 z M27,26 h1 v1 h-1 z M31,26 h1 v1 h-1 z" fill="#f48fb1" />
-    <path d="M4,13 h1 v1 h-1 z M9,13 h1 v1 h-1 z M2,15 h10 v1 h-10 z" fill="#ec407a" />
-    {/* Horns */}
-    <path d="M4,2 h1 v1 h-1 z M9,2 h1 v1 h-1 z M3,3 h2 v2 h-2 z M9,3 h2 v2 h-2 z" fill="#bdbdbd" />
-    <path d="M3,2 h1 v1 h-1 z M10,2 h1 v1 h-1 z" fill="#9e9e9e" />
-  </svg>
-));
-
-const PigSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Body */}
-    <path d="M3,8 h20 v3 h-20 z" fill="#f8bbd0" />
-    <path d="M25,5 h3 v1 h-3 z M30,5 h1 v1 h-1 z M23,6 h9 v1 h-9 z M3,7 h29 v1 h-29 z M2,8 h1 v3 h-1 z M23,8 h2 v2 h-2 z M27,8 h5 v2 h-5 z M23,10 h5 v1 h-5 z M2,11 h26 v3 h-26 z M2,14 h30 v1 h-30 z M2,15 h21 v1 h-21 z M2,16 h24 v1 h-24 z" fill="#f48fb1" />
-    <path d="M24,2 h1 v1 h-1 z M29,2 h1 v1 h-1 z M23,3 h2 v3 h-2 z M28,3 h2 v3 h-2 z M0,8 h1 v1 h-1 z M1,9 h1 v1 h-1 z M0,10 h1 v1 h-1 z M1,11 h1 v1 h-1 z M23,15 h9 v1 h-9 z M2,17 h24 v3 h-24 z M4,20 h4 v3 h-4 z M10,20 h4 v3 h-4 z M18,20 h4 v3 h-4 z M24,20 h4 v3 h-4 z" fill="#f06292" />
-    <path d="M29,11 h1 v1 h-1 z M31,11 h1 v1 h-1 z M28,13 h4 v1 h-4 z M4,23 h4 v1 h-4 z M10,23 h4 v1 h-4 z M18,23 h4 v1 h-4 z M24,23 h4 v1 h-4 z" fill="#ad1457" />
-    {/* Snout */}
-    <path d="M28,10 h4 v1 h-4 z M28,11 h1 v1 h-1 z M30,11 h1 v1 h-1 z M28,12 h4 v1 h-4 z" fill="#ec407a" />
-    {/* Eye */}
-    <path d="M26,8 h1 v1 h-1 z M25,9 h2 v1 h-2 z" fill="#212121" />
-    <path d="M25,8 h1 v1 h-1 z" fill="#ffffff" />
-  </svg>
-));
-
-const SunflowerSprite = React.memo(() => (
-  <svg viewBox="0 0 24 48" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem & leaves */}
-    <path d="M11,24 h1 v24 h-1 z M8,29 h1 v1 h-1 z M6,30 h3 v1 h-3 z M8,31 h1 v1 h-1 z M15,35 h1 v1 h-1 z M14,36 h3 v1 h-3 z M16,37 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M12,24 h1 v24 h-1 z M9,28 h2 v4 h-2 z M7,29 h1 v1 h-1 z M5,30 h1 v1 h-1 z M6,31 h2 v1 h-2 z M8,32 h2 v1 h-2 z M13,34 h2 v2 h-2 z M16,35 h1 v1 h-1 z M13,36 h1 v1 h-1 z M17,36 h2 v2 h-2 z M14,37 h2 v1 h-2 z M15,38 h2 v1 h-2 z" fill="#388e3c" />
-    {/* Petals */}
-    <path d="M13,0 h1 v1 h-1 z M12,1 h3 v1 h-3 z M16,1 h2 v1 h-2 z M11,2 h8 v1 h-8 z M10,3 h9 v1 h-9 z M9,4 h11 v1 h-11 z M8,5 h14 v1 h-14 z M7,6 h16 v1 h-16 z M6,7 h3 v1 h-3 z M10,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z M15,7 h8 v1 h-8 z M5,8 h3 v1 h-3 z M15,8 h7 v1 h-7 z M4,9 h3 v1 h-3 z M17,9 h4 v1 h-4 z M3,10 h5 v1 h-5 z M16,10 h4 v1 h-4 z M2,11 h5 v1 h-5 z M17,11 h2 v1 h-2 z M1,12 h6 v1 h-6 z M17,12 h1 v1 h-1 z M0,13 h8 v1 h-8 z M16,13 h1 v1 h-1 z M1,14 h6 v1 h-6 z M2,15 h7 v1 h-7 z M1,16 h8 v1 h-8 z M10,16 h1 v1 h-1 z M13,16 h1 v1 h-1 z M1,17 h12 v1 h-12 z M2,18 h10 v1 h-10 z M4,19 h7 v1 h-7 z M5,20 h5 v1 h-5 z M5,21 h4 v1 h-4 z M6,22 h2 v1 h-2 z" fill="#ffeb3b" />
-    <path d="M21,9 h2 v1 h-2 z M20,10 h4 v1 h-4 z M19,11 h5 v1 h-5 z M18,12 h6 v1 h-6 z M17,13 h7 v1 h-7 z M17,14 h6 v1 h-6 z M15,15 h7 v1 h-7 z M15,16 h8 v1 h-8 z M13,17 h10 v1 h-10 z M12,18 h10 v1 h-10 z M11,19 h9 v1 h-9 z M10,20 h9 v1 h-9 z M9,21 h10 v1 h-10 z M9,22 h6 v1 h-6 z M16,22 h2 v1 h-2 z M10,23 h4 v1 h-4 z" fill="#fbc02d" />
-    <path d="M10,0 h3 v1 h-3 z M6,1 h2 v1 h-2 z M9,1 h3 v1 h-3 z M5,2 h6 v1 h-6 z M5,3 h5 v1 h-5 z M4,4 h5 v1 h-5 z M2,5 h6 v1 h-6 z M1,6 h6 v1 h-6 z M1,7 h5 v1 h-5 z M2,8 h3 v1 h-3 z M1,9 h3 v1 h-3 z M0,10 h3 v1 h-3 z M0,11 h2 v1 h-2 z M0,12 h1 v1 h-1 z" fill="#fff176" />
-    {/* Seed head */}
-    <path d="M9,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M14,8 h1 v1 h-1 z M7,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M13,9 h1 v1 h-1 z M15,9 h1 v1 h-1 z M8,10 h1 v1 h-1 z M10,10 h1 v1 h-1 z M12,10 h1 v1 h-1 z M14,10 h1 v1 h-1 z M7,11 h1 v1 h-1 z M9,11 h1 v1 h-1 z M11,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z M15,11 h1 v1 h-1 z M8,12 h1 v1 h-1 z M10,12 h1 v1 h-1 z M12,12 h1 v1 h-1 z M14,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z M9,13 h1 v1 h-1 z M11,13 h1 v1 h-1 z M13,13 h1 v1 h-1 z M15,13 h1 v1 h-1 z M8,14 h1 v1 h-1 z M10,14 h1 v1 h-1 z M12,14 h1 v1 h-1 z M14,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z M9,15 h1 v1 h-1 z M11,15 h1 v1 h-1 z M13,15 h1 v1 h-1 z M12,16 h1 v1 h-1 z M14,16 h1 v1 h-1 z" fill="#5d4037" />
-    <path d="M12,7 h1 v1 h-1 z M14,7 h1 v1 h-1 z M11,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z M10,9 h1 v1 h-1 z M12,9 h1 v1 h-1 z M14,9 h1 v1 h-1 z M16,9 h1 v1 h-1 z M9,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M13,10 h1 v1 h-1 z M15,10 h1 v1 h-1 z M8,11 h1 v1 h-1 z M10,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M7,12 h1 v1 h-1 z M9,12 h1 v1 h-1 z M11,12 h1 v1 h-1 z M13,12 h1 v1 h-1 z M15,12 h1 v1 h-1 z M8,13 h1 v1 h-1 z M10,13 h1 v1 h-1 z M12,13 h1 v1 h-1 z M14,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M9,14 h1 v1 h-1 z M11,14 h1 v1 h-1 z M13,14 h1 v1 h-1 z M15,14 h1 v1 h-1 z M10,15 h1 v1 h-1 z M12,15 h1 v1 h-1 z M14,15 h1 v1 h-1 z M9,16 h1 v1 h-1 z M11,16 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M8,8 h2 v2 h-2 z" fill="#6d4c41" />
-  </svg>
-));
-
-const ZinniaSprite = React.memo(() => (
-  <svg viewBox="0 0 24 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem & leaves */}
-    <path d="M11,17 h1 v15 h-1 z M8,20 h1 v1 h-1 z M6,21 h3 v1 h-3 z M8,22 h1 v1 h-1 z M15,25 h1 v1 h-1 z M14,26 h3 v1 h-3 z M16,27 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M12,17 h1 v15 h-1 z M9,19 h2 v4 h-2 z M7,20 h1 v1 h-1 z M5,21 h1 v1 h-1 z M6,22 h2 v1 h-2 z M8,23 h2 v1 h-2 z M13,24 h2 v2 h-2 z M16,25 h1 v1 h-1 z M13,26 h1 v1 h-1 z M17,26 h2 v2 h-2 z M14,27 h2 v1 h-2 z M15,28 h2 v1 h-2 z" fill="#388e3c" />
-    {/* Petals */}
-    <path d="M12,0 h2 v1 h-2 z M11,1 h4 v1 h-4 z M16,1 h2 v1 h-2 z M10,2 h1 v1 h-1 z M13,2 h6 v2 h-6 z M9,3 h2 v1 h-2 z M16,4 h2 v1 h-2 z M7,5 h1 v1 h-1 z M16,5 h3 v1 h-3 z M6,6 h2 v1 h-2 z M16,6 h2 v1 h-2 z M5,7 h1 v1 h-1 z M4,8 h2 v1 h-2 z M4,9 h4 v1 h-4 z M5,10 h3 v1 h-3 z M6,11 h2 v1 h-2 z M5,12 h6 v2 h-6 z M6,14 h2 v1 h-2 z M9,14 h1 v1 h-1 z" fill="#e91e63" />
-    <path d="M18,6 h2 v1 h-2 z M18,7 h3 v2 h-3 z M16,9 h4 v1 h-4 z M16,10 h3 v1 h-3 z M16,11 h2 v1 h-2 z M13,12 h6 v2 h-6 z M10,14 h5 v1 h-5 z M16,14 h2 v1 h-2 z M10,15 h4 v1 h-4 z M11,16 h2 v1 h-2 z" fill="#c2185b" />
-    <path d="M10,0 h2 v1 h-2 z M6,1 h2 v1 h-2 z M9,1 h2 v1 h-2 z M5,2 h5 v1 h-5 z M5,3 h4 v1 h-4 z M6,4 h2 v1 h-2 z M5,5 h2 v1 h-2 z M4,6 h2 v1 h-2 z M3,7 h2 v1 h-2 z M3,8 h1 v1 h-1 z" fill="#f48fb1" />
-    <path d="M11,2 h2 v2 h-2 z M8,4 h8 v2 h-8 z M8,6 h2 v1 h-2 z M14,6 h2 v1 h-2 z M6,7 h4 v2 h-4 z M14,7 h4 v2 h-4 z M8,9 h2 v1 h-2 z M14,9 h2 v1 h-2 z M8,10 h8 v2 h-8 z M11,12 h2 v2 h-2 z" fill="#f06292" />
-    {/* Center */}
-    <path d="M10,6 h1 v1 h-1 z M12,6 h1 v1 h-1 z M11,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M11,9 h1 v1 h-1 z M13,9 h1 v1 h-1 z" fill="#ffeb3b" />
-    <path d="M11,6 h1 v1 h-1 z M13,6 h1 v1 h-1 z M10,7 h1 v1 h-1 z M12,7 h1 v1 h-1 z M11,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z M10,9 h1 v1 h-1 z M12,9 h1 v1 h-1 z" fill="#fbc02d" />
-  </svg>
-));
-
-const MarigoldSprite = React.memo(() => (
-  <svg viewBox="0 0 24 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem & leaves */}
-    <path d="M11,15 h1 v17 h-1 z M8,21 h1 v1 h-1 z M6,22 h3 v1 h-3 z M8,23 h1 v1 h-1 z M15,25 h1 v1 h-1 z M14,26 h3 v1 h-3 z M16,27 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M12,15 h1 v17 h-1 z M9,20 h2 v4 h-2 z M7,21 h1 v1 h-1 z M5,22 h1 v1 h-1 z M6,23 h2 v1 h-2 z M8,24 h2 v1 h-2 z M13,24 h2 v2 h-2 z M16,25 h1 v1 h-1 z M13,26 h1 v1 h-1 z M17,26 h2 v2 h-2 z M14,27 h2 v1 h-2 z M15,28 h2 v1 h-2 z" fill="#388e3c" />
-    {/* Petals */}
-    <path d="M14,0 h1 v1 h-1 z M13,1 h2 v1 h-2 z M11,2 h5 v1 h-5 z M11,3 h2 v1 h-2 z M14,3 h5 v2 h-5 z M9,4 h1 v1 h-1 z M17,5 h2 v1 h-2 z M7,6 h1 v1 h-1 z M16,6 h2 v1 h-2 z M6,7 h2 v1 h-2 z M16,7 h1 v1 h-1 z M5,8 h1 v1 h-1 z M4,9 h4 v1 h-4 z M5,10 h3 v1 h-3 z M5,11 h2 v1 h-2 z M5,12 h5 v2 h-5 z M8,14 h2 v1 h-2 z" fill="#ff9800" />
-    <path d="M11,6 h1 v1 h-1 z M18,6 h1 v1 h-1 z M10,7 h1 v1 h-1 z M12,7 h1 v1 h-1 z M17,7 h3 v1 h-3 z M9,8 h1 v1 h-1 z M11,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z M18,8 h2 v1 h-2 z M10,9 h1 v1 h-1 z M12,9 h1 v1 h-1 z M16,9 h4 v1 h-4 z M11,10 h1 v1 h-1 z M16,10 h3 v1 h-3 z M17,11 h2 v1 h-2 z M14,12 h5 v2 h-5 z M11,13 h2 v1 h-2 z M10,14 h6 v1 h-6 z M9,15 h2 v1 h-2 z M13,15 h2 v1 h-2 z M9,16 h1 v1 h-1 z M14,16 h1 v1 h-1 z" fill="#ef6c00" />
-    <path d="M9,0 h1 v1 h-1 z M9,1 h2 v1 h-2 z M8,2 h3 v1 h-3 z M5,3 h5 v1 h-5 z M5,4 h4 v1 h-4 z M5,5 h2 v2 h-2 z M4,7 h2 v1 h-2 z M4,8 h1 v1 h-1 z" fill="#ffb74d" />
-    <path d="M10,3 h1 v1 h-1 z M13,3 h1 v1 h-1 z M10,4 h4 v1 h-4 z M7,5 h10 v1 h-10 z M8,6 h3 v1 h-3 z M13,6 h3 v1 h-3 z M8,7 h2 v1 h-2 z M14,7 h2 v1 h-2 z M6,8 h3 v1 h-3 z M15,8 h3 v1 h-3 z M8,9 h2 v1 h-2 z M14,9 h2 v1 h-2 z M8,10 h3 v1 h-3 z M13,10 h3 v1 h-3 z M7,11 h10 v1 h-10 z M10,12 h4 v1 h-4 z M10,13 h1 v1 h-1 z M13,13 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M12,6 h1 v1 h-1 z M11,7 h1 v1 h-1 z M13,7 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M14,8 h1 v1 h-1 z M11,9 h1 v1 h-1 z M13,9 h1 v1 h-1 z M12,10 h1 v1 h-1 z" fill="#ffeb3b" />
-  </svg>
-));
-
-const LavenderSprite = React.memo(() => (
-  <svg viewBox="0 0 20 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem & leaves */}
-    <path d="M9,19 h1 v21 h-1 z" fill="#4caf50" />
-    <path d="M10,18 h1 v22 h-1 z M7,24 h1 v1 h-1 z M6,25 h2 v1 h-2 z M5,26 h2 v1 h-2 z M5,27 h1 v1 h-1 z M12,29 h1 v1 h-1 z M12,30 h2 v1 h-2 z M13,31 h2 v1 h-2 z M14,32 h1 v1 h-1 z" fill="#388e3c" />
-    {/* Flower spike */}
-    <path d="M9,0 h1 v2 h-1 z M8,2 h1 v2 h-1 z M10,2 h1 v2 h-1 z M7,4 h1 v2 h-1 z M9,4 h1 v2 h-1 z M11,4 h1 v2 h-1 z M6,6 h1 v1 h-1 z M8,6 h1 v1 h-1 z M10,6 h1 v1 h-1 z M12,6 h1 v1 h-1 z M7,7 h1 v1 h-1 z M9,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M6,8 h1 v1 h-1 z M8,8 h1 v1 h-1 z M10,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M5,9 h1 v1 h-1 z M7,9 h1 v1 h-1 z M9,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M13,9 h1 v1 h-1 z M6,10 h1 v3 h-1 z M8,10 h1 v3 h-1 z M10,10 h1 v3 h-1 z M12,10 h1 v3 h-1 z M7,13 h1 v3 h-1 z M9,13 h1 v3 h-1 z M11,13 h1 v3 h-1 z M8,16 h1 v2 h-1 z M10,16 h1 v2 h-1 z" fill="#ab47bc" />
-    <path d="M10,1 h1 v1 h-1 z M9,2 h1 v2 h-1 z M11,3 h1 v1 h-1 z M8,4 h1 v2 h-1 z M10,4 h1 v2 h-1 z M12,5 h1 v1 h-1 z M7,6 h1 v1 h-1 z M9,6 h1 v1 h-1 z M11,6 h1 v1 h-1 z M6,7 h1 v1 h-1 z M8,7 h1 v1 h-1 z M10,7 h1 v1 h-1 z M12,7 h1 v1 h-1 z M7,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z M11,8 h1 v1 h-1 z M13,8 h1 v1 h-1 z M6,9 h1 v1 h-1 z M8,9 h1 v1 h-1 z M10,9 h1 v1 h-1 z M12,9 h1 v1 h-1 z M5,10 h1 v1 h-1 z M7,10 h1 v3 h-1 z M9,10 h1 v3 h-1 z M11,10 h1 v3 h-1 z M13,10 h1 v2 h-1 z M6,13 h1 v1 h-1 z M8,13 h1 v3 h-1 z M10,13 h1 v3 h-1 z M12,13 h1 v2 h-1 z M7,16 h1 v1 h-1 z M9,16 h1 v3 h-1 z M11,16 h1 v1 h-1 z" fill="#8e24aa" />
-    <path d="M8,1 h1 v1 h-1 z M7,3 h1 v1 h-1 z M6,5 h1 v1 h-1 z M5,8 h1 v1 h-1 z M5,11 h1 v1 h-1 z M6,14 h1 v1 h-1 z" fill="#ce93d8" />
-  </svg>
-));
-
-const GrassSprite = React.memo(() => (
-  <svg viewBox="0 0 20 16" className="w-full h-full opacity-60 drop-shadow-sm" shapeRendering="crispEdges">
-    {/* Blades */}
-    <path d="M3,0 h1 v1 h-1 z M14,0 h1 v1 h-1 z M8,1 h1 v1 h-1 z M11,2 h1 v1 h-1 z M5,4 h1 v1 h-1 z M18,5 h1 v1 h-1 z" fill="#81c784" />
-    <path d="M3,1 h1 v1 h-1 z M14,1 h1 v1 h-1 z M2,2 h1 v3 h-1 z M8,2 h1 v5 h-1 z M15,2 h1 v2 h-1 z M11,3 h1 v3 h-1 z M16,4 h1 v4 h-1 z M1,5 h1 v4 h-1 z M5,5 h1 v5 h-1 z M12,6 h1 v6 h-1 z M18,6 h1 v3 h-1 z M9,7 h1 v8 h-1 z M15,8 h1 v4 h-1 z M2,9 h1 v3 h-1 z M17,9 h1 v3 h-1 z M6,10 h1 v4 h-1 z M3,12 h1 v2 h-1 z M13,12 h2 v2 h-2 z M16,12 h1 v2 h-1 z M4,14 h2 v1 h-2 z M7,14 h1 v1 h-1 z M13,14 h1 v1 h-1 z M15,14 h1 v1 h-1 z" fill="#66bb6a" />
-    <path d="M4,15 h12 v1 h-12 z" fill="#43a047" />
-  </svg>
-));
-
-const ChickenSprite = React.memo(() => (
-  <svg viewBox="0 0 20 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Feathers */}
-    <path d="M14,2 h5 v1 h-5 z M13,3 h6 v1 h-6 z M13,4 h3 v1 h-3 z M17,4 h2 v1 h-2 z M13,5 h6 v2 h-6 z M2,6 h1 v1 h-1 z M1,7 h2 v1 h-2 z M7,7 h12 v1 h-12 z M1,8 h17 v1 h-17 z M2,9 h14 v1 h-14 z M17,9 h1 v1 h-1 z M3,10 h7 v2 h-7 z M11,10 h4 v2 h-4 z M16,10 h1 v3 h-1 z M4,12 h7 v1 h-7 z M4,13 h13 v1 h-13 z" fill="#ffffff" />
-    <path d="M16,9 h1 v1 h-1 z M10,10 h1 v2 h-1 z M15,10 h1 v2 h-1 z M11,12 h5 v1 h-5 z M5,14 h11 v1 h-11 z M6,15 h9 v1 h-9 z" fill="#e0e0e0" />
-    {/* Comb, wattle, beak & legs */}
-    <path d="M15,0 h2 v1 h-2 z M14,1 h4 v1 h-4 z M18,8 h1 v2 h-1 z" fill="#e53935" />
-    <path d="M19,4 h1 v2 h-1 z M7,16 h2 v3 h-2 z M12,16 h2 v3 h-2 z M6,19 h4 v1 h-4 z M11,19 h4 v1 h-4 z" fill="#fbc02d" />
-    {/* Eye */}
-    <path d="M16,4 h1 v1 h-1 z" fill="#212121" />
-  </svg>
-));
-
-const RoosterSprite = React.memo(() => (
-  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Body */}
-    <path d="M6,13 h10 v1 h-10 z M20,13 h1 v1 h-1 z M6,14 h16 v1 h-16 z M6,15 h3 v2 h-3 z M15,15 h7 v1 h-7 z M10,16 h5 v1 h-5 z M16,16 h6 v1 h-6 z M7,17 h3 v1 h-3 z M11,17 h5 v1 h-5 z M17,17 h5 v2 h-5 z M7,18 h4 v1 h-4 z M8,19 h13 v1 h-13 z" fill="#8d6e63" />
-    <path d="M16,3 h6 v2 h-6 z M16,5 h2 v2 h-2 z M20,5 h2 v2 h-2 z M16,7 h6 v1 h-6 z M16,8 h5 v1 h-5 z M16,9 h4 v1 h-4 z M16,10 h3 v1 h-3 z M16,11 h2 v1 h-2 z M7,12 h5 v1 h-5 z M17,12 h2 v1 h-2 z" fill="#a1887f" />
-    <path d="M9,15 h6 v1 h-6 z M9,16 h1 v1 h-1 z M15,16 h1 v1 h-1 z M10,17 h1 v1 h-1 z M16,17 h1 v1 h-1 z M11,18 h6 v1 h-6 z M21,19 h1 v1 h-1 z M9,20 h12 v1 h-12 z" fill="#6d4c41" />
-    {/* Hackles */}
-    <path d="M15,8 h1 v1 h-1 z M14,9 h2 v1 h-2 z M13,10 h3 v1 h-3 z M12,11 h4 v1 h-4 z M12,12 h5 v1 h-5 z M16,13 h4 v1 h-4 z" fill="#f9a825" />
-    {/* Comb, wattle & beak */}
-    <path d="M18,0 h1 v1 h-1 z M20,0 h1 v1 h-1 z M17,1 h5 v2 h-5 z M19,10 h1 v1 h-1 z M19,11 h2 v1 h-2 z M20,12 h1 v1 h-1 z" fill="#e53935" />
-    {/* Tail */}
-    <path d="M2,0 h1 v1 h-1 z M1,1 h2 v1 h-2 z M0,2 h3 v1 h-3 z M5,2 h1 v1 h-1 z M0,3 h1 v2 h-1 z M2,3 h1 v1 h-1 z M4,3 h2 v1 h-2 z M2,4 h4 v1 h-4 z M1,5 h4 v2 h-4 z M6,5 h2 v1 h-2 z M7,6 h2 v1 h-2 z M2,7 h4 v2 h-4 z M8,7 h2 v4 h-2 z M3,9 h3 v1 h-3 z M4,10 h3 v1 h-3 z M5,11 h3 v1 h-3 z M9,11 h2 v1 h-2 z" fill="#1e88e5" />
-    <path d="M1,3 h1 v2 h-1 z M0,5 h1 v2 h-1 z M1,7 h1 v2 h-1 z M6,8 h1 v2 h-1 z M2,9 h1 v1 h-1 z M2,10 h2 v1 h-2 z M7,10 h1 v1 h-1 z M3,11 h2 v1 h-2 z M8,11 h1 v1 h-1 z M4,12 h3 v1 h-3 z M5,13 h1 v1 h-1 z" fill="#1565c0" />
-    <path d="M5,5 h1 v1 h-1 z M5,6 h2 v1 h-2 z M6,7 h2 v1 h-2 z M7,8 h1 v2 h-1 z" fill="#43a047" />
-    {/* Legs */}
-    <path d="M22,5 h1 v1 h-1 z M22,6 h2 v1 h-2 z M10,21 h2 v2 h-2 z M15,21 h2 v2 h-2 z M9,23 h4 v1 h-4 z M14,23 h4 v1 h-4 z" fill="#fbc02d" />
-    {/* Eye */}
-    <path d="M19,5 h1 v1 h-1 z M18,6 h2 v1 h-2 z" fill="#212121" />
-    <path d="M18,5 h1 v1 h-1 z" fill="#ffffff" />
-  </svg>
-));
-
-const ChickSprite = React.memo(() => (
-  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Fluff */}
-    <path d="M4,1 h1 v1 h-1 z M3,2 h1 v1 h-1 z M2,3 h1 v1 h-1 z" fill="#fff59d" />
-    <path d="M5,0 h4 v1 h-4 z M5,1 h5 v1 h-5 z M4,2 h7 v1 h-7 z M3,3 h4 v1 h-4 z M8,3 h2 v1 h-2 z M2,4 h9 v2 h-9 z M2,6 h2 v2 h-2 z M7,6 h4 v1 h-4 z M5,7 h2 v1 h-2 z M8,7 h2 v1 h-2 z M3,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z" fill="#ffeb3b" />
-    <path d="M4,6 h3 v1 h-3 z M4,7 h1 v1 h-1 z M7,7 h1 v1 h-1 z M10,7 h1 v2 h-1 z M4,8 h5 v1 h-5 z M4,9 h6 v1 h-6 z" fill="#fdd835" />
-    {/* Beak & legs */}
-    <path d="M10,3 h1 v1 h-1 z M11,4 h1 v1 h-1 z M5,10 h1 v1 h-1 z M8,10 h1 v1 h-1 z M4,11 h2 v1 h-2 z M7,11 h2 v1 h-2 z" fill="#f57f17" />
-    {/* Eye */}
-    <path d="M7,3 h1 v1 h-1 z" fill="#212121" />
-  </svg>
-));
-
-const BeeSprite = React.memo(() => (
-  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <path d="M2,4 h4 v2 h-4 z" fill="#ffeb3b" />
-    <path d="M3,4 h1 v2 h-1 z M5,4 h1 v2 h-1 z" fill="#212121" />
-    <path d="M3,2 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/> 
-  </svg>
-));
-
-const SheepSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Fleece */}
-    <path d="M26,3 h4 v1 h-4 z M25,4 h6 v1 h-6 z M11,5 h7 v1 h-7 z M26,5 h4 v1 h-4 z M10,6 h9 v1 h-9 z M8,7 h13 v1 h-13 z M5,8 h17 v1 h-17 z M4,9 h20 v1 h-20 z M4,10 h7 v1 h-7 z M12,10 h12 v1 h-12 z M3,11 h21 v1 h-21 z M4,12 h13 v1 h-13 z M18,12 h6 v1 h-6 z M3,13 h21 v1 h-21 z M3,14 h5 v1 h-5 z M9,14 h12 v1 h-12 z M22,14 h2 v1 h-2 z M2,15 h26 v1 h-26 z M3,16 h11 v1 h-11 z M15,16 h12 v1 h-12 z M3,17 h1 v1 h-1 z M26,17 h1 v1 h-1 z" fill="#f5f5f5" />
-    <path d="M11,10 h1 v1 h-1 z M17,12 h1 v1 h-1 z M8,14 h1 v1 h-1 z M21,14 h1 v1 h-1 z M14,16 h1 v1 h-1 z M4,17 h22 v2 h-22 z M4,19 h3 v1 h-3 z M10,19 h2 v1 h-2 z M15,19 h4 v1 h-4 z M22,19 h2 v1 h-2 z" fill="#e0e0e0" />
-    {/* Face & legs */}
-    <path d="M25,5 h1 v1 h-1 z M24,6 h7 v1 h-7 z M25,7 h6 v1 h-6 z M25,8 h2 v1 h-2 z M29,8 h2 v1 h-2 z M24,9 h3 v1 h-3 z M28,9 h4 v1 h-4 z M24,10 h8 v3 h-8 z M7,19 h2 v5 h-2 z M12,19 h2 v5 h-2 z M19,19 h2 v5 h-2 z M24,19 h2 v5 h-2 z" fill="#212121" />
-    <path d="M22,7 h3 v2 h-3 z M24,13 h7 v2 h-7 z M9,19 h1 v5 h-1 z M14,19 h1 v5 h-1 z M21,19 h1 v5 h-1 z M26,19 h1 v5 h-1 z" fill="#424242" />
-    <path d="M27,8 h2 v1 h-2 z M27,9 h1 v1 h-1 z" fill="#ffffff" />
-  </svg>
-));
-
-const GoatSprite = React.memo(() => (
-  <svg viewBox="0 0 32 28" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Coat */}
-    <path d="M5,7 h16 v2 h-16 z M5,9 h17 v1 h-17 z" fill="#f5f5f5" />
-    <path d="M23,5 h1 v1 h-1 z M26,5 h2 v1 h-2 z M22,6 h8 v1 h-8 z M2,7 h1 v1 h-1 z M23,7 h7 v1 h-7 z M3,8 h2 v2 h-2 z M23,8 h2 v1 h-2 z M27,8 h3 v2 h-3 z M22,9 h3 v1 h-3 z M4,10 h23 v4 h-23 z M4,14 h26 v1 h-26 z M4,15 h20 v2 h-20 z" fill="#e0e0e0" />
-    <path d="M21,7 h2 v2 h-2 z M27,10 h5 v1 h-5 z M27,11 h4 v1 h-4 z M27,12 h5 v2 h-5 z M26,15 h2 v3 h-2 z M4,17 h20 v3 h-20 z M27,18 h1 v1 h-1 z M6,20 h3 v6 h-3 z M11,20 h3 v6 h-3 z M17,20 h3 v6 h-3 z M22,20 h3 v6 h-3 z" fill="#bdbdbd" />
-    {/* Horns & hooves */}
-    <path d="M25,2 h1 v1 h-1 z M28,2 h1 v1 h-1 z M24,3 h2 v3 h-2 z M28,3 h2 v3 h-2 z M31,11 h1 v1 h-1 z M6,26 h3 v2 h-3 z M11,26 h3 v2 h-3 z M17,26 h3 v2 h-3 z M22,26 h3 v2 h-3 z" fill="#9e9e9e" />
-    {/* Eye */}
-    <path d="M26,8 h1 v1 h-1 z M25,9 h2 v1 h-2 z" fill="#212121" />
-    <path d="M25,8 h1 v1 h-1 z" fill="#ffffff" />
-  </svg>
-));
-
-const PondSprite = React.memo(() => (
-  <svg viewBox="0 0 80 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Water */}
-    <path d="M31,3 h18 v1 h-18 z M25,4 h1 v1 h-1 z M54,4 h1 v1 h-1 z M21,5 h1 v1 h-1 z M58,5 h1 v1 h-1 z M18,6 h1 v1 h-1 z M61,6 h1 v1 h-1 z M16,7 h1 v1 h-1 z M63,7 h1 v1 h-1 z M13,8 h1 v1 h-1 z M66,8 h1 v1 h-1 z M12,9 h1 v1 h-1 z M67,9 h1 v1 h-1 z M10,10 h1 v1 h-1 z M9,11 h1 v1 h-1 z M8,12 h1 v1 h-1 z M71,12 h1 v1 h-1 z M7,13 h1 v1 h-1 z M72,13 h1 v1 h-1 z M6,14 h1 v1 h-1 z M5,15 h1 v2 h-1 z M4,17 h1 v6 h-1 z M75,18 h1 v5 h-1 z M5,23 h1 v2 h-1 z M6,25 h1 v1 h-1 z M73,25 h1 v1 h-1 z M7,26 h1 v1 h-1 z M72,26 h1 v1 h-1 z M8,27 h1 v1 h-1 z M71,27 h1 v1 h-1 z M9,28 h1 v1 h-1 z M10,29 h1 v1 h-1 z M69,29 h1 v1 h-1 z M12,30 h1 v1 h-1 z M67,30 h1 v1 h-1 z M13,31 h1 v1 h-1 z M16,32 h1 v1 h-1 z M63,32 h1 v1 h-1 z M18,33 h1 v1 h-1 z M61,33 h1 v1 h-1 z M21,34 h1 v1 h-1 z M58,34 h1 v1 h-1 z M25,35 h1 v1 h-1 z M54,35 h1 v1 h-1 z M31,36 h18 v1 h-18 z" fill="#0288d1" />
-    <path d="M26,4 h28 v1 h-28 z M22,5 h36 v1 h-36 z M19,6 h2 v1 h-2 z M43,6 h18 v1 h-18 z M17,7 h2 v1 h-2 z M37,7 h26 v1 h-26 z M14,8 h2 v1 h-2 z M30,8 h36 v1 h-36 z M13,9 h2 v1 h-2 z M25,9 h41 v1 h-41 z M11,10 h54 v1 h-54 z M68,10 h1 v2 h-1 z M10,11 h55 v1 h-55 z M9,12 h56 v1 h-56 z M68,12 h2 v3 h-2 z M8,13 h57 v1 h-57 z M71,13 h1 v1 h-1 z M7,14 h23 v1 h-23 z M40,14 h25 v1 h-25 z M71,14 h2 v4 h-2 z M6,15 h60 v2 h-60 z M67,15 h3 v5 h-3 z M5,17 h15 v1 h-15 z M21,17 h45 v1 h-45 z M5,18 h14 v1 h-14 z M22,18 h44 v1 h-44 z M71,18 h3 v7 h-3 z M5,19 h15 v1 h-15 z M21,19 h45 v1 h-45 z M5,20 h8 v3 h-8 z M68,20 h2 v3 h-2 z M6,23 h8 v2 h-8 z M67,23 h3 v6 h-3 z M7,25 h8 v1 h-8 z M71,25 h2 v1 h-2 z M8,26 h8 v1 h-8 z M65,26 h1 v1 h-1 z M71,26 h1 v1 h-1 z M9,27 h8 v1 h-8 z M64,27 h2 v1 h-2 z M10,28 h8 v1 h-8 z M63,28 h3 v1 h-3 z M11,29 h8 v1 h-8 z M62,29 h4 v1 h-4 z M67,29 h2 v1 h-2 z M13,30 h8 v1 h-8 z M60,30 h6 v1 h-6 z M14,31 h8 v1 h-8 z M59,31 h7 v1 h-7 z M17,32 h8 v1 h-8 z M56,32 h7 v1 h-7 z M19,33 h8 v1 h-8 z M54,33 h7 v1 h-7 z M22,34 h36 v1 h-36 z M26,35 h28 v1 h-28 z" fill="#4fc3f7" />
-    <path d="M13,20 h5 v1 h-5 z M22,20 h28 v1 h-28 z M55,20 h11 v1 h-11 z M67,20 h1 v3 h-1 z M13,21 h4 v2 h-4 z M23,21 h26 v2 h-26 z M56,21 h10 v3 h-10 z M20,22 h1 v1 h-1 z M14,23 h4 v1 h-4 z M23,23 h27 v1 h-27 z M53,23 h1 v1 h-1 z M14,24 h37 v1 h-37 z M54,24 h12 v1 h-12 z M15,25 h51 v1 h-51 z M16,26 h49 v1 h-49 z M17,27 h47 v1 h-47 z M18,28 h45 v1 h-45 z M19,29 h43 v1 h-43 z M21,30 h31 v1 h-31 z M59,30 h1 v1 h-1 z M22,31 h37 v1 h-37 z M25,32 h31 v1 h-31 z M27,33 h27 v1 h-27 z" fill="#29b6f6" />
-    <path d="M21,6 h22 v1 h-22 z M19,7 h18 v1 h-18 z M16,8 h14 v1 h-14 z M15,9 h10 v1 h-10 z" fill="#81d4fa" />
-    <path d="M30,14 h10 v1 h-10 z M52,30 h7 v1 h-7 z" fill="#e1f5fe" />
-    {/* Lily pads & cattails */}
-    <path d="M18,20 h4 v1 h-4 z M50,20 h5 v1 h-5 z M17,21 h1 v1 h-1 z M19,21 h4 v1 h-4 z M49,21 h1 v1 h-1 z M51,21 h5 v1 h-5 z M17,22 h3 v1 h-3 z M21,22 h2 v1 h-2 z M49,22 h5 v1 h-5 z M55,22 h1 v1 h-1 z M18,23 h5 v1 h-5 z M50,23 h3 v1 h-3 z M54,23 h2 v1 h-2 z M51,24 h3 v1 h-3 z" fill="#4caf50" />
-    <path d="M18,21 h1 v1 h-1 z M50,21 h1 v1 h-1 z M54,22 h1 v1 h-1 z" fill="#81c784" />
-    <path d="M20,17 h1 v1 h-1 z M19,18 h1 v1 h-1 z M21,18 h1 v1 h-1 z M20,19 h1 v1 h-1 z" fill="#f48fb1" />
-    <path d="M20,18 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M70,6 h1 v1 h-1 z M66,9 h1 v1 h-1 z M70,12 h1 v23 h-1 z M74,12 h1 v1 h-1 z M66,15 h1 v20 h-1 z M74,18 h1 v17 h-1 z" fill="#558b2f" />
-    <path d="M69,7 h3 v5 h-3 z M65,10 h3 v5 h-3 z M73,13 h3 v5 h-3 z" fill="#5d4037" />
-    {/* Ripples */}
-    <g className="animate-pond-ripple-1">
-      <path d="M42,24 h4 v1 h-4 z M41,25 h1 v1 h-1 z M46,25 h1 v1 h-1 z M42,26 h4 v1 h-4 z" fill="#e1f5fe" opacity="0.7" />
-    </g>
-    <g className="animate-pond-ripple-2">
-      <path d="M58,11 h4 v1 h-4 z M57,12 h1 v1 h-1 z M62,12 h1 v1 h-1 z M58,13 h4 v1 h-4 z" fill="#e1f5fe" opacity="0.7" />
-    </g>
-    <g className="animate-pond-ripple-3">
-      <path d="M16,30 h4 v1 h-4 z M15,31 h1 v1 h-1 z M20,31 h1 v1 h-1 z M16,32 h4 v1 h-4 z" fill="#e1f5fe" opacity="0.7" />
-    </g>
-  </svg>
-));
-
-const FrogSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <g className="frog-sit">
-      {/* Frog */}
-      <path d="M9,12 h14 v2 h-14 z" fill="#66bb6a" />
-      <path d="M10,8 h4 v1 h-4 z M18,8 h4 v1 h-4 z M10,9 h1 v2 h-1 z M13,9 h1 v2 h-1 z M18,9 h1 v2 h-1 z M21,9 h1 v2 h-1 z M9,11 h14 v1 h-14 z M8,12 h1 v2 h-1 z M23,12 h1 v2 h-1 z M8,14 h6 v1 h-6 z M15,14 h9 v1 h-9 z M8,15 h10 v1 h-10 z M19,15 h5 v1 h-5 z M9,16 h3 v1 h-3 z M20,16 h3 v1 h-3 z M9,17 h1 v3 h-1 z M22,17 h1 v3 h-1 z" fill="#4caf50" />
-      <path d="M14,14 h1 v1 h-1 z M18,15 h1 v1 h-1 z M5,16 h4 v3 h-4 z M12,16 h8 v1 h-8 z M23,16 h4 v3 h-4 z" fill="#388e3c" />
-      <path d="M3,19 h6 v1 h-6 z M23,19 h6 v1 h-6 z" fill="#2e7d32" />
-      <path d="M10,17 h12 v3 h-12 z" fill="#c5e1a5" />
-      <path d="M11,9 h2 v1 h-2 z M19,9 h2 v1 h-2 z M11,10 h1 v1 h-1 z M20,10 h1 v1 h-1 z" fill="#ffffff" />
-      <path d="M12,10 h1 v1 h-1 z M19,10 h1 v1 h-1 z" fill="#212121" />
-    </g>
-    <g className="frog-leap">
-      {/* Frog */}
-      <path d="M9,8 h14 v2 h-14 z" fill="#66bb6a" />
-      <path d="M9,4 h4 v1 h-4 z M17,4 h4 v1 h-4 z M9,5 h1 v2 h-1 z M12,5 h1 v2 h-1 z M17,5 h1 v2 h-1 z M20,5 h1 v2 h-1 z M9,7 h14 v1 h-14 z M8,8 h1 v2 h-1 z M23,8 h1 v2 h-1 z M8,10 h16 v2 h-16 z M9,12 h3 v1 h-3 z M20,12 h4 v1 h-4 z M9,13 h1 v1 h-1 z M22,13 h2 v3 h-2 z M8,14 h2 v2 h-2 z" fill="#4caf50" />
-      <path d="M7,12 h2 v1 h-2 z M12,12 h8 v1 h-8 z M6,13 h3 v1 h-3 z M24,13 h2 v1 h-2 z M5,14 h3 v1 h-3 z M24,14 h3 v1 h-3 z M4,15 h3 v1 h-3 z M25,15 h3 v1 h-3 z M3,16 h3 v1 h-3 z M26,16 h3 v1 h-3 z M4,17 h1 v1 h-1 z M27,17 h3 v1 h-3 z" fill="#388e3c" />
-      <path d="M0,17 h4 v2 h-4 z M28,18 h4 v2 h-4 z" fill="#2e7d32" />
-      <path d="M10,13 h12 v3 h-12 z" fill="#c5e1a5" />
-      <path d="M10,5 h2 v1 h-2 z M18,5 h2 v1 h-2 z M10,6 h1 v1 h-1 z M19,6 h1 v1 h-1 z" fill="#ffffff" />
-      <path d="M11,6 h1 v1 h-1 z M18,6 h1 v1 h-1 z" fill="#212121" />
-    </g>
-  </svg>
-));
-
-const RabbitSprite = React.memo(() => (
-  <svg viewBox="0 0 40 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Fur */}
-    <path d="M24,2 h1 v1 h-1 z M24,9 h7 v1 h-7 z M7,13 h13 v1 h-13 z M7,14 h15 v2 h-15 z" fill="#bdbdbd" />
-    <path d="M25,2 h3 v1 h-3 z M24,3 h1 v6 h-1 z M27,3 h1 v6 h-1 z M20,4 h1 v1 h-1 z M24,10 h8 v2 h-8 z M24,12 h4 v2 h-4 z M30,12 h2 v2 h-2 z M6,14 h1 v2 h-1 z M22,14 h2 v2 h-2 z M6,16 h18 v3 h-18 z M6,19 h2 v5 h-2 z M22,19 h2 v3 h-2 z M7,24 h1 v2 h-1 z M22,26 h4 v4 h-4 z" fill="#9e9e9e" />
-    <path d="M21,4 h3 v1 h-3 z M20,5 h1 v7 h-1 z M23,5 h1 v7 h-1 z M20,12 h4 v2 h-4 z M3,24 h4 v3 h-4 z M8,26 h4 v4 h-4 z M5,27 h2 v1 h-2 z" fill="#757575" />
-    <path d="M28,12 h1 v1 h-1 z M24,14 h8 v1 h-8 z M24,15 h7 v1 h-7 z M3,16 h3 v1 h-3 z M24,16 h8 v6 h-8 z M2,17 h4 v1 h-4 z M1,18 h5 v4 h-5 z M8,19 h14 v3 h-14 z M2,22 h4 v1 h-4 z M8,22 h18 v4 h-18 z M3,23 h1 v1 h-1 z M5,23 h1 v1 h-1 z M2,27 h3 v2 h-3 z M8,30 h5 v2 h-5 z M22,30 h5 v2 h-5 z" fill="#ffffff" />
-    <path d="M4,23 h1 v1 h-1 z" fill="#e0e0e0" />
-    {/* Ears & nose */}
-    <path d="M25,3 h2 v6 h-2 z M21,5 h2 v7 h-2 z M31,15 h1 v1 h-1 z M32,16 h2 v1 h-2 z" fill="#f48fb1" />
-    {/* Eye */}
-    <path d="M29,12 h1 v1 h-1 z M28,13 h2 v1 h-2 z" fill="#212121" />
-  </svg>
-));
-
-const CatSprite = React.memo(() => (
-  <svg viewBox="0 0 28 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Fur */}
-    <path d="M1,3 h2 v1 h-2 z M22,4 h4 v1 h-4 z M20,5 h3 v2 h-3 z M25,5 h3 v2 h-3 z M20,7 h2 v2 h-2 z M24,7 h2 v2 h-2 z M5,9 h3 v1 h-3 z M10,9 h3 v4 h-3 z M15,9 h3 v4 h-3 z M20,9 h8 v1 h-8 z M4,10 h4 v3 h-4 z M20,10 h4 v3 h-4 z M4,13 h24 v1 h-24 z M4,14 h18 v2 h-18 z M4,16 h2 v2 h-2 z M20,16 h2 v2 h-2 z M6,18 h3 v5 h-3 z M11,18 h3 v5 h-3 z M17,18 h3 v5 h-3 z M21,18 h3 v5 h-3 z" fill="#ffb74d" />
-    <path d="M20,1 h1 v1 h-1 z M27,1 h1 v1 h-1 z M20,2 h2 v1 h-2 z M26,2 h2 v1 h-2 z M20,3 h1 v1 h-1 z M27,3 h1 v1 h-1 z M1,4 h1 v3 h-1 z M20,4 h2 v1 h-2 z M26,4 h2 v1 h-2 z M23,5 h2 v2 h-2 z M2,7 h1 v3 h-1 z M8,9 h2 v4 h-2 z M13,9 h2 v4 h-2 z M18,9 h2 v4 h-2 z M3,10 h1 v2 h-1 z" fill="#fb8c00" />
-    <path d="M24,10 h1 v1 h-1 z M26,10 h2 v1 h-2 z M24,11 h4 v2 h-4 z M6,16 h14 v2 h-14 z M6,23 h3 v1 h-3 z M11,23 h3 v1 h-3 z M17,23 h3 v1 h-3 z M21,23 h3 v1 h-3 z" fill="#ffe0b2" />
-    {/* Ears & nose */}
-    <path d="M21,3 h1 v1 h-1 z M26,3 h1 v1 h-1 z M25,10 h1 v1 h-1 z" fill="#f48fb1" />
-    {/* Eyes */}
-    <path d="M22,7 h2 v1 h-2 z M26,7 h2 v1 h-2 z M22,8 h1 v1 h-1 z M26,8 h1 v1 h-1 z" fill="#43a047" />
-    <path d="M23,8 h1 v1 h-1 z M27,8 h1 v1 h-1 z" fill="#212121" />
-  </svg>
-));
-
-const DogSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Fur */}
-    <path d="M5,8 h17 v1 h-17 z M27,8 h3 v2 h-3 z M5,9 h16 v1 h-16 z M27,10 h5 v2 h-5 z M27,12 h1 v1 h-1 z M31,12 h1 v1 h-1 z" fill="#a1887f" />
-    <path d="M23,2 h8 v1 h-8 z M22,3 h10 v1 h-10 z M25,4 h7 v1 h-7 z M25,5 h1 v2 h-1 z M28,5 h4 v2 h-4 z M5,7 h17 v1 h-17 z M25,7 h7 v1 h-7 z M4,8 h1 v2 h-1 z M25,8 h2 v4 h-2 z M4,10 h17 v6 h-17 z M22,12 h1 v1 h-1 z M24,12 h3 v1 h-3 z M22,13 h7 v1 h-7 z M30,13 h2 v1 h-2 z M6,18 h4 v5 h-4 z M12,18 h4 v5 h-4 z M18,18 h4 v5 h-4 z M23,18 h4 v5 h-4 z" fill="#8d6e63" />
-    <path d="M1,4 h2 v2 h-2 z M22,4 h3 v8 h-3 z M2,6 h1 v3 h-1 z M3,9 h1 v2 h-1 z M23,12 h1 v1 h-1 z M28,12 h3 v1 h-3 z M4,16 h17 v1 h-17 z M4,17 h20 v1 h-20 z M6,23 h4 v1 h-4 z M12,23 h4 v1 h-4 z M18,23 h4 v1 h-4 z M23,23 h4 v1 h-4 z" fill="#5d4037" />
-    {/* Collar */}
-    <path d="M21,9 h1 v5 h-1 z M21,14 h3 v3 h-3 z" fill="#e53935" />
-    {/* Face */}
-    <path d="M27,5 h1 v1 h-1 z M26,6 h2 v1 h-2 z M30,8 h2 v2 h-2 z" fill="#212121" />
-    <path d="M26,5 h1 v1 h-1 z" fill="#ffffff" />
-    <path d="M29,13 h1 v1 h-1 z" fill="#f48fb1" />
-  </svg>
-));
-
-const SkeletonCowSprite = React.memo(() => (
-  <svg viewBox="0 0 48 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M3,4 h8 v1 h-8 z M2,5 h10 v2 h-10 z M2,7 h2 v2 h-2 z M6,7 h2 v2 h-2 z M10,7 h2 v1 h-2 z M10,8 h34 v1 h-34 z M2,9 h10 v2 h-10 z M15,10 h1 v9 h-1 z M19,10 h1 v9 h-1 z M23,10 h1 v9 h-1 z M27,10 h1 v9 h-1 z M31,10 h1 v9 h-1 z M35,10 h1 v9 h-1 z M38,10 h6 v4 h-6 z M2,11 h5 v1 h-5 z M8,11 h4 v1 h-4 z M2,12 h10 v2 h-10 z M2,14 h1 v1 h-1 z M4,14 h1 v1 h-1 z M6,14 h1 v1 h-1 z M8,14 h1 v1 h-1 z M10,14 h2 v1 h-2 z M9,23 h1 v8 h-1 z M17,23 h1 v8 h-1 z M33,23 h1 v8 h-1 z M41,23 h1 v8 h-1 z" fill="#ffffff" />
-    <path d="M12,9 h32 v1 h-32 z M44,10 h1 v1 h-1 z M45,12 h1 v1 h-1 z M3,14 h1 v1 h-1 z M5,14 h1 v1 h-1 z M7,14 h1 v1 h-1 z M9,14 h1 v1 h-1 z M38,14 h6 v1 h-6 z M45,14 h1 v1 h-1 z M2,15 h10 v1 h-10 z M46,16 h1 v1 h-1 z M46,18 h1 v1 h-1 z M16,19 h1 v1 h-1 z M20,19 h1 v1 h-1 z M24,19 h1 v1 h-1 z M28,19 h1 v1 h-1 z M32,19 h1 v1 h-1 z M36,19 h1 v1 h-1 z M12,20 h32 v1 h-32 z M8,22 h4 v1 h-4 z M16,22 h4 v1 h-4 z M32,22 h4 v1 h-4 z M40,22 h4 v1 h-4 z M10,23 h1 v8 h-1 z M18,23 h1 v8 h-1 z M34,23 h1 v8 h-1 z M42,23 h1 v8 h-1 z M8,31 h4 v1 h-4 z M16,31 h4 v1 h-4 z M32,31 h4 v1 h-4 z M40,31 h4 v1 h-4 z" fill="#e0e0e0" />
-    <path d="M3,2 h2 v2 h-2 z M9,2 h2 v2 h-2 z" fill="#9e9e9e" />
-    {/* Eye sockets */}
-    <path d="M4,7 h2 v2 h-2 z M8,7 h2 v2 h-2 z M7,11 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonPigSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M24,6 h7 v1 h-7 z M23,7 h9 v1 h-9 z M4,8 h21 v1 h-21 z M27,8 h2 v2 h-2 z M31,8 h1 v2 h-1 z M23,9 h2 v1 h-2 z M6,10 h1 v6 h-1 z M9,10 h1 v6 h-1 z M12,10 h1 v6 h-1 z M15,10 h1 v6 h-1 z M18,10 h1 v6 h-1 z M21,10 h1 v6 h-1 z M23,10 h9 v2 h-9 z M23,12 h7 v1 h-7 z M31,12 h1 v1 h-1 z M23,13 h9 v1 h-9 z M23,14 h1 v1 h-1 z M25,14 h1 v1 h-1 z M27,14 h1 v1 h-1 z M29,14 h3 v1 h-3 z M5,18 h1 v5 h-1 z M11,18 h1 v5 h-1 z M19,18 h1 v5 h-1 z M25,18 h1 v5 h-1 z" fill="#ffffff" />
-    <path d="M2,9 h1 v1 h-1 z M4,9 h19 v1 h-19 z M1,10 h1 v1 h-1 z M2,11 h1 v1 h-1 z M24,14 h1 v1 h-1 z M26,14 h1 v1 h-1 z M28,14 h1 v1 h-1 z M23,15 h9 v1 h-9 z M4,16 h22 v1 h-22 z M4,17 h4 v1 h-4 z M10,17 h4 v1 h-4 z M18,17 h4 v1 h-4 z M24,17 h4 v1 h-4 z M6,18 h1 v5 h-1 z M12,18 h1 v5 h-1 z M20,18 h1 v5 h-1 z M26,18 h1 v5 h-1 z M4,23 h4 v1 h-4 z M10,23 h4 v1 h-4 z M18,23 h4 v1 h-4 z M24,23 h4 v1 h-4 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M25,8 h2 v2 h-2 z M29,8 h2 v2 h-2 z M30,12 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonSheepSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M25,5 h6 v1 h-6 z M24,6 h8 v1 h-8 z M5,7 h21 v1 h-21 z M28,7 h4 v1 h-4 z M24,8 h2 v1 h-2 z M28,8 h1 v1 h-1 z M31,8 h1 v2 h-1 z M7,9 h1 v6 h-1 z M10,9 h1 v6 h-1 z M13,9 h1 v6 h-1 z M16,9 h1 v6 h-1 z M19,9 h1 v6 h-1 z M22,9 h1 v6 h-1 z M24,9 h5 v1 h-5 z M24,10 h8 v2 h-8 z M24,12 h6 v1 h-6 z M31,12 h1 v1 h-1 z M24,13 h8 v1 h-8 z M7,17 h1 v6 h-1 z M12,17 h1 v6 h-1 z M19,17 h1 v6 h-1 z M24,17 h1 v6 h-1 z" fill="#ffffff" />
-    <path d="M3,8 h1 v1 h-1 z M5,8 h19 v1 h-19 z M2,10 h1 v1 h-1 z M24,14 h8 v1 h-8 z M5,15 h22 v1 h-22 z M6,16 h4 v1 h-4 z M11,16 h4 v1 h-4 z M18,16 h4 v1 h-4 z M23,16 h4 v1 h-4 z M8,17 h1 v6 h-1 z M13,17 h1 v6 h-1 z M20,17 h1 v6 h-1 z M25,17 h1 v6 h-1 z M6,23 h4 v1 h-4 z M11,23 h4 v1 h-4 z M18,23 h4 v1 h-4 z M23,23 h4 v1 h-4 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M26,7 h2 v2 h-2 z M29,8 h2 v2 h-2 z M30,12 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonGoatSprite = React.memo(() => (
-  <svg viewBox="0 0 32 28" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M23,6 h8 v1 h-8 z M22,7 h10 v1 h-10 z M5,8 h20 v1 h-20 z M27,8 h5 v1 h-5 z M22,9 h3 v1 h-3 z M27,9 h2 v1 h-2 z M31,9 h1 v2 h-1 z M7,10 h1 v7 h-1 z M10,10 h1 v7 h-1 z M13,10 h1 v7 h-1 z M16,10 h1 v7 h-1 z M19,10 h1 v7 h-1 z M22,10 h7 v1 h-7 z M22,11 h10 v1 h-10 z M22,12 h8 v1 h-8 z M31,12 h1 v1 h-1 z M22,13 h10 v1 h-10 z M6,19 h1 v8 h-1 z M11,19 h1 v8 h-1 z M17,19 h1 v8 h-1 z M22,19 h1 v8 h-1 z" fill="#ffffff" />
-    <path d="M2,7 h1 v1 h-1 z M3,8 h1 v1 h-1 z M5,9 h17 v1 h-17 z M22,14 h10 v1 h-10 z M26,15 h2 v3 h-2 z M5,17 h20 v1 h-20 z M5,18 h4 v1 h-4 z M10,18 h4 v1 h-4 z M16,18 h4 v1 h-4 z M21,18 h4 v1 h-4 z M7,19 h1 v8 h-1 z M12,19 h1 v8 h-1 z M18,19 h1 v8 h-1 z M23,19 h1 v8 h-1 z M5,27 h4 v1 h-4 z M10,27 h4 v1 h-4 z M16,27 h4 v1 h-4 z M21,27 h4 v1 h-4 z" fill="#e0e0e0" />
-    <path d="M24,2 h2 v4 h-2 z M28,2 h2 v4 h-2 z" fill="#9e9e9e" />
-    {/* Eye sockets */}
-    <path d="M25,8 h2 v2 h-2 z M29,9 h2 v2 h-2 z M30,12 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonChickenSprite = React.memo(() => (
-  <svg viewBox="0 0 20 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M14,3 h4 v1 h-4 z M13,4 h6 v1 h-6 z M13,5 h2 v2 h-2 z M17,5 h2 v2 h-2 z M13,7 h6 v1 h-6 z M4,9 h10 v1 h-10 z M6,11 h1 v3 h-1 z M9,11 h1 v3 h-1 z M12,11 h1 v3 h-1 z M7,16 h1 v3 h-1 z M12,16 h1 v3 h-1 z" fill="#ffffff" />
-    <path d="M1,6 h1 v1 h-1 z M19,6 h1 v1 h-1 z M2,7 h1 v1 h-1 z M13,8 h6 v1 h-6 z M2,9 h1 v1 h-1 z M4,10 h10 v1 h-10 z M4,14 h10 v1 h-10 z M6,15 h4 v1 h-4 z M11,15 h4 v1 h-4 z M8,16 h1 v3 h-1 z M13,16 h1 v3 h-1 z M6,19 h4 v1 h-4 z M11,19 h4 v1 h-4 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M15,5 h2 v2 h-2 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonRoosterSprite = React.memo(() => (
-  <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M17,6 h5 v1 h-5 z M16,7 h7 v1 h-7 z M16,8 h2 v2 h-2 z M20,8 h3 v2 h-3 z M16,10 h7 v2 h-7 z M6,12 h10 v1 h-10 z M8,14 h1 v4 h-1 z M11,14 h1 v4 h-1 z M14,14 h1 v4 h-1 z M10,20 h1 v3 h-1 z M15,20 h1 v3 h-1 z" fill="#ffffff" />
-    <path d="M17,3 h4 v2 h-4 z M2,4 h1 v1 h-1 z M1,5 h1 v1 h-1 z M3,6 h1 v1 h-1 z M2,7 h1 v1 h-1 z M4,8 h1 v1 h-1 z M3,9 h1 v1 h-1 z M23,9 h1 v1 h-1 z M5,10 h1 v1 h-1 z M4,11 h1 v1 h-1 z M16,12 h7 v1 h-7 z M6,13 h11 v1 h-11 z M6,18 h10 v1 h-10 z M9,19 h4 v1 h-4 z M14,19 h4 v1 h-4 z M11,20 h1 v3 h-1 z M16,20 h1 v3 h-1 z M9,23 h4 v1 h-4 z M14,23 h4 v1 h-4 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M18,8 h2 v2 h-2 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonChickSprite = React.memo(() => (
-  <svg viewBox="0 0 12 12" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M4,3 h5 v1 h-5 z M3,4 h7 v1 h-7 z M3,5 h4 v2 h-4 z M9,5 h1 v2 h-1 z M3,7 h7 v1 h-7 z" fill="#ffffff" />
-    <path d="M10,6 h1 v1 h-1 z M3,8 h7 v1 h-7 z M3,9 h2 v1 h-2 z M3,10 h7 v2 h-7 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M7,5 h2 v2 h-2 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonCatSprite = React.memo(() => (
-  <svg viewBox="0 0 28 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M20,2 h2 v3 h-2 z M26,2 h2 v3 h-2 z M21,5 h6 v1 h-6 z M20,6 h8 v1 h-8 z M20,7 h2 v2 h-2 z M24,7 h2 v2 h-2 z M4,9 h24 v1 h-24 z M20,10 h5 v1 h-5 z M26,10 h2 v1 h-2 z M6,11 h1 v4 h-1 z M9,11 h1 v4 h-1 z M12,11 h1 v4 h-1 z M15,11 h1 v4 h-1 z M18,11 h1 v4 h-1 z M20,11 h8 v1 h-8 z M7,17 h1 v6 h-1 z M12,17 h1 v6 h-1 z M18,17 h1 v6 h-1 z M22,17 h1 v6 h-1 z" fill="#ffffff" />
-    <path d="M1,4 h1 v1 h-1 z M2,6 h1 v1 h-1 z M2,8 h1 v1 h-1 z M3,10 h17 v1 h-17 z M20,12 h8 v1 h-8 z M4,15 h18 v1 h-18 z M6,16 h9 v1 h-9 z M16,16 h9 v1 h-9 z M8,17 h1 v6 h-1 z M13,17 h1 v6 h-1 z M19,17 h1 v6 h-1 z M23,17 h1 v6 h-1 z M6,23 h4 v1 h-4 z M11,23 h4 v1 h-4 z M17,23 h8 v1 h-8 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M22,7 h2 v2 h-2 z M26,7 h2 v2 h-2 z M25,10 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonDogSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Bones */}
-    <path d="M23,3 h8 v1 h-8 z M24,4 h8 v1 h-8 z M24,5 h1 v2 h-1 z M27,5 h5 v1 h-5 z M27,6 h2 v1 h-2 z M31,6 h1 v2 h-1 z M24,7 h5 v1 h-5 z M4,8 h18 v1 h-18 z M24,8 h8 v1 h-8 z M24,9 h6 v1 h-6 z M31,9 h1 v1 h-1 z M6,10 h1 v5 h-1 z M9,10 h1 v5 h-1 z M12,10 h1 v5 h-1 z M15,10 h1 v5 h-1 z M18,10 h1 v5 h-1 z M21,10 h1 v1 h-1 z M24,10 h8 v1 h-8 z M21,11 h11 v1 h-11 z M21,12 h1 v3 h-1 z M7,17 h1 v6 h-1 z M13,17 h1 v6 h-1 z M19,17 h1 v6 h-1 z M24,17 h1 v6 h-1 z" fill="#ffffff" />
-    <path d="M1,4 h1 v1 h-1 z M22,4 h2 v5 h-2 z M2,5 h1 v1 h-1 z M2,7 h1 v1 h-1 z M3,9 h21 v1 h-21 z M22,10 h2 v1 h-2 z M22,12 h10 v1 h-10 z M4,15 h20 v1 h-20 z M6,16 h5 v1 h-5 z M12,16 h5 v1 h-5 z M18,16 h9 v1 h-9 z M8,17 h1 v6 h-1 z M14,17 h1 v6 h-1 z M20,17 h1 v6 h-1 z M25,17 h1 v6 h-1 z M6,23 h4 v1 h-4 z M12,23 h4 v1 h-4 z M18,23 h4 v1 h-4 z M23,23 h4 v1 h-4 z" fill="#e0e0e0" />
-    {/* Eye sockets */}
-    <path d="M25,5 h2 v2 h-2 z M29,6 h2 v2 h-2 z M30,9 h1 v1 h-1 z" fill="#000000" />
-  </svg>
-));
-
-const SkeletonFrogSprite = React.memo(() => (
-  <svg viewBox="0 0 32 24" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    <g className="frog-sit">
-      {/* Bones */}
-      <path d="M10,8 h4 v1 h-4 z M18,8 h4 v1 h-4 z M10,9 h1 v2 h-1 z M13,9 h1 v2 h-1 z M18,9 h1 v2 h-1 z M21,9 h1 v2 h-1 z M10,11 h4 v1 h-4 z M18,11 h4 v1 h-4 z M8,12 h16 v1 h-16 z M10,14 h1 v4 h-1 z M13,14 h1 v4 h-1 z M16,14 h1 v4 h-1 z M19,14 h1 v4 h-1 z M22,14 h1 v2 h-1 z M5,16 h4 v2 h-4 z M22,16 h5 v2 h-5 z" fill="#ffffff" />
-      <path d="M8,13 h16 v1 h-16 z M11,18 h1 v1 h-1 z M14,18 h1 v1 h-1 z M17,18 h1 v1 h-1 z M20,18 h1 v1 h-1 z M23,18 h1 v1 h-1 z M3,19 h6 v1 h-6 z M23,19 h6 v1 h-6 z" fill="#e0e0e0" />
-      {/* Eye sockets */}
-      <path d="M11,9 h2 v2 h-2 z M19,9 h2 v2 h-2 z" fill="#000000" />
-    </g>
-    <g className="frog-leap">
-      {/* Bones */}
-      <path d="M10,4 h4 v1 h-4 z M18,4 h4 v1 h-4 z M10,5 h1 v2 h-1 z M13,5 h1 v2 h-1 z M18,5 h1 v2 h-1 z M21,5 h1 v2 h-1 z M10,7 h4 v1 h-4 z M18,7 h4 v1 h-4 z M8,8 h16 v1 h-16 z M10,10 h1 v4 h-1 z M13,10 h1 v4 h-1 z M16,10 h1 v4 h-1 z M19,10 h1 v4 h-1 z M22,10 h1 v4 h-1 z M7,12 h2 v1 h-2 z M6,13 h2 v1 h-2 z M24,13 h2 v1 h-2 z M5,14 h2 v1 h-2 z M25,14 h2 v1 h-2 z M4,15 h2 v1 h-2 z M26,15 h2 v1 h-2 z M3,16 h2 v1 h-2 z M27,16 h2 v1 h-2 z M28,17 h2 v1 h-2 z" fill="#ffffff" />
-      <path d="M8,9 h16 v1 h-16 z M11,14 h1 v1 h-1 z M14,14 h1 v1 h-1 z M17,14 h1 v1 h-1 z M20,14 h1 v1 h-1 z M23,14 h1 v1 h-1 z M0,17 h4 v1 h-4 z M28,18 h4 v1 h-4 z" fill="#e0e0e0" />
-      {/* Eye sockets */}
-      <path d="M11,5 h2 v2 h-2 z M19,5 h2 v2 h-2 z" fill="#000000" />
-    </g>
-  </svg>
-));
-
-const LocustSprite = React.memo(() => (
-  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
-    {/* Wing */}
-    <path d="M4,0 h4 v1 h-4 z M3,1 h6 v1 h-6 z M2,2 h9 v1 h-9 z M2,3 h11 v1 h-11 z M3,4 h11 v1 h-11 z" fill="#d7ccc8" opacity="0.8" />
-    {/* Body & legs */}
-    <path d="M2,5 h10 v1 h-10 z M1,6 h13 v1 h-13 z M1,7 h14 v1 h-14 z M4,8 h10 v1 h-10 z" fill="#5d4037" />
-    <path d="M12,5 h2 v1 h-2 z M1,8 h3 v1 h-3 z M14,8 h1 v1 h-1 z M4,9 h1 v1 h-1 z M7,9 h1 v2 h-1 z M10,9 h1 v3 h-1 z M13,9 h1 v1 h-1 z M3,10 h1 v2 h-1 z M14,10 h1 v2 h-1 z M6,11 h1 v1 h-1 z M2,12 h1 v1 h-1 z M6,12 h2 v1 h-2 z M11,12 h1 v1 h-1 z M15,12 h1 v1 h-1 z" fill="#4e342e" />
-    <path d="M1,5 h1 v1 h-1 z M0,6 h1 v2 h-1 z" fill="#8d6e63" />
-    <path d="M14,6 h1 v1 h-1 z" fill="#d84315" />
-  </svg>
-));
-
-const BareTreeSprite = React.memo(() => (
-  <svg viewBox="0 0 32 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dead tree */}
-    <path d="M14,17 h1 v2 h-1 z M13,19 h1 v6 h-1 z M12,25 h1 v10 h-1 z M11,35 h1 v1 h-1 z M10,36 h1 v1 h-1 z M9,37 h1 v1 h-1 z" fill="#5d4037" />
-    <path d="M18,0 h1 v2 h-1 z M10,1 h1 v1 h-1 z M11,2 h1 v2 h-1 z M17,2 h1 v4 h-1 z M28,2 h1 v2 h-1 z M12,4 h1 v2 h-1 z M27,4 h1 v2 h-1 z M22,5 h1 v2 h-1 z M13,6 h1 v2 h-1 z M16,6 h2 v3 h-2 z M26,6 h1 v2 h-1 z M23,7 h1 v2 h-1 z M14,8 h1 v1 h-1 z M25,8 h2 v1 h-2 z M14,9 h4 v1 h-4 z M24,9 h2 v2 h-2 z M15,10 h3 v3 h-3 z M24,11 h1 v1 h-1 z M23,12 h2 v1 h-2 z M14,13 h4 v4 h-4 z M22,13 h2 v1 h-2 z M4,14 h1 v2 h-1 z M21,14 h2 v1 h-2 z M8,15 h1 v2 h-1 z M20,15 h2 v1 h-2 z M5,16 h1 v2 h-1 z M19,16 h3 v1 h-3 z M7,17 h1 v1 h-1 z M15,17 h3 v2 h-3 z M19,17 h2 v2 h-2 z M6,18 h2 v2 h-2 z M14,19 h4 v6 h-4 z M19,19 h1 v1 h-1 z M7,20 h2 v1 h-2 z M8,21 h2 v1 h-2 z M9,22 h2 v1 h-2 z M10,23 h3 v1 h-3 z M11,24 h2 v1 h-2 z M13,25 h5 v10 h-5 z M12,35 h6 v1 h-6 z M11,36 h7 v1 h-7 z M10,37 h8 v1 h-8 z" fill="#4e342e" />
-    <path d="M18,17 h1 v21 h-1 z M8,38 h11 v1 h-11 z" fill="#3e2723" />
-  </svg>
-));
-
-const WiltedSunflowerSprite = React.memo(() => (
-  <svg viewBox="0 0 24 48" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dead stem & leaves */}
-    <path d="M12,18 h2 v3 h-2 z M11,21 h1 v1 h-1 z M10,22 h1 v1 h-1 z M9,23 h1 v1 h-1 z M8,24 h1 v1 h-1 z M7,25 h1 v2 h-1 z M8,27 h1 v2 h-1 z M9,29 h1 v2 h-1 z M10,31 h1 v2 h-1 z M11,33 h1 v15 h-1 z" fill="#5d4037" />
-    <path d="M12,21 h1 v1 h-1 z M11,22 h1 v1 h-1 z M10,23 h1 v1 h-1 z M9,24 h1 v1 h-1 z M8,25 h1 v2 h-1 z M9,27 h1 v2 h-1 z M10,29 h1 v2 h-1 z M11,31 h1 v2 h-1 z M12,33 h1 v9 h-1 z M5,36 h2 v1 h-2 z M4,37 h3 v1 h-3 z M3,38 h7 v1 h-7 z M5,39 h4 v1 h-4 z M14,40 h2 v1 h-2 z M14,41 h3 v1 h-3 z M12,42 h7 v1 h-7 z M12,43 h1 v5 h-1 z M14,43 h3 v1 h-3 z" fill="#4e342e" />
-    {/* Drooping head */}
-    <path d="M2,14 h8 v1 h-8 z M1,15 h2 v1 h-2 z M9,15 h2 v1 h-2 z M0,16 h2 v1 h-2 z M10,16 h2 v1 h-2 z M0,17 h1 v2 h-1 z M11,17 h1 v2 h-1 z M0,19 h2 v1 h-2 z M10,19 h2 v1 h-2 z M1,20 h2 v1 h-2 z M9,20 h2 v1 h-2 z M2,21 h9 v1 h-9 z M2,22 h1 v2 h-1 z M4,22 h1 v1 h-1 z M7,22 h1 v1 h-1 z M9,22 h1 v1 h-1 z M5,23 h1 v1 h-1 z M8,23 h1 v1 h-1 z M7,24 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M3,15 h1 v1 h-1 z M8,15 h1 v1 h-1 z M2,16 h1 v1 h-1 z M9,16 h1 v1 h-1 z M1,17 h1 v2 h-1 z M10,17 h1 v2 h-1 z M2,19 h1 v1 h-1 z M9,19 h1 v1 h-1 z M3,20 h1 v1 h-1 z M8,20 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M4,15 h4 v1 h-4 z M3,16 h6 v1 h-6 z M2,17 h8 v2 h-8 z M3,19 h6 v1 h-6 z M4,20 h4 v1 h-4 z" fill="#3e2723" />
-  </svg>
-));
-
-const WiltedZinniaSprite = React.memo(() => (
-  <svg viewBox="0 0 24 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dead stem & leaves */}
-    <path d="M9,9 h2 v2 h-2 z M9,11 h1 v2 h-1 z M8,13 h1 v1 h-1 z M9,14 h1 v1 h-1 z M10,15 h1 v1 h-1 z M11,16 h1 v16 h-1 z" fill="#5d4037" />
-    <path d="M10,11 h1 v2 h-1 z M9,13 h1 v1 h-1 z M10,14 h1 v1 h-1 z M11,15 h1 v1 h-1 z M12,16 h1 v9 h-1 z M5,20 h2 v1 h-2 z M4,21 h7 v1 h-7 z M6,22 h3 v1 h-3 z M14,24 h2 v1 h-2 z M12,25 h7 v1 h-7 z M12,26 h1 v6 h-1 z M14,26 h3 v1 h-3 z" fill="#4e342e" />
-    {/* Drooping head */}
-    <path d="M2,6 h6 v1 h-6 z M1,7 h1 v3 h-1 z M8,7 h1 v3 h-1 z M2,10 h6 v1 h-6 z M2,11 h1 v1 h-1 z M4,11 h1 v1 h-1 z M7,11 h1 v2 h-1 z" fill="#8d6e63" />
-    <path d="M2,7 h1 v1 h-1 z M7,7 h1 v1 h-1 z M2,9 h1 v1 h-1 z M7,9 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M3,7 h4 v1 h-4 z M2,8 h6 v1 h-6 z M3,9 h4 v1 h-4 z" fill="#3e2723" />
-  </svg>
-));
-
-const WiltedMarigoldSprite = React.memo(() => (
-  <svg viewBox="0 0 24 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dead stem & leaves */}
-    <path d="M13,9 h2 v2 h-2 z M13,11 h1 v3 h-1 z M12,14 h1 v2 h-1 z M11,16 h1 v16 h-1 z" fill="#5d4037" />
-    <path d="M14,11 h1 v3 h-1 z M13,14 h1 v2 h-1 z M12,16 h1 v5 h-1 z M14,20 h2 v1 h-2 z M12,21 h8 v1 h-8 z M12,22 h1 v10 h-1 z M15,22 h3 v1 h-3 z M5,24 h2 v1 h-2 z M4,25 h6 v1 h-6 z M6,26 h3 v1 h-3 z" fill="#4e342e" />
-    {/* Drooping head */}
-    <path d="M16,6 h6 v1 h-6 z M15,7 h1 v3 h-1 z M22,7 h1 v3 h-1 z M16,10 h6 v1 h-6 z M16,11 h1 v1 h-1 z M19,11 h1 v1 h-1 z M21,11 h1 v1 h-1 z M17,12 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M16,7 h1 v1 h-1 z M21,7 h1 v1 h-1 z M16,9 h1 v1 h-1 z M21,9 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M17,7 h4 v1 h-4 z M16,8 h6 v1 h-6 z M17,9 h4 v1 h-4 z" fill="#3e2723" />
-  </svg>
-));
-
-const WiltedLavenderSprite = React.memo(() => (
-  <svg viewBox="0 0 20 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Dead stem & leaves */}
-    <path d="M11,11 h1 v2 h-1 z M10,13 h1 v4 h-1 z M9,17 h1 v23 h-1 z" fill="#5d4037" />
-    <path d="M11,13 h1 v4 h-1 z M10,17 h1 v23 h-1 z M6,24 h1 v1 h-1 z M5,25 h2 v2 h-2 z M6,27 h1 v1 h-1 z M12,29 h1 v1 h-1 z M12,30 h2 v1 h-2 z M13,31 h2 v1 h-2 z M14,32 h1 v1 h-1 z" fill="#4e342e" />
-    {/* Dead spike */}
-    <path d="M15,5 h1 v2 h-1 z M14,7 h1 v2 h-1 z M16,7 h1 v2 h-1 z M13,9 h1 v3 h-1 z M15,9 h1 v3 h-1 z M14,12 h1 v2 h-1 z M16,12 h1 v1 h-1 z" fill="#8d6e63" />
-    <path d="M15,4 h1 v1 h-1 z M14,5 h1 v2 h-1 z M16,5 h1 v2 h-1 z M13,7 h1 v2 h-1 z M15,7 h1 v2 h-1 z M12,9 h1 v3 h-1 z M14,9 h1 v3 h-1 z M16,9 h1 v3 h-1 z M12,12 h2 v1 h-2 z M15,12 h1 v2 h-1 z M13,13 h1 v1 h-1 z M13,14 h3 v1 h-3 z M14,15 h1 v1 h-1 z" fill="#6d4c41" />
-  </svg>
-));
-
-const BarnSprite = React.memo(() => (
-  <svg viewBox="0 0 48 44" className="w-full h-full drop-shadow-lg" shapeRendering="crispEdges">
-    {/* Roof */}
-    <path d="M23,0 h2 v1 h-2 z M21,1 h2 v1 h-2 z M20,2 h2 v1 h-2 z M17,4 h2 v1 h-2 z M16,5 h2 v1 h-2 z M15,6 h2 v1 h-2 z M12,8 h2 v1 h-2 z M11,9 h2 v1 h-2 z M9,10 h2 v1 h-2 z M7,12 h2 v1 h-2 z M5,13 h2 v1 h-2 z M4,14 h2 v1 h-2 z M1,16 h2 v1 h-2 z M0,17 h2 v1 h-2 z" fill="#a52a2a" />
-    <path d="M23,1 h4 v1 h-4 z M22,2 h6 v1 h-6 z M19,4 h12 v1 h-12 z M18,5 h14 v1 h-14 z M17,6 h3 v1 h-3 z M28,6 h5 v1 h-5 z M14,8 h6 v1 h-6 z M28,8 h8 v1 h-8 z M13,9 h7 v1 h-7 z M28,9 h9 v1 h-9 z M11,10 h9 v1 h-9 z M28,10 h11 v1 h-11 z M9,12 h11 v1 h-11 z M28,12 h13 v1 h-13 z M7,13 h13 v1 h-13 z M28,13 h15 v1 h-15 z M6,14 h38 v1 h-38 z M3,16 h44 v1 h-44 z M2,17 h46 v1 h-46 z" fill="#8b1a1a" />
-    <path d="M19,3 h10 v1 h-10 z M13,7 h7 v1 h-7 z M28,7 h7 v1 h-7 z M8,11 h12 v1 h-12 z M28,11 h12 v1 h-12 z M3,15 h42 v1 h-42 z M0,18 h48 v1 h-48 z" fill="#6d1515" />
-    {/* Walls & trim */}
-    <path d="M6,20 h32 v3 h-32 z M6,24 h1 v3 h-1 z M13,24 h22 v3 h-22 z M6,28 h1 v1 h-1 z M13,28 h2 v1 h-2 z M33,28 h2 v1 h-2 z M6,29 h9 v2 h-9 z M33,29 h5 v2 h-5 z M6,32 h9 v3 h-9 z M33,32 h5 v3 h-5 z M6,36 h9 v3 h-9 z M33,36 h5 v3 h-5 z M6,40 h9 v3 h-9 z M33,40 h5 v3 h-5 z" fill="#c0392b" />
-    <path d="M38,20 h4 v3 h-4 z M41,24 h1 v3 h-1 z M41,28 h1 v1 h-1 z M38,29 h4 v2 h-4 z M38,32 h4 v3 h-4 z M38,36 h4 v3 h-4 z M38,40 h4 v3 h-4 z" fill="#922b21" />
-    <path d="M6,23 h1 v1 h-1 z M13,23 h22 v1 h-22 z M41,23 h1 v1 h-1 z M6,27 h1 v1 h-1 z M13,27 h2 v1 h-2 z M33,27 h2 v1 h-2 z M41,27 h1 v1 h-1 z M6,31 h9 v1 h-9 z M33,31 h9 v1 h-9 z M6,35 h9 v1 h-9 z M33,35 h9 v1 h-9 z M6,39 h9 v1 h-9 z M33,39 h9 v1 h-9 z" fill="#b03a2e" />
-    <path d="M20,6 h8 v1 h-8 z M20,7 h1 v6 h-1 z M27,7 h1 v6 h-1 z M20,13 h8 v1 h-8 z M4,19 h40 v1 h-40 z M4,20 h2 v23 h-2 z M42,20 h2 v23 h-2 z M7,23 h6 v1 h-6 z M35,23 h6 v1 h-6 z M7,24 h1 v2 h-1 z M10,24 h1 v2 h-1 z M12,24 h1 v2 h-1 z M35,24 h1 v2 h-1 z M38,24 h1 v2 h-1 z M40,24 h1 v2 h-1 z M7,26 h6 v1 h-6 z M35,26 h6 v1 h-6 z M7,27 h1 v1 h-1 z M10,27 h1 v1 h-1 z M12,27 h1 v1 h-1 z M15,27 h18 v1 h-18 z M35,27 h1 v1 h-1 z M38,27 h1 v1 h-1 z M40,27 h1 v1 h-1 z M7,28 h6 v1 h-6 z M15,28 h1 v15 h-1 z M23,28 h2 v13 h-2 z M32,28 h1 v15 h-1 z M35,28 h6 v1 h-6 z" fill="#f5f5f5" />
-    {/* Windows & hay */}
-    <path d="M23,7 h4 v1 h-4 z M21,8 h6 v2 h-6 z M21,10 h1 v1 h-1 z M24,10 h3 v1 h-3 z M9,24 h1 v1 h-1 z M11,24 h1 v2 h-1 z M37,24 h1 v1 h-1 z M39,24 h1 v2 h-1 z M8,25 h2 v1 h-2 z M36,25 h2 v1 h-2 z M8,27 h2 v1 h-2 z M11,27 h1 v1 h-1 z M36,27 h2 v1 h-2 z M39,27 h1 v1 h-1 z" fill="#87ceeb" />
-    <path d="M21,7 h2 v1 h-2 z M8,24 h1 v1 h-1 z M36,24 h1 v1 h-1 z" fill="#e1f5fe" />
-    <path d="M22,10 h2 v1 h-2 z M21,11 h6 v2 h-6 z" fill="#fdd835" />
-    {/* Door */}
-    <path d="M16,28 h7 v1 h-7 z M25,28 h7 v1 h-7 z M16,29 h1 v2 h-1 z M18,29 h4 v2 h-4 z M26,29 h4 v2 h-4 z M31,29 h1 v2 h-1 z M16,31 h2 v2 h-2 z M19,31 h2 v2 h-2 z M22,31 h1 v2 h-1 z M25,31 h1 v2 h-1 z M27,31 h2 v2 h-2 z M30,31 h2 v2 h-2 z M16,33 h3 v4 h-3 z M21,33 h2 v4 h-2 z M25,33 h2 v4 h-2 z M29,33 h3 v4 h-3 z M16,37 h2 v2 h-2 z M19,37 h2 v2 h-2 z M22,37 h1 v2 h-1 z M25,37 h1 v2 h-1 z M27,37 h2 v2 h-2 z M30,37 h2 v2 h-2 z M16,39 h1 v2 h-1 z M18,39 h4 v2 h-4 z M26,39 h4 v2 h-4 z M31,39 h1 v2 h-1 z M17,41 h6 v2 h-6 z M25,41 h6 v2 h-6 z" fill="#795548" />
-    <path d="M17,29 h1 v2 h-1 z M22,29 h1 v2 h-1 z M25,29 h1 v2 h-1 z M30,29 h1 v2 h-1 z M18,31 h1 v2 h-1 z M21,31 h1 v2 h-1 z M26,31 h1 v2 h-1 z M29,31 h1 v2 h-1 z M19,33 h2 v4 h-2 z M27,33 h2 v4 h-2 z M18,37 h1 v2 h-1 z M21,37 h1 v2 h-1 z M26,37 h1 v2 h-1 z M29,37 h1 v2 h-1 z M17,39 h1 v2 h-1 z M22,39 h1 v2 h-1 z M25,39 h1 v2 h-1 z M30,39 h1 v2 h-1 z M16,41 h1 v2 h-1 z M23,41 h2 v2 h-2 z M31,41 h1 v2 h-1 z M4,43 h40 v1 h-40 z" fill="#5d4037" />
-  </svg>
-));
-
-const SiloSprite = React.memo(() => (
-  <svg viewBox="0 0 20 40" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Silo */}
-    <path d="M6,0 h2 v1 h-2 z M12,0 h2 v1 h-2 z M8,1 h9 v2 h-9 z M7,3 h12 v3 h-12 z M17,6 h1 v2 h-1 z M15,8 h3 v1 h-3 z M17,9 h1 v2 h-1 z M15,11 h3 v1 h-3 z M17,12 h1 v1 h-1 z M2,13 h16 v1 h-16 z M15,14 h3 v1 h-3 z M17,15 h1 v2 h-1 z M15,17 h3 v1 h-3 z M17,18 h1 v2 h-1 z M15,20 h3 v1 h-3 z M17,21 h1 v1 h-1 z M2,22 h16 v1 h-16 z M15,23 h3 v1 h-3 z M17,24 h1 v2 h-1 z M15,26 h3 v1 h-3 z M17,27 h1 v2 h-1 z M15,29 h3 v1 h-3 z M17,30 h1 v1 h-1 z M2,31 h4 v1 h-4 z M12,31 h6 v1 h-6 z M17,32 h1 v8 h-1 z" fill="#9e9e9e" />
-    <path d="M3,1 h5 v2 h-5 z M1,3 h6 v3 h-6 z M14,6 h3 v2 h-3 z M14,8 h1 v1 h-1 z M14,9 h3 v2 h-3 z M14,11 h1 v1 h-1 z M14,12 h3 v1 h-3 z M14,14 h1 v1 h-1 z M14,15 h3 v2 h-3 z M14,17 h1 v1 h-1 z M14,18 h3 v2 h-3 z M14,20 h1 v1 h-1 z M14,21 h3 v1 h-3 z M14,23 h1 v1 h-1 z M14,24 h3 v2 h-3 z M14,26 h1 v1 h-1 z M14,27 h3 v2 h-3 z M14,29 h1 v1 h-1 z M14,30 h3 v1 h-3 z M14,32 h3 v8 h-3 z" fill="#bdbdbd" />
-    <path d="M8,0 h4 v1 h-4 z M6,6 h8 v7 h-8 z M6,14 h8 v8 h-8 z M6,23 h8 v8 h-8 z M12,32 h2 v8 h-2 z" fill="#e0e0e0" />
-    <path d="M2,6 h4 v7 h-4 z M2,14 h4 v8 h-4 z M2,23 h4 v8 h-4 z M2,32 h4 v8 h-4 z" fill="#f5f5f5" />
-    {/* Door */}
-    <path d="M6,31 h1 v9 h-1 z M9,31 h3 v9 h-3 z" fill="#8d6e63" />
-    <path d="M7,31 h2 v9 h-2 z" fill="#a1887f" />
-  </svg>
-));
-
-const CuttingStationSprite = React.memo(({ isChopping }) => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Table Legs */}
-    <path d="M6,16 h4 v14 h-4 z M22,16 h4 v14 h-4 z" fill="#5d4037" />
-    <path d="M8,18 h2 v12 h-2 z M24,18 h2 v12 h-2 z" fill="#3e2723" />
-    {/* Table Top */}
-    <path d="M2,12 h28 v6 h-28 z" fill="#8d6e63" />
-    <path d="M2,12 h28 v2 h-28 z" fill="#a1887f" />
-    <path d="M2,16 h28 v2 h-28 z" fill="#5d4037" />
-    {/* Cutting Board */}
-    <path d="M8,9 h16 v3 h-16 z" fill="#ffccaa" />
-    <path d="M8,11 h16 v1 h-16 z" fill="#e6b38c" />
-    
-    {/* Food */}
-    <path d="M10,8 h5 v3 h-5 z M15,10 h2 v1 h-2 z M17,9 h2 v2 h-2 z" fill="#4caf50" />
-    <path d="M11,9 h2 v1 h-2 z M16,9 h1 v1 h-1 z" fill="#81c784" />
-    
-    {/* Chopping Knife Animation */}
-    {isChopping ? (
-       <g className="animate-chop-fast" style={{ transformOrigin: '20px 8px' }}>
-          <path d="M16,4 h6 v3 h-6 z" fill="#bdbdbd" />
-          <path d="M15,5 h1 v2 h-1 z" fill="#9e9e9e" />
-          <path d="M22,4 h4 v3 h-4 z" fill="#212121" />
-       </g>
-    ) : (
-       <g>
-          <path d="M18,9 h6 v2 h-6 z" fill="#bdbdbd" />
-          <path d="M17,10 h1 v1 h-1 z" fill="#9e9e9e" />
-          <path d="M24,9 h4 v2 h-4 z" fill="#212121" />
-       </g>
-    )}
-  </svg>
-));
-
-const PrepStationSprite = React.memo(({ isPrepping }) => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Table Legs */}
-    <path d="M6,16 h4 v14 h-4 z M22,16 h4 v14 h-4 z" fill="#5d4037" />
-    <path d="M8,18 h2 v12 h-2 z M24,18 h2 v12 h-2 z" fill="#3e2723" />
-    {/* Table Top */}
-    <path d="M2,12 h28 v6 h-28 z" fill="#8d6e63" />
-    <path d="M2,12 h28 v2 h-28 z" fill="#a1887f" />
-    <path d="M2,16 h28 v2 h-28 z" fill="#5d4037" />
-
-    {/* Tape Dispenser */}
-    <g>
-      <path d="M19,10 h7 v2 h-7 z" fill="#455a64" />
-      <path d="M20,8 h2 v2 h-2 z" fill="#37474f" />
-      <path d="M18,4 h6 v4 h-6 z" fill="#eeeeee" />
-      <path d="M20,5 h2 v2 h-2 z" fill="#bdbdbd" />
-      <path d="M25,8 h1 v2 h-1 z" fill="#9e9e9e" />
-    </g>
-
-    {/* Scrap papers on table */}
-    <path d="M15,11 h3 v1 h-3 z" fill="#ffffff" opacity="0.8" />
-    <path d="M6,10 h4 v2 h-4 z" fill="#fff59d" opacity="0.9" />
-
-    {/* Scissors */}
-    <g style={{ transform: 'translate(2px, 0)' }}>
-        {/* Top Blade & Handle */}
-        <g className={isPrepping ? "animate-snip-top" : ""} style={{ transformOrigin: "11px 9px" }}>
-          <path d="M5,6 h4 v3 h-4 z" fill="#ef5350" />
-          <path d="M6,7 h2 v1 h-2 z" fill="#a1887f" />
-          <path d="M9,8 h6 v1 h-6 z" fill="#e0e0e0" />
-        </g>
-        {/* Bottom Blade & Handle */}
-        <g className={isPrepping ? "animate-snip-bottom" : ""} style={{ transformOrigin: "11px 9px" }}>
-          <path d="M5,9 h4 v3 h-4 z" fill="#ef5350" />
-          <path d="M6,10 h2 v1 h-2 z" fill="#a1887f" />
-          <path d="M9,9 h6 v1 h-6 z" fill="#bdbdbd" />
-          <rect x="10.5" y="8.5" width="1" height="1" fill="#424242" />
-        </g>
-    </g>
-  </svg>
-));
-
-const CompostBucketSprite = React.memo(() => (
-  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="crispEdges">
-    {/* Smell Lines */}
-    <g stroke="#65a30d" strokeWidth="4" fill="none" className="opacity-70">
-       <path className="animate-smell-1" d="M15,40 v-5 h-5 v-5 h5 v-5 h-5 v-5 h5 v-10" />
-       <path className="animate-smell-2" d="M30,40 v-5 h5 v-5 h-5 v-5 h5 v-5 h-5 v-10" />
-       <path className="animate-smell-3" d="M45,40 v-5 h-5 v-5 h5 v-5 h-5 v-5 h5 v-10" />
-    </g>
-    
-    {/* Glitter */}
-    <g fill="#facc15">
-       <path d="M10,0 h5 v5 h-5 z M5,5 h15 v5 h-15 z M10,10 h5 v5 h-5 z" className="animate-sparkle-1" />
-       <path d="M45,10 h5 v5 h-5 z M40,15 h15 v5 h-15 z M45,20 h5 v5 h-5 z" className="animate-sparkle-2" />
-       <path d="M25,-5 h5 v5 h-5 z M20,0 h15 v5 h-15 z M25,5 h5 v5 h-5 z" className="animate-sparkle-3" />
-    </g>
-    {/* Overflowing scraps */}
-    <path d="M26,24 h4 v2 h-4 z M22,26 h4 v2 h-4 z M28,26 h2 v2 h-2 z M18,28 h2 v2 h-2 z M22,28 h2 v2 h-2 z M26,28 h4 v2 h-4 z M14,30 h4 v2 h-4 z M20,30 h4 v2 h-4 z M26,30 h6 v2 h-6 z M40,30 h2 v4 h-2 z M14,32 h6 v2 h-6 z M22,32 h2 v2 h-2 z M26,32 h4 v2 h-4 z M34,32 h4 v2 h-4 z M44,32 h2 v2 h-2 z M16,34 h2 v2 h-2 z M20,34 h4 v2 h-4 z M26,34 h6 v2 h-6 z M36,34 h8 v2 h-8 z M16,36 h6 v2 h-6 z M24,36 h4 v2 h-4 z M36,36 h4 v2 h-4 z M42,36 h2 v2 h-2 z M46,36 h2 v2 h-2 z M14,38 h4 v2 h-4 z M20,38 h2 v2 h-2 z M24,38 h6 v2 h-6 z M32,38 h4 v2 h-4 z M38,38 h4 v2 h-4 z M44,38 h6 v2 h-6 z" fill="#7cb342" />
-    <path d="M26,26 h2 v2 h-2 z M16,28 h2 v2 h-2 z M24,28 h2 v4 h-2 z M20,32 h2 v2 h-2 z M42,32 h2 v2 h-2 z M24,34 h2 v2 h-2 z M34,34 h2 v2 h-2 z M44,34 h2 v2 h-2 z M28,36 h2 v2 h-2 z M18,38 h2 v2 h-2 z M36,38 h2 v2 h-2 z" fill="#aed581" />
-    <path d="M20,28 h2 v2 h-2 z M18,30 h2 v2 h-2 z M38,30 h2 v4 h-2 z M12,32 h2 v2 h-2 z M24,32 h2 v2 h-2 z M18,34 h2 v2 h-2 z M32,34 h2 v2 h-2 z M22,36 h2 v4 h-2 z M34,36 h2 v2 h-2 z M40,36 h2 v2 h-2 z M44,36 h2 v2 h-2 z M10,38 h2 v2 h-2 z M30,38 h2 v2 h-2 z M42,38 h2 v2 h-2 z" fill="#558b2f" />
-    <path d="M38,24 h2 v2 h-2 z M36,26 h2 v2 h-2 z M40,26 h2 v2 h-2 z M34,28 h8 v2 h-8 z M34,30 h4 v2 h-4 z M12,34 h2 v2 h-2 z M10,36 h6 v2 h-6 z M12,38 h2 v2 h-2 z" fill="#e53935" />
-    <path d="M38,26 h2 v2 h-2 z M14,34 h2 v2 h-2 z" fill="#ff8a80" />
-    <path d="M44,26 h2 v2 h-2 z M42,28 h6 v2 h-6 z M32,30 h2 v2 h-2 z M44,30 h4 v2 h-4 z M30,32 h4 v2 h-4 z M30,36 h4 v2 h-4 z" fill="#ffb300" />
-    <path d="M42,30 h2 v2 h-2 z" fill="#fb8c00" />
-    {/* Bucket */}
-    <path d="M6,40 h48 v2 h-48 z" fill="#66bb6a" />
-    <path d="M6,42 h48 v2 h-48 z M10,46 h4 v22 h-4 z M12,68 h4 v8 h-4 z M14,76 h2 v8 h-2 z" fill="#4caf50" />
-    <path d="M14,46 h8 v22 h-8 z M24,46 h12 v38 h-12 z M38,46 h8 v22 h-8 z M16,68 h6 v16 h-6 z M38,68 h6 v8 h-6 z M38,76 h4 v8 h-4 z" fill="#2e7d32" />
-    <path d="M6,44 h48 v2 h-48 z M22,46 h2 v38 h-2 z M36,46 h2 v38 h-2 z M46,46 h4 v22 h-4 z M44,68 h4 v8 h-4 z M42,76 h4 v8 h-4 z M14,84 h32 v2 h-32 z" fill="#1b5e20" />
-  </svg>
-));
-
-const BrownsBucketSprite = React.memo(() => (
-  <svg viewBox="0 0 60 90" className="w-full h-full drop-shadow-md" overflow="visible" shapeRendering="crispEdges">
-    {/* Leaves, twigs & cardboard */}
-    <path d="M28,26 h2 v2 h-2 z M26,28 h2 v2 h-2 z M30,28 h2 v2 h-2 z M24,30 h2 v2 h-2 z M32,30 h2 v2 h-2 z M24,32 h4 v2 h-4 z M30,32 h4 v2 h-4 z M28,34 h4 v2 h-4 z M34,36 h2 v2 h-2 z" fill="#ef6c00" />
-    <path d="M28,28 h2 v2 h-2 z M26,30 h6 v2 h-6 z M28,32 h2 v2 h-2 z M34,32 h2 v2 h-2 z M34,34 h10 v2 h-10 z M30,36 h4 v2 h-4 z M36,36 h6 v2 h-6 z M10,38 h4 v2 h-4 z M32,38 h6 v2 h-6 z M40,38 h4 v2 h-4 z" fill="#d84315" />
-    <path d="M40,24 h2 v2 h-2 z M38,26 h2 v2 h-2 z M42,26 h2 v2 h-2 z M14,30 h2 v2 h-2 z M36,30 h4 v2 h-4 z M42,30 h4 v2 h-4 z M12,32 h2 v2 h-2 z M16,32 h2 v2 h-2 z M36,32 h8 v2 h-8 z M10,34 h2 v2 h-2 z M16,34 h4 v2 h-4 z M32,34 h2 v2 h-2 z M44,34 h4 v2 h-4 z M10,36 h10 v2 h-10 z M16,38 h2 v2 h-2 z" fill="#f9a825" />
-    <path d="M40,26 h2 v2 h-2 z M38,28 h6 v2 h-6 z M40,30 h2 v2 h-2 z M14,32 h2 v2 h-2 z M12,34 h4 v2 h-4 z" fill="#fdd835" />
-    <path d="M8,38 h2 v2 h-2 z M14,38 h2 v2 h-2 z M30,38 h2 v2 h-2 z M38,38 h2 v2 h-2 z M44,38 h2 v2 h-2 z M54,38 h2 v2 h-2 z" fill="#bf360c" />
-    <path d="M18,24 h2 v4 h-2 z M16,28 h4 v4 h-4 z M46,28 h2 v4 h-2 z M18,32 h2 v2 h-2 z M44,32 h4 v2 h-4 z M20,34 h2 v4 h-2 z" fill="#6d4c41" />
-    <path d="M22,34 h6 v2 h-6 z M22,36 h8 v2 h-8 z M42,36 h8 v2 h-8 z M18,38 h12 v2 h-12 z M46,38 h8 v2 h-8 z" fill="#c49a6c" />
-    {/* Bucket */}
-    <path d="M6,40 h48 v2 h-48 z" fill="#a1887f" />
-    <path d="M6,42 h48 v2 h-48 z M10,46 h4 v22 h-4 z M12,68 h4 v8 h-4 z M14,76 h2 v8 h-2 z" fill="#8d6e63" />
-    <path d="M14,46 h8 v22 h-8 z M24,46 h12 v38 h-12 z M38,46 h8 v22 h-8 z M16,68 h6 v16 h-6 z M38,68 h6 v8 h-6 z M38,76 h4 v8 h-4 z" fill="#5d4037" />
-    <path d="M6,44 h48 v2 h-48 z M22,46 h2 v38 h-2 z M36,46 h2 v38 h-2 z M46,46 h4 v22 h-4 z M44,68 h4 v8 h-4 z M42,76 h4 v8 h-4 z M14,84 h32 v2 h-32 z" fill="#3e2723" />
-  </svg>
-));
-
-const ComposterSprite = React.memo(({ greens = false, browns = false, wet = false }) => (
-  <svg viewBox="0 0 56 56" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Ground shadow */}
-    <path d="M3,55 h50 v1 h-50 z" fill="#000000" opacity="0.25" />
-    {/* Bin walls (top view of rim) */}
-    <path d="M2,1 h52 v54 h-52 z" fill="#3e2723" />
-    <path d="M3,2 h50 v4 h-50 z M3,6 h5 v32 h-5 z M48,6 h5 v32 h-5 z" fill="#8d6e63" />
-    <path d="M3,2 h50 v1 h-50 z M3,6 h1 v32 h-1 z" fill="#a1887f" />
-    <path d="M7,6 h1 v32 h-1 z M48,6 h1 v32 h-1 z M20,3 h1 v3 h-1 z M36,3 h1 v3 h-1 z M4,16 h3 v1 h-3 z M4,27 h3 v1 h-3 z M49,13 h3 v1 h-3 z M49,30 h3 v1 h-3 z" fill="#6d4c41" />
-    <path d="M52,6 h1 v32 h-1 z M11,4 h5 v1 h-5 z M26,3 h6 v1 h-6 z M40,4 h4 v1 h-4 z M5,10 h1 v4 h-1 z M5,21 h1 v4 h-1 z M5,32 h1 v3 h-1 z M50,8 h1 v3 h-1 z M50,19 h1 v5 h-1 z M50,34 h1 v3 h-1 z M3,2 h5 v4 h-5 z M48,2 h5 v4 h-5 z" fill="#795548" />
-    <path d="M3,2 h5 v1 h-5 z M48,2 h5 v1 h-5 z" fill="#a1887f" />
-    <path d="M5,4 h1 v1 h-1 z M50,4 h1 v1 h-1 z" fill="#3e2723" />
-    {/* Inside back wall */}
-    <path d="M8,6 h40 v6 h-40 z" fill="#5d4037" />
-    <path d="M8,6 h40 v1 h-40 z" fill="#3e2723" />
-    <path d="M8,9 h40 v1 h-40 z M21,7 h1 v2 h-1 z M35,7 h1 v2 h-1 z M14,10 h1 v2 h-1 z M28,10 h1 v2 h-1 z M42,10 h1 v2 h-1 z" fill="#4e342e" />
-    {/* Soil */}
-    <path d="M8,12 h40 v26 h-40 z" fill="#4e342e" />
-    <path d="M8,12 h40 v2 h-40 z M8,14 h1 v24 h-1 z M17,20 h2 v1 h-2 z M31,17 h1 v1 h-1 z M39,23 h2 v1 h-2 z M13,28 h1 v1 h-1 z M27,30 h2 v1 h-2 z M43,36 h2 v1 h-2 z M21,36 h1 v1 h-1 z M34,29 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M12,17 h2 v1 h-2 z M20,15 h1 v1 h-1 z M27,19 h2 v1 h-2 z M36,16 h1 v1 h-1 z M42,20 h2 v1 h-2 z M15,24 h1 v1 h-1 z M23,27 h2 v1 h-2 z M33,24 h1 v1 h-1 z M40,29 h2 v1 h-2 z M11,31 h2 v1 h-2 z M19,34 h1 v1 h-1 z M29,33 h2 v1 h-2 z M37,35 h1 v1 h-1 z M44,33 h1 v1 h-1 z M25,22 h1 v1 h-1 z M45,25 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M38,31 h2 v1 h-2 z M37,32 h1 v1 h-1 z M40,32 h1 v1 h-1 z M42,32 h1 v1 h-1 z M41,33 h1 v1 h-1 z" fill="#f48fb1" />
-    {/* Front wall */}
-    <path d="M3,38 h50 v3 h-50 z" fill="#8d6e63" />
-    <path d="M3,38 h50 v1 h-50 z" fill="#a1887f" />
-    <path d="M3,40 h50 v1 h-50 z" fill="#6d4c41" />
-    <path d="M8,42 h40 v3 h-40 z M8,46 h40 v3 h-40 z M8,50 h40 v3 h-40 z M3,38 h5 v3 h-5 z M48,38 h5 v3 h-5 z" fill="#795548" />
-    <path d="M8,42 h40 v1 h-40 z M8,46 h40 v1 h-40 z M8,50 h40 v1 h-40 z" fill="#8d6e63" />
-    <path d="M8,44 h40 v1 h-40 z M8,48 h40 v1 h-40 z M8,52 h40 v1 h-40 z M15,43 h6 v1 h-6 z M31,43 h8 v1 h-8 z M20,47 h9 v1 h-9 z M36,47 h5 v1 h-5 z M13,51 h7 v1 h-7 z M27,51 h6 v1 h-6 z M39,51 h4 v1 h-4 z M3,41 h5 v13 h-5 z M48,41 h5 v13 h-5 z" fill="#6d4c41" />
-    <path d="M10,43 h1 v1 h-1 z M45,43 h1 v1 h-1 z M10,47 h1 v1 h-1 z M45,47 h1 v1 h-1 z M10,51 h1 v1 h-1 z M45,51 h1 v1 h-1 z M5,39 h1 v1 h-1 z M50,39 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M25,43 h2 v1 h-2 z" fill="#4e342e" />
-    <path d="M3,41 h1 v13 h-1 z" fill="#8d6e63" />
-    <path d="M52,41 h1 v13 h-1 z" fill="#5d4037" />
-    <path d="M3,38 h5 v1 h-5 z M48,38 h5 v1 h-5 z" fill="#a1887f" />
-    {greens && <>
-      {/* Greens (veggie scraps) */}
-      <path d="M11,15 h3 v1 h-3 z M10,16 h2 v1 h-2 z M13,16 h2 v1 h-2 z M11,17 h1 v1 h-1 z M13,17 h1 v1 h-1 z M19,19 h3 v1 h-3 z M18,20 h2 v1 h-2 z M21,20 h2 v1 h-2 z M19,21 h1 v1 h-1 z M21,21 h1 v1 h-1 z M13,25 h3 v1 h-3 z M12,26 h2 v1 h-2 z M15,26 h2 v1 h-2 z M13,27 h1 v1 h-1 z M15,27 h1 v1 h-1 z M23,30 h3 v1 h-3 z M22,31 h2 v1 h-2 z M25,31 h2 v1 h-2 z M23,32 h1 v1 h-1 z M25,32 h1 v1 h-1 z M29,16 h3 v1 h-3 z M28,17 h2 v1 h-2 z M31,17 h2 v1 h-2 z M29,18 h1 v1 h-1 z M31,18 h1 v1 h-1 z" fill="#7cb342" />
-      <path d="M12,16 h1 v1 h-1 z M20,20 h1 v1 h-1 z M14,26 h1 v1 h-1 z M24,31 h1 v1 h-1 z M30,17 h1 v1 h-1 z M33,27 h1 v1 h-1 z M17,34 h1 v1 h-1 z" fill="#aed581" />
-      <path d="M12,17 h1 v1 h-1 z M20,21 h1 v1 h-1 z M14,27 h1 v1 h-1 z M24,32 h1 v1 h-1 z M30,18 h1 v1 h-1 z M33,28 h1 v1 h-1 z M17,35 h1 v1 h-1 z M18,15 h1 v1 h-1 z M26,23 h1 v1 h-1 z M12,20 h1 v1 h-1 z M35,33 h1 v1 h-1 z M28,34 h1 v1 h-1 z" fill="#558b2f" />
-      <path d="M32,26 h3 v1 h-3 z M31,27 h2 v1 h-2 z M34,27 h2 v1 h-2 z M32,28 h1 v1 h-1 z M34,28 h1 v1 h-1 z M16,33 h3 v1 h-3 z M15,34 h2 v1 h-2 z M18,34 h2 v1 h-2 z M16,35 h1 v1 h-1 z M18,35 h1 v1 h-1 z" fill="#7cb342" />
-      <path d="M17,16 h1 v1 h-1 z M19,16 h1 v1 h-1 z M17,17 h3 v1 h-3 z M25,24 h1 v1 h-1 z M27,24 h1 v1 h-1 z M25,25 h3 v1 h-3 z M11,21 h1 v1 h-1 z M13,21 h1 v1 h-1 z M11,22 h3 v1 h-3 z M34,34 h1 v1 h-1 z M36,34 h1 v1 h-1 z M34,35 h3 v1 h-3 z M27,35 h1 v1 h-1 z M29,35 h1 v1 h-1 z M27,36 h3 v1 h-3 z" fill="#e53935" />
-      <path d="M18,16 h1 v1 h-1 z M26,24 h1 v1 h-1 z M12,21 h1 v1 h-1 z M35,34 h1 v1 h-1 z M28,35 h1 v1 h-1 z" fill="#ff8a80" />
-      <path d="M22,15 h3 v1 h-3 z M23,16 h3 v1 h-3 z M16,29 h3 v1 h-3 z M17,30 h3 v1 h-3 z M30,21 h3 v1 h-3 z M31,22 h3 v1 h-3 z M10,34 h3 v1 h-3 z M11,35 h3 v1 h-3 z M35,17 h3 v1 h-3 z M36,18 h3 v1 h-3 z" fill="#ffb300" />
-    </>}
-    {browns && <>
-      {/* Browns (leaves, twigs, cardboard) */}
-      <path d="M42,14 h1 v1 h-1 z M41,15 h1 v1 h-1 z M43,15 h1 v1 h-1 z M40,16 h1 v1 h-1 z M44,16 h1 v1 h-1 z M41,17 h2 v1 h-2 z M35,20 h1 v1 h-1 z M34,21 h1 v1 h-1 z M36,21 h1 v1 h-1 z M33,22 h1 v1 h-1 z M37,22 h1 v1 h-1 z M34,23 h2 v1 h-2 z M43,26 h1 v1 h-1 z M42,27 h1 v1 h-1 z M44,27 h1 v1 h-1 z M41,28 h1 v1 h-1 z M45,28 h1 v1 h-1 z M42,29 h2 v1 h-2 z M26,26 h1 v1 h-1 z M25,27 h1 v1 h-1 z M27,27 h1 v1 h-1 z M24,28 h1 v1 h-1 z M28,28 h1 v1 h-1 z M25,29 h2 v1 h-2 z" fill="#ef6c00" />
-      <path d="M42,15 h1 v1 h-1 z M41,16 h3 v1 h-3 z M35,21 h1 v1 h-1 z M34,22 h3 v1 h-3 z M43,27 h1 v1 h-1 z M42,28 h3 v1 h-3 z M26,27 h1 v1 h-1 z M25,28 h3 v1 h-3 z M38,30 h1 v1 h-1 z M37,31 h3 v1 h-3 z M22,23 h1 v1 h-1 z M21,24 h3 v1 h-3 z" fill="#d84315" />
-      <path d="M38,29 h1 v1 h-1 z M37,30 h1 v1 h-1 z M39,30 h1 v1 h-1 z M36,31 h1 v1 h-1 z M40,31 h1 v1 h-1 z M37,32 h2 v1 h-2 z M22,22 h1 v1 h-1 z M21,23 h1 v1 h-1 z M23,23 h1 v1 h-1 z M20,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z M21,25 h2 v1 h-2 z" fill="#ef6c00" />
-      <path d="M36,14 h2 v1 h-2 z M35,15 h1 v1 h-1 z M38,15 h1 v1 h-1 z M36,16 h2 v1 h-2 z M44,21 h2 v1 h-2 z M43,22 h1 v1 h-1 z M46,22 h1 v1 h-1 z M44,23 h2 v1 h-2 z M30,30 h2 v1 h-2 z M29,31 h1 v1 h-1 z M32,31 h1 v1 h-1 z M30,32 h2 v1 h-2 z M40,34 h2 v1 h-2 z M39,35 h1 v1 h-1 z M42,35 h1 v1 h-1 z M40,36 h2 v1 h-2 z M15,17 h2 v1 h-2 z M14,18 h1 v1 h-1 z M17,18 h1 v1 h-1 z M15,19 h2 v1 h-2 z" fill="#f9a825" />
-      <path d="M36,15 h2 v1 h-2 z M44,22 h2 v1 h-2 z M30,31 h2 v1 h-2 z M40,35 h2 v1 h-2 z M15,18 h2 v1 h-2 z" fill="#fdd835" />
-      <path d="M40,19 h1 v1 h-1 z M38,20 h6 v1 h-6 z M28,20 h1 v1 h-1 z M26,21 h6 v1 h-6 z M33,35 h1 v1 h-1 z M31,36 h6 v1 h-6 z M14,30 h1 v1 h-1 z M12,31 h6 v1 h-6 z" fill="#a1887f" />
-      <path d="M43,30 h4 v1 h-4 z M43,31 h1 v1 h-1 z M46,31 h1 v1 h-1 z M43,32 h4 v1 h-4 z M29,24 h4 v1 h-4 z M29,25 h1 v1 h-1 z M32,25 h1 v1 h-1 z M29,26 h4 v1 h-4 z M19,34 h4 v1 h-4 z M19,35 h1 v1 h-1 z M22,35 h1 v1 h-1 z M19,36 h4 v1 h-4 z" fill="#c49a6c" />
-      <path d="M44,31 h2 v1 h-2 z M30,25 h2 v1 h-2 z M20,35 h2 v1 h-2 z" fill="#a67c52" />
-    </>}
-    {wet && <>
-      {/* Water droplets */}
-      <path d="M13,18 h2 v1 h-2 z M21,16 h2 v1 h-2 z M30,19 h2 v1 h-2 z M39,17 h2 v1 h-2 z M45,23 h2 v1 h-2 z M16,27 h2 v1 h-2 z M26,29 h2 v1 h-2 z M35,25 h2 v1 h-2 z M42,33 h2 v1 h-2 z M11,35 h2 v1 h-2 z M23,34 h2 v1 h-2 z M32,31 h2 v1 h-2 z" fill="#81d4fa" />
-      <path d="M13,19 h1 v1 h-1 z M21,17 h1 v1 h-1 z M30,20 h1 v1 h-1 z M39,18 h1 v1 h-1 z M45,24 h1 v1 h-1 z M16,28 h1 v1 h-1 z M26,30 h1 v1 h-1 z M35,26 h1 v1 h-1 z M42,34 h1 v1 h-1 z M11,36 h1 v1 h-1 z M23,35 h1 v1 h-1 z M32,32 h1 v1 h-1 z" fill="#4fc3f7" />
-    </>}
-  </svg>
-));
-
-const CompactedPlotSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plot edge */}
-    <path d="M0,0 h32 v1 h-32 z M0,1 h1 v30 h-1 z M31,1 h1 v30 h-1 z M0,31 h32 v1 h-32 z" fill="#3e2723" />
-    <path d="M30,1 h1 v29 h-1 z M1,30 h30 v1 h-30 z" fill="#4e342e" />
-    {/* Hard dry soil */}
-    <path d="M1,1 h6 v1 h-6 z M8,1 h1 v1 h-1 z M10,1 h1 v1 h-1 z M13,1 h6 v1 h-6 z M21,1 h3 v1 h-3 z M25,1 h1 v1 h-1 z M27,1 h2 v1 h-2 z M3,2 h4 v1 h-4 z M8,2 h4 v1 h-4 z M15,2 h2 v1 h-2 z M18,2 h1 v1 h-1 z M20,2 h4 v1 h-4 z M28,2 h2 v1 h-2 z M1,3 h1 v1 h-1 z M3,3 h12 v1 h-12 z M16,3 h1 v2 h-1 z M18,3 h3 v1 h-3 z M24,3 h5 v1 h-5 z M2,4 h1 v1 h-1 z M4,4 h5 v1 h-5 z M11,4 h1 v1 h-1 z M13,4 h2 v1 h-2 z M18,4 h1 v1 h-1 z M20,4 h3 v1 h-3 z M24,4 h1 v1 h-1 z M29,4 h1 v1 h-1 z M1,5 h3 v1 h-3 z M6,5 h1 v1 h-1 z M8,5 h5 v1 h-5 z M14,5 h3 v1 h-3 z M18,5 h8 v1 h-8 z M1,6 h4 v1 h-4 z M6,6 h9 v1 h-9 z M16,6 h1 v1 h-1 z M18,6 h1 v1 h-1 z M20,6 h4 v1 h-4 z M27,6 h2 v1 h-2 z M1,7 h2 v1 h-2 z M4,7 h2 v1 h-2 z M7,7 h2 v2 h-2 z M10,7 h6 v2 h-6 z M19,7 h1 v1 h-1 z M21,7 h1 v1 h-1 z M24,7 h6 v1 h-6 z M2,8 h4 v1 h-4 z M17,8 h2 v1 h-2 z M22,8 h2 v1 h-2 z M25,8 h2 v1 h-2 z M28,8 h1 v1 h-1 z M2,9 h1 v1 h-1 z M4,9 h2 v1 h-2 z M8,9 h3 v1 h-3 z M12,9 h3 v1 h-3 z M19,9 h2 v1 h-2 z M23,9 h5 v1 h-5 z M29,9 h1 v1 h-1 z M3,10 h4 v1 h-4 z M10,10 h1 v1 h-1 z M15,10 h1 v1 h-1 z M17,10 h10 v1 h-10 z M28,10 h2 v1 h-2 z M3,11 h6 v1 h-6 z M11,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M18,11 h9 v1 h-9 z M3,12 h1 v1 h-1 z M5,12 h1 v1 h-1 z M11,12 h5 v1 h-5 z M17,12 h1 v1 h-1 z M19,12 h4 v1 h-4 z M24,12 h3 v1 h-3 z M2,13 h7 v1 h-7 z M11,13 h1 v1 h-1 z M13,13 h1 v1 h-1 z M15,13 h4 v1 h-4 z M21,13 h2 v1 h-2 z M24,13 h6 v1 h-6 z M1,14 h8 v1 h-8 z M11,14 h7 v1 h-7 z M23,14 h7 v1 h-7 z M1,15 h1 v1 h-1 z M3,15 h3 v1 h-3 z M9,15 h1 v1 h-1 z M12,15 h5 v1 h-5 z M18,15 h4 v1 h-4 z M24,15 h1 v1 h-1 z M28,15 h2 v1 h-2 z M1,16 h5 v1 h-5 z M10,16 h1 v1 h-1 z M12,16 h1 v1 h-1 z M14,16 h1 v1 h-1 z M16,16 h7 v1 h-7 z M25,16 h1 v1 h-1 z M27,16 h3 v1 h-3 z M2,17 h1 v1 h-1 z M4,17 h1 v1 h-1 z M6,17 h5 v1 h-5 z M12,17 h8 v1 h-8 z M21,17 h2 v1 h-2 z M24,17 h4 v1 h-4 z M29,17 h1 v1 h-1 z M1,18 h1 v1 h-1 z M5,18 h5 v1 h-5 z M13,18 h1 v1 h-1 z M15,18 h8 v1 h-8 z M24,18 h6 v1 h-6 z M2,19 h3 v1 h-3 z M6,19 h6 v1 h-6 z M14,19 h2 v1 h-2 z M17,19 h1 v1 h-1 z M19,19 h3 v1 h-3 z M24,19 h2 v1 h-2 z M27,19 h1 v1 h-1 z M29,19 h1 v1 h-1 z M1,20 h8 v1 h-8 z M10,20 h2 v1 h-2 z M13,20 h1 v1 h-1 z M19,20 h1 v1 h-1 z M21,20 h1 v1 h-1 z M23,20 h6 v1 h-6 z M1,21 h2 v1 h-2 z M4,21 h7 v1 h-7 z M13,21 h5 v1 h-5 z M20,21 h2 v1 h-2 z M24,21 h2 v1 h-2 z M27,21 h1 v1 h-1 z M1,22 h7 v1 h-7 z M9,22 h1 v1 h-1 z M12,22 h8 v1 h-8 z M21,22 h1 v1 h-1 z M23,22 h7 v1 h-7 z M2,23 h4 v1 h-4 z M8,23 h3 v1 h-3 z M13,23 h1 v1 h-1 z M15,23 h6 v1 h-6 z M22,23 h4 v1 h-4 z M28,23 h1 v1 h-1 z M1,24 h3 v1 h-3 z M9,24 h1 v1 h-1 z M12,24 h3 v1 h-3 z M17,24 h3 v1 h-3 z M22,24 h1 v1 h-1 z M25,24 h5 v1 h-5 z M1,25 h5 v1 h-5 z M7,25 h1 v1 h-1 z M10,25 h1 v1 h-1 z M12,25 h1 v1 h-1 z M14,25 h1 v1 h-1 z M16,25 h2 v1 h-2 z M19,25 h3 v1 h-3 z M27,25 h3 v3 h-3 z M1,26 h2 v1 h-2 z M4,26 h1 v1 h-1 z M6,26 h4 v1 h-4 z M11,26 h3 v1 h-3 z M15,26 h5 v1 h-5 z M1,27 h3 v1 h-3 z M5,27 h5 v3 h-5 z M12,27 h5 v1 h-5 z M18,27 h6 v1 h-6 z M25,27 h1 v1 h-1 z M1,28 h2 v2 h-2 z M11,28 h3 v1 h-3 z M16,28 h1 v1 h-1 z M18,28 h2 v1 h-2 z M21,28 h4 v1 h-4 z M26,28 h1 v1 h-1 z M28,28 h2 v1 h-2 z M11,29 h2 v1 h-2 z M14,29 h7 v1 h-7 z M22,29 h2 v1 h-2 z M27,29 h1 v1 h-1 z M29,29 h1 v1 h-1 z" fill="#bcaaa4" />
-    <path d="M7,1 h1 v2 h-1 z M11,1 h1 v1 h-1 z M19,1 h2 v1 h-2 z M24,1 h1 v2 h-1 z M26,1 h1 v1 h-1 z M29,1 h1 v1 h-1 z M1,2 h2 v1 h-2 z M12,2 h3 v1 h-3 z M27,2 h1 v1 h-1 z M2,3 h1 v1 h-1 z M15,3 h1 v2 h-1 z M21,3 h3 v1 h-3 z M29,3 h1 v1 h-1 z M1,4 h1 v1 h-1 z M10,4 h1 v1 h-1 z M12,4 h1 v1 h-1 z M19,4 h1 v1 h-1 z M23,4 h1 v1 h-1 z M25,4 h3 v1 h-3 z M7,5 h1 v1 h-1 z M13,5 h1 v1 h-1 z M28,5 h2 v1 h-2 z M15,6 h1 v1 h-1 z M26,6 h1 v1 h-1 z M29,6 h1 v1 h-1 z M3,7 h1 v1 h-1 z M9,7 h1 v2 h-1 z M17,7 h1 v1 h-1 z M20,7 h1 v1 h-1 z M1,8 h1 v1 h-1 z M24,8 h1 v1 h-1 z M27,8 h1 v1 h-1 z M29,8 h1 v1 h-1 z M3,9 h1 v1 h-1 z M6,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M22,9 h1 v1 h-1 z M28,9 h1 v1 h-1 z M2,10 h1 v1 h-1 z M7,10 h1 v1 h-1 z M9,10 h1 v1 h-1 z M27,10 h1 v1 h-1 z M1,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z M1,12 h2 v1 h-2 z M4,12 h1 v1 h-1 z M6,12 h3 v1 h-3 z M10,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z M23,12 h1 v1 h-1 z M1,13 h1 v1 h-1 z M9,13 h1 v2 h-1 z M12,13 h1 v1 h-1 z M14,13 h1 v1 h-1 z M19,14 h2 v1 h-2 z M22,14 h1 v1 h-1 z M2,15 h1 v1 h-1 z M10,15 h1 v1 h-1 z M17,15 h1 v1 h-1 z M25,15 h3 v1 h-3 z M13,16 h1 v1 h-1 z M15,16 h1 v1 h-1 z M26,16 h1 v1 h-1 z M1,17 h1 v1 h-1 z M5,17 h1 v1 h-1 z M20,17 h1 v1 h-1 z M28,17 h1 v1 h-1 z M2,18 h3 v1 h-3 z M5,19 h1 v1 h-1 z M16,19 h1 v1 h-1 z M18,19 h1 v2 h-1 z M23,19 h1 v1 h-1 z M28,19 h1 v1 h-1 z M9,20 h1 v1 h-1 z M20,20 h1 v1 h-1 z M29,20 h1 v2 h-1 z M3,21 h1 v1 h-1 z M11,21 h1 v1 h-1 z M26,21 h1 v1 h-1 z M10,22 h1 v1 h-1 z M20,22 h1 v1 h-1 z M1,23 h1 v1 h-1 z M12,23 h1 v1 h-1 z M14,23 h1 v1 h-1 z M26,23 h2 v1 h-2 z M7,24 h2 v1 h-2 z M10,24 h1 v1 h-1 z M15,24 h2 v1 h-2 z M20,24 h1 v1 h-1 z M23,24 h2 v1 h-2 z M6,25 h1 v1 h-1 z M8,25 h1 v1 h-1 z M15,25 h1 v1 h-1 z M18,25 h1 v1 h-1 z M23,25 h1 v1 h-1 z M3,26 h1 v1 h-1 z M14,26 h1 v1 h-1 z M21,26 h2 v1 h-2 z M4,27 h1 v3 h-1 z M11,27 h1 v1 h-1 z M17,27 h1 v2 h-1 z M26,27 h1 v1 h-1 z M14,28 h2 v1 h-2 z M20,28 h1 v1 h-1 z M27,28 h1 v1 h-1 z M10,29 h1 v1 h-1 z M24,29 h2 v1 h-2 z M28,29 h1 v1 h-1 z" fill="#cfc1bb" />
-    <path d="M9,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M19,2 h1 v1 h-1 z M25,2 h2 v1 h-2 z M9,4 h1 v1 h-1 z M5,5 h1 v1 h-1 z M19,6 h1 v1 h-1 z M18,7 h1 v1 h-1 z M1,9 h1 v2 h-1 z M21,9 h1 v1 h-1 z M2,11 h1 v1 h-1 z M15,11 h1 v1 h-1 z M23,13 h1 v1 h-1 z M18,14 h1 v1 h-1 z M23,15 h1 v1 h-1 z M9,16 h1 v1 h-1 z M24,16 h1 v1 h-1 z M3,17 h1 v1 h-1 z M10,18 h2 v1 h-2 z M14,18 h1 v1 h-1 z M1,19 h1 v1 h-1 z M26,19 h1 v1 h-1 z M23,21 h1 v1 h-1 z M28,21 h1 v1 h-1 z M29,23 h1 v1 h-1 z M6,24 h1 v1 h-1 z M9,25 h1 v1 h-1 z M13,25 h1 v1 h-1 z M5,26 h1 v1 h-1 z M20,26 h1 v1 h-1 z M3,28 h1 v2 h-1 z M13,29 h1 v1 h-1 z M21,29 h1 v1 h-1 z" fill="#a89890" />
-    {/* Cracks */}
-    <path d="M17,2 h1 v5 h-1 z M3,4 h1 v1 h-1 z M28,4 h1 v1 h-1 z M4,5 h1 v1 h-1 z M26,5 h2 v1 h-2 z M5,6 h1 v1 h-1 z M24,6 h2 v1 h-2 z M6,7 h1 v2 h-1 z M16,7 h1 v2 h-1 z M22,7 h2 v1 h-2 z M19,8 h3 v1 h-3 z M7,9 h1 v1 h-1 z M15,9 h4 v1 h-4 z M8,10 h1 v1 h-1 z M11,10 h4 v1 h-4 z M16,10 h1 v1 h-1 z M9,11 h2 v1 h-2 z M17,11 h1 v1 h-1 z M9,12 h1 v1 h-1 z M18,12 h1 v1 h-1 z M10,13 h1 v2 h-1 z M19,13 h2 v1 h-2 z M21,14 h1 v1 h-1 z M11,15 h1 v3 h-1 z M22,15 h1 v1 h-1 z M23,16 h1 v3 h-1 z M12,18 h1 v1 h-1 z M12,19 h2 v1 h-2 z M22,19 h1 v4 h-1 z M12,20 h1 v2 h-1 z M14,20 h4 v1 h-4 z M18,21 h2 v1 h-2 z M8,22 h1 v1 h-1 z M11,22 h1 v4 h-1 z M6,23 h2 v1 h-2 z M21,23 h1 v2 h-1 z M4,24 h2 v1 h-2 z M22,25 h1 v1 h-1 z M10,26 h1 v3 h-1 z M23,26 h1 v1 h-1 z M24,27 h1 v1 h-1 z M25,28 h1 v1 h-1 z M26,29 h1 v1 h-1 z" fill="#5d4037" />
-    {/* Stones */}
-    <path d="M28,11 h2 v1 h-2 z M27,12 h2 v1 h-2 z M7,15 h2 v1 h-2 z M6,16 h2 v1 h-2 z M25,25 h2 v1 h-2 z M24,26 h2 v1 h-2 z" fill="#9e9e9e" />
-    <path d="M27,11 h1 v1 h-1 z M6,15 h1 v1 h-1 z M24,25 h1 v1 h-1 z" fill="#bdbdbd" />
-    <path d="M29,12 h1 v1 h-1 z M8,16 h1 v1 h-1 z M26,26 h1 v1 h-1 z" fill="#757575" />
-  </svg>
-));
-
-const ErodingPlotSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plot edge */}
-    <path d="M0,0 h32 v1 h-32 z M0,1 h1 v30 h-1 z M31,1 h1 v19 h-1 z M31,21 h1 v10 h-1 z M0,31 h32 v1 h-32 z" fill="#3e2723" />
-    <path d="M30,1 h1 v9 h-1 z M30,11 h1 v17 h-1 z M1,30 h30 v1 h-30 z" fill="#4e342e" />
-    {/* Washed soil */}
-    <path d="M1,1 h2 v5 h-2 z M5,1 h2 v1 h-2 z M8,1 h1 v1 h-1 z M11,1 h4 v1 h-4 z M17,1 h1 v2 h-1 z M19,1 h2 v2 h-2 z M25,1 h1 v1 h-1 z M27,1 h3 v1 h-3 z M6,2 h3 v1 h-3 z M11,2 h1 v1 h-1 z M13,2 h2 v1 h-2 z M23,2 h6 v1 h-6 z M6,3 h4 v2 h-4 z M13,3 h3 v1 h-3 z M20,3 h2 v1 h-2 z M26,3 h2 v1 h-2 z M29,3 h1 v1 h-1 z M12,4 h3 v1 h-3 z M21,4 h1 v1 h-1 z M24,4 h1 v1 h-1 z M28,4 h2 v2 h-2 z M6,5 h2 v1 h-2 z M9,5 h1 v1 h-1 z M12,5 h4 v2 h-4 z M2,6 h2 v1 h-2 z M6,6 h4 v1 h-4 z M18,6 h4 v1 h-4 z M25,6 h4 v1 h-4 z M2,7 h3 v1 h-3 z M7,7 h4 v2 h-4 z M13,7 h1 v1 h-1 z M15,7 h2 v1 h-2 z M28,7 h2 v1 h-2 z M1,8 h1 v1 h-1 z M3,8 h2 v2 h-2 z M13,8 h3 v1 h-3 z M19,8 h2 v1 h-2 z M26,8 h1 v1 h-1 z M7,9 h3 v1 h-3 z M13,9 h1 v1 h-1 z M15,9 h2 v1 h-2 z M20,9 h2 v1 h-2 z M28,9 h2 v1 h-2 z M1,10 h1 v1 h-1 z M3,10 h3 v2 h-3 z M8,10 h4 v1 h-4 z M14,10 h4 v1 h-4 z M20,10 h4 v2 h-4 z M26,10 h4 v2 h-4 z M9,11 h3 v1 h-3 z M15,11 h1 v1 h-1 z M17,11 h1 v1 h-1 z M1,12 h5 v2 h-5 z M8,12 h4 v2 h-4 z M14,12 h3 v1 h-3 z M21,12 h2 v1 h-2 z M28,12 h1 v1 h-1 z M14,13 h2 v1 h-2 z M17,13 h1 v2 h-1 z M21,13 h3 v1 h-3 z M26,13 h3 v1 h-3 z M1,14 h1 v1 h-1 z M3,14 h4 v1 h-4 z M9,14 h4 v1 h-4 z M15,14 h1 v1 h-1 z M22,14 h3 v1 h-3 z M27,14 h2 v1 h-2 z M2,15 h1 v1 h-1 z M4,15 h3 v1 h-3 z M10,15 h3 v1 h-3 z M16,15 h2 v1 h-2 z M21,15 h3 v1 h-3 z M28,15 h2 v1 h-2 z M1,16 h4 v1 h-4 z M6,16 h1 v1 h-1 z M10,16 h2 v1 h-2 z M15,16 h3 v1 h-3 z M23,16 h2 v1 h-2 z M27,16 h3 v1 h-3 z M2,17 h6 v1 h-6 z M12,17 h1 v1 h-1 z M16,17 h4 v1 h-4 z M22,17 h4 v1 h-4 z M28,17 h2 v1 h-2 z M1,18 h7 v1 h-7 z M10,18 h4 v1 h-4 z M17,18 h3 v1 h-3 z M23,18 h3 v1 h-3 z M28,18 h1 v1 h-1 z M2,19 h4 v1 h-4 z M7,19 h1 v1 h-1 z M11,19 h3 v2 h-3 z M16,19 h2 v1 h-2 z M19,19 h1 v3 h-1 z M24,19 h2 v1 h-2 z M29,19 h1 v1 h-1 z M1,20 h4 v2 h-4 z M16,20 h1 v1 h-1 z M22,20 h3 v1 h-3 z M28,20 h2 v1 h-2 z M11,21 h4 v1 h-4 z M17,21 h1 v1 h-1 z M23,21 h3 v1 h-3 z M29,21 h1 v2 h-1 z M1,22 h2 v4 h-2 z M4,22 h1 v1 h-1 z M11,22 h1 v1 h-1 z M13,22 h2 v1 h-2 z M17,22 h3 v1 h-3 z M23,22 h2 v1 h-2 z M4,23 h3 v1 h-3 z M8,23 h1 v1 h-1 z M11,23 h2 v1 h-2 z M18,23 h2 v1 h-2 z M26,23 h1 v2 h-1 z M5,24 h5 v1 h-5 z M12,24 h1 v1 h-1 z M14,24 h2 v2 h-2 z M19,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z M4,25 h6 v1 h-6 z M18,25 h4 v1 h-4 z M24,25 h4 v1 h-4 z M2,26 h7 v1 h-7 z M12,26 h4 v1 h-4 z M18,26 h3 v1 h-3 z M25,26 h3 v1 h-3 z M1,27 h3 v1 h-3 z M5,27 h2 v1 h-2 z M8,27 h2 v1 h-2 z M13,27 h2 v1 h-2 z M18,27 h2 v1 h-2 z M21,27 h1 v1 h-1 z M24,27 h2 v1 h-2 z M1,28 h8 v1 h-8 z M10,28 h1 v1 h-1 z M13,28 h1 v1 h-1 z M15,28 h2 v1 h-2 z M19,28 h4 v1 h-4 z M25,28 h4 v1 h-4 z M2,29 h9 v1 h-9 z M13,29 h4 v1 h-4 z M19,29 h2 v1 h-2 z M22,29 h1 v1 h-1 z M25,29 h2 v1 h-2 z M28,29 h1 v1 h-1 z" fill="#795548" />
-    <path d="M7,1 h1 v1 h-1 z M18,1 h1 v1 h-1 z M23,1 h1 v1 h-1 z M5,2 h1 v1 h-1 z M12,2 h1 v2 h-1 z M3,3 h1 v3 h-1 z M18,3 h1 v1 h-1 z M28,3 h1 v1 h-1 z M15,4 h1 v1 h-1 z M19,4 h1 v1 h-1 z M27,4 h1 v1 h-1 z M8,5 h1 v1 h-1 z M26,5 h2 v1 h-2 z M1,6 h1 v2 h-1 z M14,7 h1 v1 h-1 z M2,8 h1 v1 h-1 z M16,8 h1 v1 h-1 z M22,8 h1 v2 h-1 z M25,8 h1 v1 h-1 z M27,8 h1 v1 h-1 z M1,9 h2 v1 h-2 z M10,9 h1 v1 h-1 z M14,9 h1 v1 h-1 z M2,10 h1 v1 h-1 z M1,11 h2 v1 h-2 z M8,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M17,12 h1 v1 h-1 z M20,12 h1 v1 h-1 z M23,12 h1 v1 h-1 z M16,13 h1 v1 h-1 z M2,14 h1 v1 h-1 z M1,15 h1 v1 h-1 z M3,15 h1 v1 h-1 z M9,15 h1 v2 h-1 z M15,15 h1 v1 h-1 z M18,15 h1 v2 h-1 z M24,15 h1 v1 h-1 z M5,16 h1 v1 h-1 z M12,16 h1 v1 h-1 z M1,17 h1 v1 h-1 z M10,17 h2 v1 h-2 z M13,17 h1 v1 h-1 z M1,19 h1 v1 h-1 z M6,19 h1 v1 h-1 z M10,19 h1 v2 h-1 z M22,19 h1 v1 h-1 z M18,21 h1 v1 h-1 z M20,21 h1 v3 h-1 z M26,21 h1 v1 h-1 z M3,22 h1 v2 h-1 z M12,22 h1 v1 h-1 z M25,22 h2 v1 h-2 z M7,23 h1 v1 h-1 z M13,23 h2 v1 h-2 z M17,23 h1 v1 h-1 z M23,23 h1 v1 h-1 z M25,23 h1 v1 h-1 z M29,23 h1 v1 h-1 z M3,24 h2 v1 h-2 z M13,24 h1 v1 h-1 z M18,24 h1 v1 h-1 z M21,24 h1 v1 h-1 z M3,25 h1 v1 h-1 z M12,25 h2 v1 h-2 z M1,26 h1 v1 h-1 z M9,26 h1 v1 h-1 z M24,26 h1 v1 h-1 z M4,27 h1 v1 h-1 z M7,27 h1 v1 h-1 z M12,27 h1 v1 h-1 z M15,27 h1 v1 h-1 z M20,27 h1 v1 h-1 z M26,27 h1 v1 h-1 z M9,28 h1 v1 h-1 z M14,28 h1 v1 h-1 z M1,29 h1 v1 h-1 z M21,29 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M3,1 h1 v2 h-1 z M9,1 h1 v2 h-1 z M15,1 h1 v2 h-1 z M21,1 h1 v2 h-1 z M4,3 h1 v4 h-1 z M10,3 h1 v4 h-1 z M16,3 h1 v4 h-1 z M22,4 h1 v1 h-1 z M5,7 h1 v3 h-1 z M11,7 h1 v3 h-1 z M17,7 h1 v3 h-1 z M23,8 h1 v2 h-1 z M6,10 h1 v4 h-1 z M12,10 h1 v4 h-1 z M18,10 h1 v4 h-1 z M24,10 h1 v4 h-1 z M7,14 h1 v3 h-1 z M13,14 h1 v3 h-1 z M19,14 h1 v3 h-1 z M25,14 h1 v3 h-1 z M8,17 h1 v3 h-1 z M14,17 h1 v4 h-1 z M20,17 h1 v4 h-1 z M26,17 h1 v4 h-1 z M9,21 h1 v3 h-1 z M15,21 h1 v3 h-1 z M21,21 h1 v3 h-1 z M27,21 h1 v3 h-1 z M10,24 h1 v4 h-1 z M16,24 h1 v4 h-1 z M22,24 h1 v4 h-1 z M28,24 h1 v4 h-1 z M11,28 h1 v2 h-1 z M17,28 h1 v2 h-1 z M23,28 h1 v2 h-1 z M29,28 h1 v2 h-1 z" fill="#5d4037" />
-    <path d="M4,1 h1 v2 h-1 z M10,1 h1 v2 h-1 z M16,1 h1 v2 h-1 z M22,1 h1 v2 h-1 z M5,3 h1 v4 h-1 z M11,3 h1 v4 h-1 z M17,3 h1 v4 h-1 z M23,4 h1 v1 h-1 z M6,7 h1 v3 h-1 z M12,7 h1 v3 h-1 z M18,8 h1 v2 h-1 z M24,8 h1 v1 h-1 z M7,10 h1 v4 h-1 z M13,10 h1 v4 h-1 z M19,10 h1 v4 h-1 z M25,10 h1 v4 h-1 z M8,14 h1 v3 h-1 z M14,14 h1 v3 h-1 z M20,14 h1 v3 h-1 z M26,14 h1 v3 h-1 z M9,17 h1 v4 h-1 z M15,17 h1 v4 h-1 z M21,17 h1 v4 h-1 z M27,17 h1 v1 h-1 z M27,19 h1 v2 h-1 z M10,21 h1 v3 h-1 z M16,21 h1 v3 h-1 z M22,21 h1 v3 h-1 z M28,21 h1 v1 h-1 z M28,23 h1 v1 h-1 z M11,24 h1 v4 h-1 z M17,24 h1 v4 h-1 z M23,24 h1 v4 h-1 z M29,24 h1 v2 h-1 z M29,27 h1 v1 h-1 z M12,28 h1 v2 h-1 z M18,28 h1 v2 h-1 z M24,28 h1 v2 h-1 z M30,28 h1 v2 h-1 z" fill="#a1887f" />
-    <path d="M24,1 h1 v1 h-1 z M26,1 h1 v1 h-1 z M18,2 h1 v1 h-1 z M29,2 h1 v1 h-1 z M19,3 h1 v1 h-1 z M18,4 h1 v1 h-1 z M20,4 h1 v1 h-1 z M29,6 h1 v1 h-1 z M21,8 h1 v1 h-1 z M19,9 h1 v1 h-1 z M30,10 h1 v1 h-1 z M26,12 h2 v1 h-2 z M29,12 h1 v3 h-1 z M20,13 h1 v1 h-1 z M16,14 h1 v1 h-1 z M18,14 h1 v1 h-1 z M21,14 h1 v1 h-1 z M27,15 h1 v1 h-1 z M21,16 h2 v1 h-2 z M16,18 h1 v1 h-1 z M22,18 h1 v1 h-1 z M27,18 h1 v1 h-1 z M29,18 h1 v1 h-1 z M18,19 h1 v1 h-1 z M23,19 h1 v1 h-1 z M28,19 h1 v1 h-1 z M17,20 h2 v1 h-2 z M25,20 h1 v1 h-1 z M31,20 h1 v1 h-1 z M28,22 h1 v1 h-1 z M24,23 h1 v1 h-1 z M20,24 h1 v1 h-1 z M25,24 h1 v1 h-1 z M27,24 h1 v1 h-1 z M21,26 h1 v1 h-1 z M29,26 h1 v1 h-1 z M27,27 h1 v1 h-1 z M27,29 h1 v1 h-1 z" fill="#bcaaa4" />
-    {/* Stones */}
-    <path d="M23,6 h2 v1 h-2 z M6,20 h3 v1 h-3 z M5,21 h4 v1 h-4 z M5,22 h3 v1 h-3 z" fill="#9e9e9e" />
-    <path d="M22,6 h1 v1 h-1 z M5,20 h1 v1 h-1 z" fill="#bdbdbd" />
-    <path d="M8,22 h1 v1 h-1 z" fill="#757575" />
-    {/* Wind */}
-    <path d="M22,3 h4 v1 h-4 z M25,4 h2 v1 h-2 z M18,5 h8 v1 h-8 z M18,7 h10 v1 h-10 z M28,8 h2 v1 h-2 z M24,9 h4 v1 h-4 z" fill="#eceff1" opacity="0.85" />
-  </svg>
-));
-
-const FloodedPlotSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plot edge */}
-    <path d="M0,0 h32 v1 h-32 z M0,1 h1 v30 h-1 z M31,1 h1 v30 h-1 z M0,31 h32 v1 h-32 z" fill="#3e2723" />
-    <path d="M30,1 h1 v29 h-1 z M1,30 h30 v1 h-30 z" fill="#4e342e" />
-    {/* Mud */}
-    <path d="M2,1 h1 v2 h-1 z M5,1 h3 v1 h-3 z M9,1 h10 v1 h-10 z M20,1 h9 v1 h-9 z M4,2 h8 v1 h-8 z M13,2 h1 v1 h-1 z M16,2 h4 v1 h-4 z M21,2 h5 v1 h-5 z M27,2 h3 v2 h-3 z M1,3 h12 v1 h-12 z M14,3 h1 v1 h-1 z M16,3 h10 v1 h-10 z M1,4 h3 v1 h-3 z M5,4 h2 v1 h-2 z M8,4 h5 v1 h-5 z M14,4 h9 v1 h-9 z M25,4 h1 v1 h-1 z M29,4 h1 v1 h-1 z M1,5 h2 v1 h-2 z M4,5 h2 v1 h-2 z M8,5 h14 v1 h-14 z M24,5 h6 v1 h-6 z M1,6 h6 v1 h-6 z M8,6 h3 v1 h-3 z M12,6 h5 v1 h-5 z M18,6 h1 v1 h-1 z M20,6 h8 v1 h-8 z M29,6 h1 v1 h-1 z M2,7 h2 v1 h-2 z M5,7 h5 v1 h-5 z M22,7 h8 v1 h-8 z M1,8 h3 v1 h-3 z M5,8 h3 v1 h-3 z M24,8 h4 v1 h-4 z M29,8 h1 v2 h-1 z M1,9 h6 v1 h-6 z M25,9 h3 v1 h-3 z M1,10 h3 v1 h-3 z M5,10 h1 v1 h-1 z M26,10 h3 v1 h-3 z M1,11 h4 v1 h-4 z M27,11 h3 v1 h-3 z M2,12 h2 v1 h-2 z M28,12 h2 v2 h-2 z M1,13 h2 v7 h-2 z M29,14 h1 v6 h-1 z M1,20 h1 v2 h-1 z M3,20 h1 v2 h-1 z M28,20 h2 v2 h-2 z M1,22 h3 v1 h-3 z M27,22 h2 v1 h-2 z M1,23 h5 v1 h-5 z M26,23 h4 v1 h-4 z M2,24 h1 v1 h-1 z M4,24 h3 v1 h-3 z M25,24 h4 v1 h-4 z M1,25 h6 v1 h-6 z M24,25 h1 v1 h-1 z M26,25 h2 v1 h-2 z M1,26 h5 v1 h-5 z M8,26 h2 v1 h-2 z M22,26 h3 v1 h-3 z M27,26 h3 v1 h-3 z M1,27 h1 v1 h-1 z M4,27 h8 v1 h-8 z M13,27 h4 v1 h-4 z M19,27 h3 v1 h-3 z M23,27 h1 v1 h-1 z M25,27 h4 v1 h-4 z M1,28 h2 v1 h-2 z M4,28 h13 v1 h-13 z M18,28 h5 v1 h-5 z M24,28 h3 v1 h-3 z M28,28 h2 v1 h-2 z M1,29 h8 v1 h-8 z M10,29 h2 v1 h-2 z M13,29 h8 v1 h-8 z M22,29 h8 v1 h-8 z" fill="#5d4037" />
-    <path d="M1,1 h1 v2 h-1 z M3,1 h2 v1 h-2 z M8,1 h1 v1 h-1 z M19,1 h1 v1 h-1 z M29,1 h1 v1 h-1 z M3,2 h1 v1 h-1 z M12,2 h1 v1 h-1 z M14,2 h2 v1 h-2 z M20,2 h1 v1 h-1 z M26,2 h1 v2 h-1 z M13,3 h1 v2 h-1 z M15,3 h1 v1 h-1 z M4,4 h1 v1 h-1 z M7,4 h1 v1 h-1 z M23,4 h2 v1 h-2 z M26,4 h3 v1 h-3 z M3,5 h1 v1 h-1 z M6,5 h2 v1 h-2 z M22,5 h2 v1 h-2 z M7,6 h1 v1 h-1 z M11,6 h1 v1 h-1 z M17,6 h1 v1 h-1 z M19,6 h1 v1 h-1 z M28,6 h1 v1 h-1 z M1,7 h1 v1 h-1 z M4,7 h1 v2 h-1 z M28,8 h1 v2 h-1 z M4,10 h1 v1 h-1 z M29,10 h1 v1 h-1 z M1,12 h1 v1 h-1 z M3,13 h1 v1 h-1 z M2,20 h1 v2 h-1 z M4,22 h1 v1 h-1 z M29,22 h1 v1 h-1 z M1,24 h1 v1 h-1 z M3,24 h1 v1 h-1 z M29,24 h1 v1 h-1 z M7,25 h1 v1 h-1 z M25,25 h1 v1 h-1 z M28,25 h2 v1 h-2 z M6,26 h2 v1 h-2 z M25,26 h2 v1 h-2 z M2,27 h2 v1 h-2 z M12,27 h1 v1 h-1 z M17,27 h2 v1 h-2 z M22,27 h1 v1 h-1 z M24,27 h1 v1 h-1 z M29,27 h1 v1 h-1 z M3,28 h1 v1 h-1 z M17,28 h1 v1 h-1 z M23,28 h1 v1 h-1 z M27,28 h1 v1 h-1 z M9,29 h1 v1 h-1 z M12,29 h1 v1 h-1 z M21,29 h1 v1 h-1 z" fill="#4e342e" />
-    {/* Standing water */}
-    <path d="M10,7 h12 v1 h-12 z M8,8 h3 v1 h-3 z M21,8 h3 v1 h-3 z M7,9 h1 v1 h-1 z M23,9 h2 v1 h-2 z M6,10 h1 v1 h-1 z M25,10 h1 v1 h-1 z M5,11 h1 v1 h-1 z M26,11 h1 v1 h-1 z M4,12 h1 v2 h-1 z M27,12 h1 v2 h-1 z M3,14 h1 v6 h-1 z M28,14 h1 v6 h-1 z M4,20 h1 v2 h-1 z M27,20 h1 v2 h-1 z M5,22 h1 v1 h-1 z M26,22 h1 v1 h-1 z M6,23 h1 v1 h-1 z M25,23 h1 v1 h-1 z M7,24 h2 v1 h-2 z M23,24 h1 v1 h-1 z M8,25 h3 v1 h-3 z M21,25 h3 v1 h-3 z M10,26 h12 v1 h-12 z" fill="#0288d1" />
-    <path d="M11,8 h10 v1 h-10 z M11,9 h12 v1 h-12 z M8,10 h3 v1 h-3 z M12,10 h13 v1 h-13 z M6,11 h6 v1 h-6 z M13,11 h5 v1 h-5 z M19,11 h3 v1 h-3 z M25,11 h1 v1 h-1 z M5,12 h7 v1 h-7 z M14,12 h3 v1 h-3 z M19,12 h2 v1 h-2 z M22,12 h3 v1 h-3 z M26,12 h1 v1 h-1 z M5,13 h8 v1 h-8 z M15,13 h1 v1 h-1 z M18,13 h9 v1 h-9 z M4,14 h10 v1 h-10 z M21,14 h7 v1 h-7 z M4,15 h9 v1 h-9 z M23,15 h5 v1 h-5 z M4,16 h8 v1 h-8 z M24,16 h4 v1 h-4 z M4,17 h7 v3 h-7 z M25,17 h3 v3 h-3 z M5,20 h6 v1 h-6 z M25,20 h2 v1 h-2 z M5,21 h7 v1 h-7 z M24,21 h3 v1 h-3 z M6,22 h7 v1 h-7 z M23,22 h3 v1 h-3 z M7,23 h8 v1 h-8 z M24,23 h1 v1 h-1 z M9,24 h10 v1 h-10 z M20,24 h3 v1 h-3 z M11,25 h10 v1 h-10 z" fill="#4fc3f7" />
-    <path d="M17,14 h4 v1 h-4 z M13,15 h2 v1 h-2 z M16,15 h7 v1 h-7 z M12,16 h3 v1 h-3 z M16,16 h8 v1 h-8 z M11,17 h14 v4 h-14 z M12,21 h12 v1 h-12 z M13,22 h10 v1 h-10 z M15,23 h5 v1 h-5 z" fill="#29b6f6" />
-    <path d="M8,9 h3 v1 h-3 z M7,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M22,11 h3 v1 h-3 z M21,12 h1 v1 h-1 z M25,12 h1 v1 h-1 z M20,23 h4 v1 h-4 z M19,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z" fill="#e1f5fe" />
-    {/* Drowning seedling */}
-    <path d="M12,11 h1 v1 h-1 z M18,11 h1 v1 h-1 z M12,12 h2 v1 h-2 z M17,12 h2 v1 h-2 z M13,13 h2 v1 h-2 z M16,13 h2 v1 h-2 z M14,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z" fill="#81c784" />
-    <path d="M15,14 h1 v3 h-1 z" fill="#558b2f" />
-  </svg>
-));
-
-const GardenPlotSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plot edge */}
-    <path d="M0,0 h32 v1 h-32 z M0,1 h1 v30 h-1 z M31,1 h1 v30 h-1 z M0,31 h32 v1 h-32 z" fill="#3e2723" />
-    <path d="M30,1 h1 v29 h-1 z M1,30 h30 v1 h-30 z" fill="#4e342e" />
-    {/* Rich soil */}
-    <path d="M1,1 h2 v1 h-2 z M4,1 h8 v1 h-8 z M15,1 h1 v1 h-1 z M17,1 h5 v1 h-5 z M23,1 h7 v1 h-7 z M1,2 h11 v1 h-11 z M13,2 h6 v1 h-6 z M20,2 h3 v1 h-3 z M24,2 h6 v1 h-6 z M1,3 h5 v1 h-5 z M7,3 h3 v1 h-3 z M11,3 h4 v1 h-4 z M16,3 h2 v1 h-2 z M19,3 h1 v1 h-1 z M21,3 h9 v1 h-9 z M2,4 h8 v1 h-8 z M11,4 h5 v1 h-5 z M17,4 h2 v1 h-2 z M20,4 h7 v1 h-7 z M28,4 h2 v3 h-2 z M1,5 h1 v1 h-1 z M3,5 h1 v1 h-1 z M7,5 h3 v1 h-3 z M14,5 h4 v2 h-4 z M19,5 h1 v1 h-1 z M21,5 h3 v1 h-3 z M26,5 h1 v1 h-1 z M1,6 h2 v1 h-2 z M7,6 h2 v1 h-2 z M10,6 h1 v1 h-1 z M22,6 h3 v1 h-3 z M1,7 h4 v1 h-4 z M6,7 h6 v1 h-6 z M14,7 h2 v1 h-2 z M17,7 h2 v1 h-2 z M21,7 h4 v1 h-4 z M27,7 h3 v1 h-3 z M1,8 h1 v3 h-1 z M3,8 h1 v1 h-1 z M5,8 h3 v1 h-3 z M9,8 h10 v1 h-10 z M20,8 h8 v1 h-8 z M29,8 h1 v1 h-1 z M3,10 h5 v1 h-5 z M9,10 h2 v1 h-2 z M12,10 h5 v1 h-5 z M18,10 h1 v1 h-1 z M20,10 h4 v1 h-4 z M25,10 h5 v1 h-5 z M2,11 h5 v1 h-5 z M8,11 h1 v1 h-1 z M10,11 h2 v1 h-2 z M13,11 h1 v1 h-1 z M18,11 h2 v1 h-2 z M21,11 h1 v1 h-1 z M23,11 h1 v1 h-1 z M25,11 h2 v1 h-2 z M28,11 h2 v1 h-2 z M1,12 h1 v1 h-1 z M3,12 h10 v1 h-10 z M20,12 h10 v1 h-10 z M1,13 h2 v4 h-2 z M6,13 h5 v1 h-5 z M13,13 h1 v1 h-1 z M17,13 h1 v1 h-1 z M19,13 h7 v1 h-7 z M28,13 h2 v1 h-2 z M7,14 h1 v1 h-1 z M9,14 h1 v1 h-1 z M11,14 h4 v2 h-4 z M16,14 h1 v1 h-1 z M18,14 h1 v1 h-1 z M20,14 h1 v1 h-1 z M22,14 h3 v1 h-3 z M6,15 h1 v2 h-1 z M8,15 h1 v1 h-1 z M16,15 h5 v1 h-5 z M24,15 h1 v1 h-1 z M29,15 h1 v4 h-1 z M11,16 h3 v1 h-3 z M17,16 h4 v1 h-4 z M25,16 h1 v1 h-1 z M1,17 h1 v1 h-1 z M7,17 h1 v1 h-1 z M9,17 h9 v1 h-9 z M19,17 h1 v1 h-1 z M21,17 h1 v1 h-1 z M23,17 h1 v1 h-1 z M25,17 h2 v1 h-2 z M1,18 h7 v1 h-7 z M9,18 h4 v1 h-4 z M14,18 h4 v1 h-4 z M19,18 h3 v1 h-3 z M23,18 h3 v1 h-3 z M1,19 h1 v1 h-1 z M2,20 h2 v1 h-2 z M6,20 h15 v1 h-15 z M22,20 h8 v1 h-8 z M1,21 h1 v2 h-1 z M3,21 h5 v1 h-5 z M9,21 h3 v1 h-3 z M16,21 h8 v1 h-8 z M25,21 h5 v1 h-5 z M3,22 h12 v1 h-12 z M16,22 h4 v1 h-4 z M21,22 h5 v1 h-5 z M27,22 h3 v1 h-3 z M1,23 h4 v1 h-4 z M6,23 h8 v1 h-8 z M15,23 h11 v1 h-11 z M27,23 h1 v1 h-1 z M29,23 h1 v1 h-1 z M1,24 h2 v1 h-2 z M6,24 h21 v1 h-21 z M28,24 h2 v3 h-2 z M1,25 h3 v2 h-3 z M5,25 h1 v1 h-1 z M7,25 h3 v1 h-3 z M12,25 h1 v1 h-1 z M14,25 h4 v1 h-4 z M19,25 h1 v1 h-1 z M21,25 h1 v1 h-1 z M23,25 h2 v1 h-2 z M26,25 h1 v1 h-1 z M8,26 h3 v1 h-3 z M14,26 h1 v1 h-1 z M16,26 h2 v1 h-2 z M21,26 h3 v1 h-3 z M1,27 h1 v1 h-1 z M3,27 h2 v1 h-2 z M6,27 h6 v1 h-6 z M13,27 h2 v1 h-2 z M16,27 h3 v1 h-3 z M20,27 h3 v1 h-3 z M24,27 h2 v2 h-2 z M27,27 h3 v1 h-3 z M1,28 h6 v1 h-6 z M8,28 h8 v1 h-8 z M17,28 h3 v1 h-3 z M21,28 h2 v1 h-2 z M28,28 h2 v1 h-2 z M1,29 h1 v1 h-1 z" fill="#4e342e" />
-    <path d="M3,1 h1 v1 h-1 z M12,1 h3 v1 h-3 z M16,1 h1 v1 h-1 z M22,1 h1 v1 h-1 z M12,2 h1 v1 h-1 z M19,2 h1 v1 h-1 z M23,2 h1 v1 h-1 z M6,3 h1 v1 h-1 z M10,3 h1 v3 h-1 z M15,3 h1 v1 h-1 z M18,3 h1 v1 h-1 z M20,3 h1 v1 h-1 z M1,4 h1 v1 h-1 z M16,4 h1 v1 h-1 z M19,4 h1 v1 h-1 z M27,4 h1 v1 h-1 z M2,5 h1 v1 h-1 z M5,5 h1 v1 h-1 z M12,5 h1 v1 h-1 z M24,5 h1 v1 h-1 z M3,6 h1 v1 h-1 z M9,6 h1 v1 h-1 z M21,6 h1 v1 h-1 z M13,7 h1 v1 h-1 z M16,7 h1 v1 h-1 z M20,7 h1 v1 h-1 z M25,7 h1 v1 h-1 z M2,8 h1 v1 h-1 z M4,8 h1 v1 h-1 z M8,8 h1 v1 h-1 z M19,8 h1 v1 h-1 z M28,8 h1 v1 h-1 z M2,10 h1 v1 h-1 z M8,10 h1 v1 h-1 z M11,10 h1 v1 h-1 z M17,10 h1 v2 h-1 z M19,10 h1 v1 h-1 z M24,10 h1 v2 h-1 z M1,11 h1 v1 h-1 z M7,11 h1 v1 h-1 z M9,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z M15,11 h1 v1 h-1 z M20,11 h1 v1 h-1 z M22,11 h1 v1 h-1 z M27,11 h1 v1 h-1 z M2,12 h1 v1 h-1 z M18,12 h2 v1 h-2 z M3,13 h1 v1 h-1 z M11,13 h2 v1 h-2 z M18,13 h1 v1 h-1 z M8,14 h1 v1 h-1 z M10,14 h1 v3 h-1 z M17,14 h1 v1 h-1 z M19,14 h1 v1 h-1 z M21,14 h1 v1 h-1 z M29,14 h1 v1 h-1 z M22,15 h1 v1 h-1 z M3,16 h1 v1 h-1 z M5,16 h1 v1 h-1 z M24,16 h1 v2 h-1 z M28,16 h1 v2 h-1 z M2,17 h1 v1 h-1 z M6,17 h1 v1 h-1 z M18,17 h1 v2 h-1 z M20,17 h1 v1 h-1 z M8,18 h1 v1 h-1 z M13,18 h1 v1 h-1 z M22,18 h1 v1 h-1 z M1,20 h1 v1 h-1 z M4,20 h2 v1 h-2 z M21,20 h1 v1 h-1 z M2,21 h1 v2 h-1 z M8,21 h1 v1 h-1 z M12,21 h4 v1 h-4 z M24,21 h1 v1 h-1 z M15,22 h1 v1 h-1 z M20,22 h1 v1 h-1 z M26,22 h1 v2 h-1 z M5,23 h1 v1 h-1 z M14,23 h1 v1 h-1 z M28,23 h1 v1 h-1 z M3,24 h3 v1 h-3 z M27,24 h1 v1 h-1 z M10,25 h1 v1 h-1 z M22,25 h1 v1 h-1 z M7,26 h1 v1 h-1 z M15,26 h1 v2 h-1 z M24,26 h1 v1 h-1 z M2,27 h1 v1 h-1 z M23,27 h1 v2 h-1 z M7,28 h1 v1 h-1 z M16,28 h1 v1 h-1 z M20,28 h1 v1 h-1 z M26,28 h2 v1 h-2 z" fill="#5d4037" />
-    <path d="M2,9 h28 v1 h-28 z M2,19 h28 v1 h-28 z M2,29 h28 v1 h-28 z" fill="#3e2723" />
-    {/* Seedlings */}
-    <path d="M4,5 h1 v1 h-1 z M6,5 h1 v1 h-1 z M11,5 h1 v1 h-1 z M13,5 h1 v1 h-1 z M18,5 h1 v1 h-1 z M20,5 h1 v1 h-1 z M25,5 h1 v1 h-1 z M27,5 h1 v1 h-1 z M7,15 h1 v1 h-1 z M9,15 h1 v1 h-1 z M21,15 h1 v1 h-1 z M23,15 h1 v1 h-1 z M14,16 h1 v1 h-1 z M16,16 h1 v1 h-1 z M3,17 h1 v1 h-1 z M5,17 h1 v1 h-1 z M26,18 h1 v1 h-1 z M28,18 h1 v1 h-1 z M4,25 h1 v1 h-1 z M6,25 h1 v1 h-1 z M11,25 h1 v1 h-1 z M13,25 h1 v1 h-1 z M18,25 h1 v1 h-1 z M20,25 h1 v1 h-1 z M25,25 h1 v1 h-1 z M27,25 h1 v1 h-1 z" fill="#81c784" />
-    <path d="M4,6 h1 v1 h-1 z M6,6 h1 v1 h-1 z M11,6 h1 v1 h-1 z M13,6 h1 v1 h-1 z M18,6 h1 v1 h-1 z M20,6 h1 v1 h-1 z M25,6 h1 v1 h-1 z M27,6 h1 v1 h-1 z M7,16 h1 v1 h-1 z M9,16 h1 v1 h-1 z M21,16 h1 v1 h-1 z M23,16 h1 v1 h-1 z M4,26 h1 v1 h-1 z M6,26 h1 v1 h-1 z M11,26 h1 v1 h-1 z M13,26 h1 v1 h-1 z M18,26 h1 v1 h-1 z M20,26 h1 v1 h-1 z M25,26 h1 v1 h-1 z M27,26 h1 v1 h-1 z" fill="#4caf50" />
-    <path d="M5,6 h1 v2 h-1 z M12,6 h1 v2 h-1 z M19,6 h1 v2 h-1 z M26,6 h1 v2 h-1 z M15,14 h1 v3 h-1 z M4,16 h1 v2 h-1 z M8,16 h1 v2 h-1 z M22,16 h1 v2 h-1 z M27,17 h1 v2 h-1 z M5,26 h1 v2 h-1 z M12,26 h1 v2 h-1 z M19,26 h1 v2 h-1 z M26,26 h1 v2 h-1 z" fill="#2e7d32" />
-    {/* Flowers & fruit */}
-    <path d="M14,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M13,12 h1 v1 h-1 z M15,12 h1 v1 h-1 z M17,12 h1 v1 h-1 z M14,13 h3 v1 h-3 z" fill="#f06292" />
-    <path d="M14,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z" fill="#fdd835" />
-    <path d="M26,13 h2 v1 h-2 z M25,14 h1 v2 h-1 z M28,14 h1 v2 h-1 z M26,16 h2 v1 h-2 z" fill="#ff9800" />
-    <path d="M26,14 h2 v2 h-2 z" fill="#ffeb3b" />
-    <path d="M4,13 h2 v1 h-2 z M3,14 h1 v1 h-1 z M5,14 h2 v1 h-2 z M3,15 h3 v1 h-3 z" fill="#e53935" />
-    <path d="M4,14 h1 v1 h-1 z" fill="#ff8a80" />
-  </svg>
-));
-
-const LoamBedSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plank edging */}
-    <path d="M2,1 h28 v1 h-28 z M1,2 h1 v28 h-1 z M30,2 h1 v28 h-1 z M2,30 h28 v1 h-28 z" fill="#8d6e63" />
-    <path d="M0,0 h31 v1 h-31 z M0,1 h1 v30 h-1 z" fill="#a1887f" />
-    <path d="M31,0 h1 v1 h-1 z M1,1 h1 v1 h-1 z M30,1 h2 v1 h-2 z M2,2 h28 v1 h-28 z M31,2 h1 v28 h-1 z M2,3 h1 v26 h-1 z M29,3 h1 v26 h-1 z M2,29 h28 v1 h-28 z M1,30 h1 v1 h-1 z M30,30 h2 v1 h-2 z M0,31 h32 v1 h-32 z" fill="#5d4037" />
-    {/* Dark crumbly loam */}
-    <path d="M3,3 h4 v1 h-4 z M8,3 h1 v1 h-1 z M10,3 h3 v1 h-3 z M16,3 h2 v2 h-2 z M19,3 h2 v2 h-2 z M22,3 h2 v1 h-2 z M25,3 h1 v1 h-1 z M27,3 h1 v1 h-1 z M3,4 h6 v1 h-6 z M10,4 h1 v2 h-1 z M13,4 h2 v2 h-2 z M22,4 h5 v1 h-5 z M7,5 h2 v1 h-2 z M16,5 h1 v2 h-1 z M19,5 h8 v1 h-8 z M28,5 h1 v1 h-1 z M3,6 h6 v1 h-6 z M12,6 h1 v1 h-1 z M14,6 h1 v1 h-1 z M18,6 h3 v1 h-3 z M22,6 h2 v1 h-2 z M26,6 h3 v1 h-3 z M3,7 h2 v2 h-2 z M6,7 h1 v2 h-1 z M8,7 h1 v1 h-1 z M11,7 h3 v1 h-3 z M16,7 h6 v1 h-6 z M25,7 h1 v1 h-1 z M27,7 h2 v2 h-2 z M10,8 h2 v1 h-2 z M13,8 h3 v1 h-3 z M17,8 h2 v1 h-2 z M20,8 h2 v1 h-2 z M23,8 h3 v1 h-3 z M3,9 h1 v1 h-1 z M5,9 h2 v1 h-2 z M8,9 h10 v1 h-10 z M21,9 h6 v1 h-6 z M5,10 h3 v1 h-3 z M9,10 h6 v1 h-6 z M16,10 h1 v1 h-1 z M18,10 h2 v1 h-2 z M21,10 h4 v1 h-4 z M3,11 h1 v1 h-1 z M7,11 h3 v1 h-3 z M11,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z M16,11 h4 v1 h-4 z M21,11 h1 v1 h-1 z M24,11 h2 v1 h-2 z M27,11 h2 v1 h-2 z M6,12 h4 v1 h-4 z M12,12 h1 v1 h-1 z M14,12 h4 v1 h-4 z M19,12 h5 v1 h-5 z M25,12 h2 v1 h-2 z M28,12 h1 v1 h-1 z M3,13 h2 v1 h-2 z M8,13 h12 v1 h-12 z M21,13 h2 v1 h-2 z M25,13 h4 v1 h-4 z M5,14 h2 v1 h-2 z M9,14 h3 v1 h-3 z M13,14 h6 v1 h-6 z M20,14 h1 v1 h-1 z M23,14 h1 v2 h-1 z M25,14 h2 v1 h-2 z M28,14 h1 v1 h-1 z M6,15 h2 v1 h-2 z M9,15 h1 v1 h-1 z M11,15 h2 v1 h-2 z M14,15 h5 v1 h-5 z M25,15 h4 v1 h-4 z M5,16 h10 v1 h-10 z M17,16 h1 v1 h-1 z M19,16 h2 v1 h-2 z M22,16 h4 v1 h-4 z M28,16 h1 v2 h-1 z M3,17 h2 v1 h-2 z M6,17 h2 v1 h-2 z M9,17 h1 v1 h-1 z M11,17 h4 v1 h-4 z M16,17 h1 v1 h-1 z M18,17 h3 v1 h-3 z M22,17 h2 v1 h-2 z M25,17 h2 v1 h-2 z M4,18 h1 v1 h-1 z M7,18 h2 v1 h-2 z M10,18 h2 v1 h-2 z M14,18 h4 v1 h-4 z M19,18 h5 v1 h-5 z M26,18 h2 v1 h-2 z M3,19 h5 v1 h-5 z M10,19 h1 v1 h-1 z M12,19 h5 v1 h-5 z M18,19 h1 v1 h-1 z M21,19 h2 v1 h-2 z M24,19 h3 v1 h-3 z M3,20 h1 v1 h-1 z M7,20 h1 v1 h-1 z M9,20 h2 v1 h-2 z M14,20 h3 v1 h-3 z M19,20 h2 v1 h-2 z M22,20 h5 v1 h-5 z M28,20 h1 v1 h-1 z M3,21 h2 v1 h-2 z M6,21 h1 v1 h-1 z M8,21 h1 v1 h-1 z M10,21 h4 v1 h-4 z M15,21 h7 v1 h-7 z M23,21 h5 v1 h-5 z M4,22 h2 v1 h-2 z M7,22 h1 v1 h-1 z M9,22 h5 v1 h-5 z M15,22 h3 v1 h-3 z M19,22 h1 v1 h-1 z M23,22 h4 v1 h-4 z M28,22 h1 v1 h-1 z M3,23 h1 v1 h-1 z M5,23 h4 v1 h-4 z M10,23 h4 v1 h-4 z M16,23 h2 v1 h-2 z M20,23 h2 v1 h-2 z M23,23 h1 v1 h-1 z M26,23 h3 v1 h-3 z M4,24 h1 v1 h-1 z M6,24 h2 v1 h-2 z M9,24 h3 v1 h-3 z M13,24 h4 v1 h-4 z M19,24 h2 v1 h-2 z M22,24 h1 v1 h-1 z M25,24 h2 v1 h-2 z M28,24 h1 v1 h-1 z M3,25 h3 v1 h-3 z M7,25 h1 v1 h-1 z M9,25 h2 v1 h-2 z M13,25 h7 v1 h-7 z M22,25 h7 v1 h-7 z M3,26 h1 v2 h-1 z M5,26 h5 v1 h-5 z M11,26 h5 v1 h-5 z M17,26 h2 v1 h-2 z M20,26 h5 v1 h-5 z M26,26 h2 v1 h-2 z M5,27 h8 v1 h-8 z M14,27 h1 v1 h-1 z M16,27 h2 v1 h-2 z M19,27 h4 v1 h-4 z M25,27 h3 v1 h-3 z M5,28 h4 v1 h-4 z M13,28 h3 v1 h-3 z M17,28 h1 v1 h-1 z M19,28 h3 v1 h-3 z M24,28 h5 v1 h-5 z" fill="#4e342e" />
-    <path d="M9,3 h1 v2 h-1 z M13,3 h3 v1 h-3 z M21,3 h1 v2 h-1 z M24,3 h1 v1 h-1 z M28,3 h1 v1 h-1 z M12,4 h1 v1 h-1 z M15,4 h1 v4 h-1 z M18,4 h1 v1 h-1 z M27,4 h1 v2 h-1 z M3,5 h4 v1 h-4 z M11,5 h1 v1 h-1 z M17,5 h1 v2 h-1 z M10,6 h2 v1 h-2 z M13,6 h1 v1 h-1 z M21,6 h1 v1 h-1 z M24,6 h2 v1 h-2 z M5,7 h1 v1 h-1 z M7,7 h1 v3 h-1 z M10,7 h1 v1 h-1 z M22,7 h2 v1 h-2 z M26,7 h1 v2 h-1 z M9,8 h1 v1 h-1 z M4,9 h1 v1 h-1 z M18,9 h3 v1 h-3 z M27,9 h1 v1 h-1 z M3,10 h2 v1 h-2 z M8,10 h1 v1 h-1 z M20,10 h1 v2 h-1 z M25,10 h2 v1 h-2 z M28,10 h1 v1 h-1 z M5,11 h1 v1 h-1 z M10,11 h1 v1 h-1 z M12,11 h1 v1 h-1 z M22,11 h1 v1 h-1 z M26,11 h1 v1 h-1 z M4,12 h2 v1 h-2 z M18,12 h1 v1 h-1 z M24,12 h1 v1 h-1 z M27,12 h1 v1 h-1 z M5,13 h2 v1 h-2 z M23,13 h1 v1 h-1 z M4,14 h1 v1 h-1 z M7,14 h2 v1 h-2 z M12,14 h1 v1 h-1 z M21,14 h1 v1 h-1 z M27,14 h1 v1 h-1 z M3,15 h1 v1 h-1 z M5,15 h1 v1 h-1 z M19,15 h3 v1 h-3 z M3,16 h2 v1 h-2 z M15,16 h1 v2 h-1 z M18,16 h1 v1 h-1 z M21,16 h1 v2 h-1 z M26,16 h2 v1 h-2 z M5,17 h1 v1 h-1 z M8,17 h1 v1 h-1 z M17,17 h1 v1 h-1 z M24,17 h1 v1 h-1 z M27,17 h1 v1 h-1 z M5,18 h2 v1 h-2 z M9,18 h1 v1 h-1 z M12,18 h2 v1 h-2 z M18,18 h1 v1 h-1 z M24,18 h2 v1 h-2 z M28,18 h1 v1 h-1 z M8,19 h2 v1 h-2 z M19,19 h2 v1 h-2 z M27,19 h2 v1 h-2 z M4,20 h3 v1 h-3 z M8,20 h1 v1 h-1 z M12,20 h2 v1 h-2 z M17,20 h2 v1 h-2 z M27,20 h1 v1 h-1 z M7,21 h1 v1 h-1 z M9,21 h1 v1 h-1 z M22,21 h1 v2 h-1 z M28,21 h1 v1 h-1 z M6,22 h1 v1 h-1 z M14,22 h1 v1 h-1 z M27,22 h1 v1 h-1 z M18,23 h1 v2 h-1 z M3,24 h1 v1 h-1 z M5,24 h1 v1 h-1 z M8,24 h1 v2 h-1 z M12,24 h1 v1 h-1 z M21,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z M11,25 h2 v1 h-2 z M20,25 h2 v1 h-2 z M10,26 h1 v1 h-1 z M16,26 h1 v1 h-1 z M19,26 h1 v1 h-1 z M25,26 h1 v1 h-1 z M28,26 h1 v1 h-1 z M13,27 h1 v1 h-1 z M18,27 h1 v1 h-1 z M23,27 h2 v1 h-2 z M3,28 h2 v1 h-2 z M9,28 h2 v1 h-2 z M12,28 h1 v1 h-1 z M22,28 h2 v1 h-2 z" fill="#5d4037" />
-    <path d="M28,4 h1 v1 h-1 z M12,5 h1 v1 h-1 z M18,5 h1 v1 h-1 z M9,6 h1 v1 h-1 z M24,7 h1 v1 h-1 z M5,8 h1 v1 h-1 z M8,8 h1 v1 h-1 z M12,8 h1 v1 h-1 z M28,9 h1 v1 h-1 z M15,10 h1 v1 h-1 z M17,10 h1 v1 h-1 z M4,11 h1 v1 h-1 z M6,11 h1 v1 h-1 z M14,11 h2 v1 h-2 z M23,11 h1 v1 h-1 z M3,12 h1 v1 h-1 z M10,12 h2 v1 h-2 z M13,12 h1 v1 h-1 z M7,13 h1 v1 h-1 z M20,13 h1 v1 h-1 z M24,13 h1 v2 h-1 z M3,14 h1 v1 h-1 z M22,14 h1 v2 h-1 z M8,15 h1 v1 h-1 z M10,15 h1 v1 h-1 z M13,15 h1 v1 h-1 z M16,16 h1 v1 h-1 z M10,17 h1 v1 h-1 z M3,18 h1 v1 h-1 z M11,19 h1 v2 h-1 z M23,19 h1 v1 h-1 z M21,20 h1 v1 h-1 z M5,21 h1 v1 h-1 z M3,22 h1 v1 h-1 z M8,22 h1 v1 h-1 z M4,23 h1 v1 h-1 z M9,23 h1 v1 h-1 z M14,23 h1 v1 h-1 z M17,24 h1 v1 h-1 z M27,24 h1 v1 h-1 z M4,26 h1 v2 h-1 z M28,27 h1 v1 h-1 z M11,28 h1 v1 h-1 z M16,28 h1 v1 h-1 z" fill="#6d4c41" />
-    <path d="M18,3 h1 v1 h-1 z M26,3 h1 v1 h-1 z M11,4 h1 v1 h-1 z M9,5 h1 v1 h-1 z M9,7 h1 v1 h-1 z M14,7 h1 v1 h-1 z M22,8 h1 v1 h-1 z M19,14 h1 v1 h-1 z M17,19 h1 v1 h-1 z M14,21 h1 v1 h-1 z M25,23 h1 v1 h-1 z M6,25 h1 v1 h-1 z" fill="#3e2723" />
-    <path d="M7,3 h1 v1 h-1 z M16,8 h1 v1 h-1 z M19,8 h1 v1 h-1 z M27,10 h1 v1 h-1 z M4,15 h1 v1 h-1 z M24,15 h1 v1 h-1 z M18,22 h1 v1 h-1 z M15,23 h1 v1 h-1 z M15,27 h1 v1 h-1 z M18,28 h1 v1 h-1 z" fill="#8d6e63" />
-    {/* Worm */}
-    <path d="M20,22 h2 v1 h-2 z M19,23 h1 v1 h-1 z M22,23 h1 v1 h-1 z M24,23 h1 v1 h-1 z M23,24 h1 v1 h-1 z" fill="#f48fb1" />
-  </svg>
-));
-
-const SandyBedSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plank edging */}
-    <path d="M2,1 h28 v1 h-28 z M1,2 h1 v28 h-1 z M30,2 h1 v28 h-1 z M2,30 h28 v1 h-28 z" fill="#8d6e63" />
-    <path d="M0,0 h31 v1 h-31 z M0,1 h1 v30 h-1 z" fill="#a1887f" />
-    <path d="M31,0 h1 v1 h-1 z M1,1 h1 v1 h-1 z M30,1 h2 v1 h-2 z M2,2 h28 v1 h-28 z M31,2 h1 v28 h-1 z M2,3 h1 v26 h-1 z M29,3 h1 v26 h-1 z M2,29 h28 v1 h-28 z M1,30 h1 v1 h-1 z M30,30 h2 v1 h-2 z M0,31 h32 v1 h-32 z" fill="#5d4037" />
-    {/* Sand & grit */}
-    <path d="M5,3 h6 v1 h-6 z M12,3 h3 v1 h-3 z M17,3 h1 v2 h-1 z M19,3 h2 v1 h-2 z M28,3 h1 v1 h-1 z M3,4 h1 v5 h-1 z M5,4 h2 v1 h-2 z M8,4 h2 v1 h-2 z M12,4 h2 v1 h-2 z M19,4 h1 v1 h-1 z M21,4 h3 v1 h-3 z M25,4 h3 v1 h-3 z M5,5 h3 v1 h-3 z M10,5 h1 v1 h-1 z M12,5 h1 v1 h-1 z M14,5 h1 v1 h-1 z M16,5 h1 v1 h-1 z M19,5 h6 v1 h-6 z M26,5 h3 v1 h-3 z M5,6 h8 v1 h-8 z M14,6 h4 v1 h-4 z M20,6 h1 v1 h-1 z M22,6 h7 v1 h-7 z M5,7 h1 v1 h-1 z M10,7 h3 v1 h-3 z M14,7 h1 v1 h-1 z M16,7 h2 v1 h-2 z M19,7 h1 v1 h-1 z M21,7 h2 v1 h-2 z M25,7 h2 v1 h-2 z M28,7 h1 v1 h-1 z M9,8 h3 v1 h-3 z M13,8 h5 v1 h-5 z M19,8 h2 v1 h-2 z M22,8 h2 v2 h-2 z M26,8 h3 v1 h-3 z M4,9 h1 v1 h-1 z M6,9 h2 v1 h-2 z M10,9 h7 v1 h-7 z M25,9 h4 v1 h-4 z M4,10 h13 v1 h-13 z M18,10 h1 v1 h-1 z M24,10 h1 v1 h-1 z M26,10 h2 v1 h-2 z M4,11 h5 v1 h-5 z M10,11 h9 v1 h-9 z M24,11 h3 v1 h-3 z M3,12 h2 v1 h-2 z M6,12 h1 v1 h-1 z M8,12 h1 v1 h-1 z M12,12 h1 v2 h-1 z M14,12 h2 v2 h-2 z M17,12 h2 v1 h-2 z M20,12 h2 v1 h-2 z M23,12 h6 v2 h-6 z M3,13 h4 v1 h-4 z M8,13 h2 v1 h-2 z M17,13 h1 v1 h-1 z M19,13 h2 v1 h-2 z M4,14 h2 v1 h-2 z M7,14 h1 v1 h-1 z M9,14 h1 v1 h-1 z M15,14 h4 v1 h-4 z M20,14 h1 v1 h-1 z M22,14 h1 v1 h-1 z M24,14 h4 v1 h-4 z M3,15 h1 v1 h-1 z M5,15 h1 v1 h-1 z M8,15 h5 v1 h-5 z M14,15 h3 v1 h-3 z M18,15 h6 v1 h-6 z M26,15 h3 v1 h-3 z M3,16 h2 v3 h-2 z M7,16 h5 v1 h-5 z M13,16 h1 v1 h-1 z M17,16 h3 v1 h-3 z M21,16 h1 v1 h-1 z M23,16 h2 v1 h-2 z M28,16 h1 v1 h-1 z M6,17 h2 v2 h-2 z M11,17 h1 v1 h-1 z M13,17 h2 v2 h-2 z M17,17 h2 v1 h-2 z M21,17 h3 v1 h-3 z M25,17 h4 v1 h-4 z M9,18 h3 v1 h-3 z M16,18 h1 v1 h-1 z M18,18 h3 v1 h-3 z M23,18 h3 v1 h-3 z M27,18 h2 v1 h-2 z M3,19 h1 v2 h-1 z M5,19 h1 v2 h-1 z M7,19 h8 v1 h-8 z M16,19 h3 v1 h-3 z M20,19 h1 v1 h-1 z M22,19 h1 v1 h-1 z M25,19 h1 v2 h-1 z M8,20 h1 v1 h-1 z M15,20 h4 v1 h-4 z M20,20 h4 v1 h-4 z M4,21 h1 v1 h-1 z M6,21 h2 v1 h-2 z M9,21 h3 v1 h-3 z M15,21 h11 v1 h-11 z M27,21 h2 v1 h-2 z M3,22 h9 v1 h-9 z M13,22 h2 v1 h-2 z M16,22 h6 v1 h-6 z M23,22 h5 v1 h-5 z M3,23 h1 v1 h-1 z M6,23 h1 v1 h-1 z M10,23 h4 v1 h-4 z M15,23 h1 v1 h-1 z M17,23 h3 v1 h-3 z M21,23 h3 v2 h-3 z M27,23 h1 v1 h-1 z M5,24 h2 v1 h-2 z M8,24 h1 v1 h-1 z M11,24 h2 v1 h-2 z M14,24 h1 v1 h-1 z M16,24 h4 v1 h-4 z M27,24 h2 v1 h-2 z M3,25 h2 v1 h-2 z M6,25 h2 v1 h-2 z M11,25 h5 v1 h-5 z M20,25 h4 v1 h-4 z M26,25 h2 v1 h-2 z M3,26 h1 v2 h-1 z M7,26 h1 v1 h-1 z M12,26 h1 v1 h-1 z M14,26 h3 v1 h-3 z M18,26 h4 v1 h-4 z M24,26 h1 v1 h-1 z M26,26 h1 v1 h-1 z M28,26 h1 v2 h-1 z M5,27 h2 v1 h-2 z M8,27 h2 v1 h-2 z M11,27 h2 v1 h-2 z M14,27 h2 v1 h-2 z M18,27 h1 v1 h-1 z M20,27 h2 v1 h-2 z M23,27 h2 v1 h-2 z M4,28 h1 v1 h-1 z M6,28 h3 v1 h-3 z M10,28 h2 v1 h-2 z M13,28 h4 v1 h-4 z M19,28 h4 v1 h-4 z M24,28 h1 v1 h-1 z M27,28 h1 v1 h-1 z" fill="#d7b98a" />
-    <path d="M3,3 h2 v1 h-2 z M11,3 h1 v1 h-1 z M16,3 h1 v1 h-1 z M18,3 h1 v1 h-1 z M22,3 h4 v1 h-4 z M4,4 h1 v4 h-1 z M10,4 h1 v1 h-1 z M14,4 h3 v1 h-3 z M20,4 h1 v1 h-1 z M9,5 h1 v1 h-1 z M11,5 h1 v1 h-1 z M13,5 h1 v3 h-1 z M15,5 h1 v1 h-1 z M18,5 h1 v1 h-1 z M25,5 h1 v1 h-1 z M18,6 h2 v1 h-2 z M21,6 h1 v1 h-1 z M15,7 h1 v1 h-1 z M18,7 h1 v2 h-1 z M20,7 h1 v1 h-1 z M27,7 h1 v1 h-1 z M5,8 h1 v2 h-1 z M12,8 h1 v1 h-1 z M21,8 h1 v1 h-1 z M8,9 h2 v1 h-2 z M18,9 h4 v1 h-4 z M3,10 h1 v2 h-1 z M19,10 h2 v1 h-2 z M28,10 h1 v1 h-1 z M9,11 h1 v2 h-1 z M19,11 h1 v2 h-1 z M27,11 h2 v1 h-2 z M11,12 h1 v2 h-1 z M13,12 h1 v2 h-1 z M16,12 h1 v2 h-1 z M22,12 h1 v1 h-1 z M21,13 h1 v2 h-1 z M3,14 h1 v1 h-1 z M8,14 h1 v1 h-1 z M10,14 h3 v1 h-3 z M14,14 h1 v1 h-1 z M23,14 h1 v1 h-1 z M4,15 h1 v1 h-1 z M7,15 h1 v1 h-1 z M13,15 h1 v1 h-1 z M17,15 h1 v1 h-1 z M25,15 h1 v1 h-1 z M5,16 h1 v1 h-1 z M12,16 h1 v1 h-1 z M14,16 h1 v1 h-1 z M22,16 h1 v1 h-1 z M25,16 h3 v1 h-3 z M8,17 h3 v1 h-3 z M15,17 h1 v1 h-1 z M20,17 h1 v1 h-1 z M5,18 h1 v1 h-1 z M8,18 h1 v1 h-1 z M12,18 h1 v1 h-1 z M17,18 h1 v1 h-1 z M26,18 h1 v1 h-1 z M6,19 h1 v1 h-1 z M15,19 h1 v1 h-1 z M19,19 h1 v1 h-1 z M21,19 h1 v1 h-1 z M23,19 h2 v1 h-2 z M27,19 h2 v1 h-2 z M4,20 h1 v1 h-1 z M7,20 h1 v1 h-1 z M9,20 h2 v1 h-2 z M26,20 h3 v1 h-3 z M3,21 h1 v1 h-1 z M5,21 h1 v1 h-1 z M8,21 h1 v1 h-1 z M26,21 h1 v1 h-1 z M12,22 h1 v1 h-1 z M28,22 h1 v2 h-1 z M4,23 h1 v1 h-1 z M7,23 h1 v1 h-1 z M9,23 h1 v1 h-1 z M16,23 h1 v1 h-1 z M3,24 h2 v1 h-2 z M10,24 h1 v1 h-1 z M15,24 h1 v1 h-1 z M5,25 h1 v1 h-1 z M16,25 h2 v1 h-2 z M19,25 h1 v1 h-1 z M24,25 h2 v1 h-2 z M4,26 h1 v2 h-1 z M6,26 h1 v1 h-1 z M11,26 h1 v1 h-1 z M13,26 h1 v2 h-1 z M17,26 h1 v1 h-1 z M22,26 h2 v1 h-2 z M27,26 h1 v1 h-1 z M7,27 h1 v1 h-1 z M10,27 h1 v1 h-1 z M16,27 h2 v1 h-2 z M22,27 h1 v1 h-1 z M26,27 h1 v2 h-1 z M3,28 h1 v1 h-1 z M5,28 h1 v1 h-1 z M12,28 h1 v1 h-1 z M28,28 h1 v1 h-1 z" fill="#e6d2b0" />
-    <path d="M15,3 h1 v1 h-1 z M26,3 h2 v1 h-2 z M11,4 h1 v1 h-1 z M18,4 h1 v1 h-1 z M24,4 h1 v1 h-1 z M8,5 h1 v1 h-1 z M9,7 h1 v1 h-1 z M23,7 h2 v1 h-2 z M4,8 h1 v1 h-1 z M25,8 h1 v1 h-1 z M3,9 h1 v1 h-1 z M17,9 h1 v2 h-1 z M24,9 h1 v1 h-1 z M25,10 h1 v1 h-1 z M20,11 h1 v1 h-1 z M5,12 h1 v1 h-1 z M7,12 h1 v1 h-1 z M10,12 h1 v2 h-1 z M18,13 h1 v1 h-1 z M6,14 h1 v1 h-1 z M13,14 h1 v1 h-1 z M19,14 h1 v1 h-1 z M28,14 h1 v1 h-1 z M24,15 h1 v1 h-1 z M6,16 h1 v1 h-1 z M15,16 h2 v1 h-2 z M20,16 h1 v1 h-1 z M5,17 h1 v1 h-1 z M12,17 h1 v1 h-1 z M16,17 h1 v1 h-1 z M19,17 h1 v1 h-1 z M24,17 h1 v1 h-1 z M15,18 h1 v1 h-1 z M21,18 h2 v1 h-2 z M4,19 h1 v1 h-1 z M26,19 h1 v1 h-1 z M6,20 h1 v1 h-1 z M19,20 h1 v1 h-1 z M24,20 h1 v1 h-1 z M15,22 h1 v1 h-1 z M22,22 h1 v1 h-1 z M5,23 h1 v1 h-1 z M14,23 h1 v1 h-1 z M20,23 h1 v1 h-1 z M7,24 h1 v1 h-1 z M9,24 h1 v1 h-1 z M13,24 h1 v1 h-1 z M28,25 h1 v1 h-1 z M19,27 h1 v1 h-1 z M25,27 h1 v2 h-1 z M27,27 h1 v1 h-1 z M9,28 h1 v1 h-1 z M17,28 h1 v1 h-1 z" fill="#bcaaa4" />
-    <path d="M21,3 h1 v1 h-1 z M7,4 h1 v1 h-1 z M28,4 h1 v1 h-1 z M17,5 h1 v1 h-1 z M24,8 h1 v1 h-1 z M7,13 h1 v1 h-1 z M22,13 h1 v1 h-1 z M6,15 h1 v1 h-1 z M11,20 h1 v1 h-1 z M8,23 h1 v1 h-1 z M20,24 h1 v1 h-1 z M18,25 h1 v1 h-1 z M5,26 h1 v1 h-1 z M25,26 h1 v1 h-1 z M18,28 h1 v1 h-1 z M23,28 h1 v1 h-1 z" fill="#f5f5f5" />
-    {/* Pebbles */}
-    <path d="M7,7 h2 v1 h-2 z M6,8 h2 v1 h-2 z M22,10 h2 v1 h-2 z M21,11 h2 v1 h-2 z M13,20 h2 v1 h-2 z M12,21 h2 v1 h-2 z M25,23 h2 v1 h-2 z M24,24 h2 v1 h-2 z M9,25 h2 v1 h-2 z M8,26 h2 v1 h-2 z" fill="#9e9e9e" />
-    <path d="M6,7 h1 v1 h-1 z M21,10 h1 v1 h-1 z M12,20 h1 v1 h-1 z M24,23 h1 v1 h-1 z M8,25 h1 v1 h-1 z" fill="#bdbdbd" />
-    <path d="M8,8 h1 v1 h-1 z M23,11 h1 v1 h-1 z M14,21 h1 v1 h-1 z M26,24 h1 v1 h-1 z M10,26 h1 v1 h-1 z" fill="#757575" />
-  </svg>
-));
-
-const AcidicBedSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Plank edging */}
-    <path d="M2,1 h28 v1 h-28 z M1,2 h1 v28 h-1 z M30,2 h1 v28 h-1 z M2,30 h28 v1 h-28 z" fill="#8d6e63" />
-    <path d="M0,0 h31 v1 h-31 z M0,1 h1 v30 h-1 z" fill="#a1887f" />
-    <path d="M31,0 h1 v1 h-1 z M1,1 h1 v1 h-1 z M30,1 h2 v1 h-2 z M2,2 h28 v1 h-28 z M31,2 h1 v28 h-1 z M2,3 h1 v26 h-1 z M29,3 h1 v26 h-1 z M2,29 h28 v1 h-28 z M1,30 h1 v1 h-1 z M30,30 h2 v1 h-2 z M0,31 h32 v1 h-32 z" fill="#5d4037" />
-    {/* Peaty soil & bark */}
-    <path d="M4,3 h1 v1 h-1 z M6,3 h2 v1 h-2 z M10,3 h2 v1 h-2 z M14,3 h3 v1 h-3 z M18,3 h3 v1 h-3 z M23,3 h3 v1 h-3 z M28,3 h1 v3 h-1 z M3,4 h3 v1 h-3 z M7,4 h1 v1 h-1 z M11,4 h11 v1 h-11 z M25,4 h1 v1 h-1 z M3,5 h4 v1 h-4 z M8,5 h2 v1 h-2 z M11,5 h2 v1 h-2 z M14,5 h2 v1 h-2 z M17,5 h5 v1 h-5 z M24,5 h3 v1 h-3 z M3,6 h11 v1 h-11 z M15,6 h2 v1 h-2 z M18,6 h1 v1 h-1 z M20,6 h1 v1 h-1 z M23,6 h2 v1 h-2 z M27,6 h1 v1 h-1 z M4,7 h3 v1 h-3 z M8,7 h2 v1 h-2 z M12,7 h1 v1 h-1 z M14,7 h7 v1 h-7 z M22,7 h5 v1 h-5 z M3,8 h3 v1 h-3 z M7,8 h2 v1 h-2 z M10,8 h4 v1 h-4 z M15,8 h2 v1 h-2 z M18,8 h1 v1 h-1 z M20,8 h7 v1 h-7 z M28,8 h1 v1 h-1 z M3,9 h4 v1 h-4 z M8,9 h1 v1 h-1 z M11,9 h4 v1 h-4 z M16,9 h3 v1 h-3 z M20,9 h5 v1 h-5 z M27,9 h1 v1 h-1 z M3,10 h1 v1 h-1 z M5,10 h2 v1 h-2 z M9,10 h4 v1 h-4 z M14,10 h1 v1 h-1 z M19,10 h3 v1 h-3 z M23,10 h2 v1 h-2 z M27,10 h2 v1 h-2 z M3,11 h4 v1 h-4 z M10,11 h5 v1 h-5 z M18,11 h5 v1 h-5 z M24,11 h4 v1 h-4 z M3,12 h5 v1 h-5 z M9,12 h8 v1 h-8 z M19,12 h5 v1 h-5 z M25,12 h1 v1 h-1 z M27,12 h1 v1 h-1 z M3,13 h4 v2 h-4 z M8,13 h3 v1 h-3 z M12,13 h13 v1 h-13 z M26,13 h1 v1 h-1 z M28,13 h1 v1 h-1 z M9,14 h3 v1 h-3 z M13,14 h10 v1 h-10 z M25,14 h1 v1 h-1 z M27,14 h1 v1 h-1 z M3,15 h6 v1 h-6 z M12,15 h3 v1 h-3 z M16,15 h9 v1 h-9 z M26,15 h1 v1 h-1 z M28,15 h1 v1 h-1 z M3,16 h1 v1 h-1 z M5,16 h1 v1 h-1 z M7,16 h3 v1 h-3 z M11,16 h2 v1 h-2 z M14,16 h5 v1 h-5 z M20,16 h2 v1 h-2 z M24,16 h2 v1 h-2 z M4,17 h7 v1 h-7 z M13,17 h4 v1 h-4 z M18,17 h1 v1 h-1 z M21,17 h8 v1 h-8 z M3,18 h1 v2 h-1 z M5,18 h4 v1 h-4 z M11,18 h1 v1 h-1 z M13,18 h2 v1 h-2 z M16,18 h3 v1 h-3 z M20,18 h1 v1 h-1 z M22,18 h4 v1 h-4 z M27,18 h2 v1 h-2 z M6,19 h1 v1 h-1 z M8,19 h1 v1 h-1 z M10,19 h1 v1 h-1 z M12,19 h2 v1 h-2 z M16,19 h1 v1 h-1 z M19,19 h4 v1 h-4 z M24,19 h3 v1 h-3 z M3,20 h2 v1 h-2 z M7,20 h1 v1 h-1 z M9,20 h7 v1 h-7 z M17,20 h1 v1 h-1 z M23,20 h4 v1 h-4 z M28,20 h1 v3 h-1 z M3,21 h1 v1 h-1 z M5,21 h2 v1 h-2 z M8,21 h1 v1 h-1 z M10,21 h5 v1 h-5 z M16,21 h1 v1 h-1 z M18,21 h1 v1 h-1 z M24,21 h3 v1 h-3 z M3,22 h3 v1 h-3 z M7,22 h1 v1 h-1 z M9,22 h1 v1 h-1 z M12,22 h2 v1 h-2 z M15,22 h4 v1 h-4 z M21,22 h1 v1 h-1 z M23,22 h1 v1 h-1 z M25,22 h1 v1 h-1 z M3,23 h2 v1 h-2 z M6,23 h3 v1 h-3 z M12,23 h1 v1 h-1 z M14,23 h3 v1 h-3 z M18,23 h2 v1 h-2 z M22,23 h3 v1 h-3 z M26,23 h3 v1 h-3 z M3,24 h3 v1 h-3 z M7,24 h1 v1 h-1 z M9,24 h3 v1 h-3 z M13,24 h1 v1 h-1 z M16,24 h3 v1 h-3 z M21,24 h1 v1 h-1 z M23,24 h1 v1 h-1 z M25,24 h1 v1 h-1 z M27,24 h1 v1 h-1 z M3,25 h2 v1 h-2 z M6,25 h4 v1 h-4 z M12,25 h2 v1 h-2 z M15,25 h1 v1 h-1 z M17,25 h2 v1 h-2 z M22,25 h1 v1 h-1 z M24,25 h5 v1 h-5 z M3,26 h1 v1 h-1 z M6,26 h6 v1 h-6 z M13,26 h3 v1 h-3 z M19,26 h3 v1 h-3 z M23,26 h1 v1 h-1 z M25,26 h2 v1 h-2 z M3,27 h5 v1 h-5 z M10,27 h1 v1 h-1 z M12,27 h1 v1 h-1 z M14,27 h5 v1 h-5 z M21,27 h4 v2 h-4 z M27,27 h1 v1 h-1 z M4,28 h4 v1 h-4 z M10,28 h4 v1 h-4 z M15,28 h5 v1 h-5 z M26,28 h2 v1 h-2 z" fill="#3e2723" />
-    <path d="M3,3 h1 v1 h-1 z M5,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z M21,3 h2 v1 h-2 z M26,3 h2 v1 h-2 z M6,4 h1 v1 h-1 z M10,4 h1 v1 h-1 z M22,4 h2 v1 h-2 z M27,4 h1 v1 h-1 z M16,5 h1 v1 h-1 z M22,5 h1 v1 h-1 z M14,6 h1 v1 h-1 z M17,6 h1 v1 h-1 z M19,6 h1 v1 h-1 z M25,6 h2 v1 h-2 z M3,7 h1 v1 h-1 z M7,7 h1 v1 h-1 z M27,7 h2 v1 h-2 z M9,8 h1 v1 h-1 z M17,8 h1 v1 h-1 z M19,8 h1 v1 h-1 z M27,8 h1 v1 h-1 z M10,9 h1 v1 h-1 z M26,9 h1 v1 h-1 z M28,9 h1 v1 h-1 z M4,10 h1 v1 h-1 z M13,10 h1 v1 h-1 z M15,10 h1 v1 h-1 z M17,10 h1 v1 h-1 z M22,10 h1 v1 h-1 z M25,10 h1 v1 h-1 z M15,11 h2 v1 h-2 z M23,11 h1 v1 h-1 z M28,11 h1 v2 h-1 z M17,12 h2 v1 h-2 z M24,12 h1 v1 h-1 z M11,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M12,14 h1 v1 h-1 z M26,14 h1 v1 h-1 z M11,15 h1 v1 h-1 z M15,15 h1 v1 h-1 z M27,15 h1 v1 h-1 z M4,16 h1 v1 h-1 z M13,16 h1 v1 h-1 z M19,16 h1 v1 h-1 z M22,16 h2 v1 h-2 z M27,16 h2 v1 h-2 z M3,17 h1 v1 h-1 z M12,17 h1 v1 h-1 z M19,17 h2 v1 h-2 z M9,18 h1 v1 h-1 z M15,18 h1 v1 h-1 z M19,18 h1 v1 h-1 z M21,18 h1 v1 h-1 z M26,18 h1 v1 h-1 z M4,19 h1 v1 h-1 z M7,19 h1 v1 h-1 z M11,19 h1 v1 h-1 z M14,19 h2 v1 h-2 z M18,19 h1 v1 h-1 z M23,19 h1 v1 h-1 z M28,19 h1 v1 h-1 z M5,20 h1 v1 h-1 z M8,20 h1 v1 h-1 z M19,20 h1 v1 h-1 z M27,20 h1 v2 h-1 z M4,21 h1 v1 h-1 z M17,21 h1 v1 h-1 z M8,22 h1 v1 h-1 z M11,22 h1 v1 h-1 z M26,22 h2 v1 h-2 z M10,23 h2 v1 h-2 z M17,23 h1 v1 h-1 z M20,23 h1 v1 h-1 z M6,24 h1 v1 h-1 z M14,24 h1 v1 h-1 z M19,24 h1 v1 h-1 z M10,25 h1 v1 h-1 z M16,25 h1 v1 h-1 z M20,25 h1 v1 h-1 z M4,26 h2 v1 h-2 z M17,26 h2 v1 h-2 z M22,26 h1 v1 h-1 z M27,26 h2 v1 h-2 z M8,27 h1 v1 h-1 z M11,27 h1 v1 h-1 z M19,27 h1 v1 h-1 z M26,27 h1 v1 h-1 z M28,27 h1 v2 h-1 z M8,28 h2 v1 h-2 z M20,28 h1 v1 h-1 z M25,28 h1 v1 h-1 z" fill="#4e342e" />
-    <path d="M12,3 h2 v1 h-2 z M17,3 h1 v1 h-1 z M9,4 h1 v1 h-1 z M24,4 h1 v1 h-1 z M10,5 h1 v1 h-1 z M13,5 h1 v1 h-1 z M21,6 h1 v1 h-1 z M10,7 h2 v1 h-2 z M13,7 h1 v1 h-1 z M9,9 h1 v1 h-1 z M25,9 h1 v1 h-1 z M26,10 h1 v1 h-1 z M25,13 h1 v1 h-1 z M23,14 h1 v1 h-1 z M10,15 h1 v1 h-1 z M6,16 h1 v1 h-1 z M17,17 h1 v1 h-1 z M12,18 h1 v1 h-1 z M27,19 h1 v1 h-1 z M20,20 h1 v1 h-1 z M9,21 h1 v1 h-1 z M10,22 h1 v1 h-1 z M19,22 h1 v1 h-1 z M9,23 h1 v1 h-1 z M8,24 h1 v1 h-1 z M15,24 h1 v1 h-1 z M24,24 h1 v1 h-1 z M28,24 h1 v1 h-1 z M5,25 h1 v1 h-1 z M14,25 h1 v1 h-1 z M21,25 h1 v1 h-1 z M16,26 h1 v1 h-1 z M9,27 h1 v1 h-1 z M20,27 h1 v1 h-1 z M25,27 h1 v1 h-1 z M3,28 h1 v1 h-1 z" fill="#795548" />
-    <path d="M7,10 h2 v2 h-2 z M21,20 h2 v1 h-2 z M20,21 h3 v1 h-3 z" fill="#6d4c41" />
-    {/* Pine needles */}
-    <path d="M9,3 h1 v1 h-1 z M8,4 h1 v1 h-1 z M26,4 h1 v1 h-1 z M7,5 h1 v1 h-1 z M23,5 h1 v1 h-1 z M27,5 h1 v1 h-1 z M22,6 h1 v1 h-1 z M28,6 h1 v1 h-1 z M21,7 h1 v1 h-1 z M6,8 h1 v1 h-1 z M14,8 h1 v1 h-1 z M7,9 h1 v1 h-1 z M15,9 h1 v1 h-1 z M16,10 h1 v1 h-1 z M9,11 h1 v1 h-1 z M8,12 h1 v1 h-1 z M26,12 h1 v1 h-1 z M7,13 h1 v1 h-1 z M27,13 h1 v1 h-1 z M28,14 h1 v1 h-1 z M11,17 h1 v1 h-1 z M4,18 h1 v1 h-1 z M10,18 h1 v1 h-1 z M5,19 h1 v1 h-1 z M9,19 h1 v1 h-1 z M6,20 h1 v1 h-1 z M7,21 h1 v1 h-1 z M23,21 h1 v1 h-1 z M6,22 h1 v1 h-1 z M22,22 h1 v1 h-1 z M24,22 h1 v1 h-1 z M5,23 h1 v1 h-1 z M21,23 h1 v1 h-1 z M25,23 h1 v1 h-1 z M20,24 h1 v1 h-1 z M26,24 h1 v1 h-1 z M19,25 h1 v1 h-1 z" fill="#bf360c" />
-    <path d="M19,9 h1 v1 h-1 z M18,10 h1 v1 h-1 z M17,11 h1 v1 h-1 z M8,14 h1 v1 h-1 z M24,14 h1 v1 h-1 z M9,15 h1 v1 h-1 z M25,15 h1 v1 h-1 z M10,16 h1 v1 h-1 z M26,16 h1 v1 h-1 z M17,19 h1 v1 h-1 z M16,20 h1 v1 h-1 z M18,20 h1 v1 h-1 z M15,21 h1 v1 h-1 z M19,21 h1 v1 h-1 z M14,22 h1 v1 h-1 z M20,22 h1 v1 h-1 z M13,23 h1 v1 h-1 z M12,24 h1 v1 h-1 z M22,24 h1 v1 h-1 z M11,25 h1 v1 h-1 z M23,25 h1 v1 h-1 z M12,26 h1 v1 h-1 z M24,26 h1 v1 h-1 z M13,27 h1 v1 h-1 z M14,28 h1 v1 h-1 z" fill="#d84315" />
-  </svg>
-));
-
-const TomatoPlantSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stake */}
-    <path d="M15,0 h1 v3 h-1 z M16,3 h1 v2 h-1 z M15,5 h1 v3 h-1 z M13,8 h1 v1 h-1 z M14,9 h1 v1 h-1 z M15,10 h1 v7 h-1 z M16,17 h1 v2 h-1 z M15,19 h1 v4 h-1 z M14,23 h1 v3 h-1 z M15,26 h1 v4 h-1 z" fill="#8d6e63" />
-    <path d="M16,0 h1 v3 h-1 z M17,3 h1 v2 h-1 z M16,5 h1 v3 h-1 z M14,8 h1 v1 h-1 z M15,9 h1 v1 h-1 z M16,10 h1 v7 h-1 z M17,17 h1 v2 h-1 z M16,19 h1 v4 h-1 z M15,23 h1 v3 h-1 z M16,26 h1 v4 h-1 z" fill="#6d4c41" />
-    {/* Vine & leaves */}
-    <path d="M13,1 h1 v1 h-1 z M17,1 h1 v1 h-1 z M12,2 h1 v2 h-1 z M14,2 h1 v1 h-1 z M18,2 h1 v1 h-1 z M15,3 h1 v1 h-1 z M20,3 h1 v1 h-1 z M14,4 h1 v1 h-1 z M19,4 h1 v1 h-1 z M21,5 h1 v1 h-1 z M9,6 h1 v3 h-1 z M20,6 h1 v1 h-1 z M22,6 h1 v1 h-1 z M11,7 h1 v1 h-1 z M18,7 h1 v1 h-1 z M21,7 h1 v1 h-1 z M12,8 h1 v1 h-1 z M15,8 h2 v1 h-2 z M12,9 h2 v1 h-2 z M17,9 h1 v1 h-1 z M20,13 h2 v1 h-2 z M19,14 h1 v1 h-1 z M22,14 h1 v1 h-1 z M17,15 h1 v1 h-1 z M21,15 h2 v1 h-2 z M11,16 h1 v1 h-1 z M20,16 h1 v1 h-1 z M12,17 h1 v1 h-1 z M15,17 h1 v1 h-1 z M13,23 h1 v1 h-1 z M12,24 h1 v1 h-1 z M11,25 h1 v1 h-1 z M16,25 h1 v1 h-1 z M17,26 h1 v1 h-1 z M19,26 h1 v1 h-1 z M18,27 h1 v1 h-1 z M14,31 h1 v1 h-1 z M16,31 h1 v1 h-1 z" fill="#43a047" />
-    <path d="M13,2 h1 v1 h-1 z M17,2 h1 v1 h-1 z M19,2 h1 v1 h-1 z M13,3 h2 v1 h-2 z M18,3 h2 v1 h-2 z M15,4 h1 v1 h-1 z M18,4 h1 v1 h-1 z M21,6 h1 v1 h-1 z M10,7 h1 v1 h-1 z M19,7 h2 v1 h-2 z M10,8 h2 v1 h-2 z M11,9 h1 v1 h-1 z M16,9 h1 v1 h-1 z M20,14 h2 v1 h-2 z M18,15 h3 v1 h-3 z M18,16 h2 v1 h-2 z M13,17 h2 v1 h-2 z M14,18 h2 v1 h-2 z M13,24 h1 v1 h-1 z M12,25 h2 v1 h-2 z M18,26 h1 v1 h-1 z M14,30 h4 v1 h-4 z M13,31 h1 v1 h-1 z M15,31 h1 v1 h-1 z M17,31 h2 v1 h-2 z" fill="#2e7d32" />
-    <path d="M12,1 h1 v1 h-1 z M18,1 h1 v1 h-1 z M11,2 h1 v1 h-1 z M20,2 h1 v1 h-1 z M20,5 h1 v1 h-1 z M10,6 h1 v1 h-1 z M19,6 h1 v1 h-1 z M8,7 h1 v1 h-1 z M19,13 h1 v1 h-1 z M18,14 h1 v1 h-1 z M10,16 h1 v1 h-1 z M19,27 h1 v1 h-1 z" fill="#81c784" />
-    <path d="M22,7 h1 v1 h-1 z M6,11 h2 v1 h-2 z M21,17 h2 v1 h-2 z M9,22 h2 v1 h-2 z" fill="#558b2f" />
-    {/* Tomatoes */}
-    <path d="M5,12 h4 v1 h-4 z M4,13 h1 v1 h-1 z M6,13 h4 v1 h-4 z M4,14 h5 v2 h-5 z M5,16 h3 v1 h-3 z M20,18 h4 v1 h-4 z M19,19 h1 v1 h-1 z M21,19 h4 v1 h-4 z M19,20 h5 v2 h-5 z M20,22 h3 v1 h-3 z M8,23 h4 v1 h-4 z M7,24 h1 v1 h-1 z M9,24 h3 v1 h-3 z M7,25 h4 v1 h-4 z M7,26 h5 v1 h-5 z M8,27 h3 v1 h-3 z" fill="#e53935" />
-    <path d="M5,13 h1 v1 h-1 z M20,19 h1 v1 h-1 z M8,24 h1 v1 h-1 z" fill="#ff8a80" />
-    <path d="M9,14 h1 v2 h-1 z M8,16 h1 v1 h-1 z M24,20 h1 v2 h-1 z M23,22 h1 v1 h-1 z M12,26 h1 v1 h-1 z M11,27 h1 v1 h-1 z" fill="#b71c1c" />
-    <path d="M22,8 h3 v1 h-3 z M21,9 h4 v2 h-4 z M22,11 h2 v1 h-2 z" fill="#ff9800" />
-  </svg>
-));
-
-const SucculentsSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Green rosette */}
-    <path d="M12,9 h1 v1 h-1 z M17,9 h1 v1 h-1 z M11,10 h2 v1 h-2 z M14,10 h1 v1 h-1 z M17,10 h2 v1 h-2 z M10,11 h1 v2 h-1 z M13,11 h1 v1 h-1 z M15,11 h1 v1 h-1 z M17,11 h1 v1 h-1 z M19,11 h1 v3 h-1 z M12,12 h1 v1 h-1 z M15,12 h3 v1 h-3 z M9,13 h1 v1 h-1 z M13,13 h2 v1 h-2 z M16,13 h1 v1 h-1 z M21,13 h2 v1 h-2 z M26,13 h1 v1 h-1 z M10,14 h1 v1 h-1 z M15,14 h1 v1 h-1 z M20,14 h1 v1 h-1 z M25,14 h1 v1 h-1 z M12,15 h1 v2 h-1 z M23,15 h1 v1 h-1 z M14,16 h1 v1 h-1 z M21,16 h1 v1 h-1 z M13,17 h2 v1 h-2 z M19,17 h2 v1 h-2 z M14,18 h5 v1 h-5 z M15,19 h3 v1 h-3 z" fill="#66bb6a" />
-    <path d="M11,11 h1 v2 h-1 z M14,11 h1 v1 h-1 z M18,11 h1 v2 h-1 z M13,12 h2 v1 h-2 z M10,13 h3 v1 h-3 z M17,13 h2 v1 h-2 z M23,13 h3 v1 h-3 z M11,14 h4 v1 h-4 z M16,14 h4 v1 h-4 z M21,14 h4 v1 h-4 z M13,15 h10 v1 h-10 z M15,16 h6 v1 h-6 z M15,17 h4 v1 h-4 z" fill="#2e7d32" />
-    <path d="M12,8 h1 v1 h-1 z M17,8 h1 v1 h-1 z M11,9 h1 v1 h-1 z M14,9 h1 v1 h-1 z M18,9 h1 v1 h-1 z M10,10 h1 v1 h-1 z M13,10 h1 v1 h-1 z M15,10 h1 v1 h-1 z M19,10 h1 v1 h-1 z M12,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M9,12 h1 v1 h-1 z M20,12 h1 v2 h-1 z M15,13 h1 v1 h-1 z M11,15 h1 v1 h-1 z M24,15 h1 v1 h-1 z M13,16 h1 v1 h-1 z M22,16 h1 v1 h-1 z" fill="#a5d6a7" />
-    {/* Blue-green rosette */}
-    <path d="M4,19 h1 v1 h-1 z M3,20 h2 v1 h-2 z M6,20 h1 v1 h-1 z M3,21 h1 v1 h-1 z M5,21 h5 v1 h-5 z M2,22 h2 v2 h-2 z M7,22 h4 v1 h-4 z M8,23 h3 v1 h-3 z M1,24 h3 v1 h-3 z M9,24 h3 v2 h-3 z M2,25 h3 v1 h-3 z M3,26 h3 v1 h-3 z M8,26 h3 v1 h-3 z M3,27 h9 v1 h-9 z M5,28 h6 v1 h-6 z" fill="#80cbc4" />
-    <path d="M4,21 h1 v1 h-1 z M4,22 h3 v1 h-3 z M4,23 h4 v1 h-4 z M4,24 h5 v1 h-5 z M5,25 h4 v1 h-4 z M6,26 h2 v1 h-2 z" fill="#26a69a" />
-    <path d="M4,18 h1 v1 h-1 z M3,19 h1 v1 h-1 z M6,19 h1 v1 h-1 z M5,20 h1 v1 h-1 z M2,21 h1 v1 h-1 z M10,21 h1 v1 h-1 z M1,23 h1 v1 h-1 z M11,23 h1 v1 h-1 z M2,26 h1 v1 h-1 z M11,26 h1 v1 h-1 z M4,28 h1 v1 h-1 z M11,28 h1 v1 h-1 z" fill="#b2dfdb" />
-    {/* Pink-tipped rosette */}
-    <path d="M23,16 h1 v1 h-1 z M21,17 h1 v1 h-1 z M23,17 h2 v1 h-2 z M25,18 h1 v1 h-1 z M20,19 h1 v1 h-1 z M27,19 h1 v1 h-1 z M19,21 h1 v1 h-1 z M27,21 h1 v1 h-1 z M20,24 h1 v1 h-1 z M26,24 h1 v1 h-1 z" fill="#f48fb1" />
-    <path d="M22,17 h1 v1 h-1 z M21,18 h4 v1 h-4 z M21,19 h6 v1 h-6 z M20,20 h3 v1 h-3 z M25,20 h2 v1 h-2 z M20,21 h2 v1 h-2 z M26,21 h1 v1 h-1 z M19,22 h2 v1 h-2 z M26,22 h2 v1 h-2 z M20,23 h2 v1 h-2 z M25,23 h2 v1 h-2 z M21,24 h5 v2 h-5 z" fill="#81c784" />
-    <path d="M23,20 h2 v1 h-2 z M22,21 h4 v1 h-4 z M21,22 h5 v1 h-5 z M22,23 h3 v1 h-3 z" fill="#388e3c" />
-  </svg>
-));
-
-const BlueberryBushSprite = React.memo(() => (
-  <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Stem */}
-    <path d="M14,24 h1 v7 h-1 z" fill="#8d6e63" />
-    <path d="M15,24 h3 v7 h-3 z" fill="#6d4c41" />
-    {/* Foliage */}
-    <path d="M10,5 h1 v1 h-1 z M13,5 h3 v1 h-3 z M7,6 h4 v1 h-4 z M14,6 h2 v1 h-2 z M6,7 h1 v1 h-1 z M9,7 h7 v1 h-7 z M19,7 h1 v2 h-1 z M6,8 h3 v1 h-3 z M13,8 h3 v1 h-3 z M5,9 h3 v1 h-3 z M9,9 h1 v1 h-1 z M13,9 h4 v1 h-4 z M18,9 h3 v1 h-3 z M5,10 h5 v1 h-5 z M13,10 h2 v1 h-2 z M16,10 h5 v1 h-5 z M5,11 h4 v1 h-4 z M10,11 h3 v1 h-3 z M14,11 h7 v1 h-7 z M5,12 h1 v1 h-1 z M9,12 h6 v1 h-6 z M17,12 h3 v1 h-3 z M9,13 h5 v1 h-5 z M15,13 h1 v1 h-1 z M17,13 h2 v2 h-2 z M10,14 h6 v1 h-6 z M10,15 h8 v1 h-8 z M9,16 h3 v1 h-3 z M15,16 h2 v1 h-2 z" fill="#43a047" />
-    <path d="M11,4 h10 v1 h-10 z M9,5 h1 v1 h-1 z M11,5 h1 v2 h-1 z M16,5 h7 v1 h-7 z M13,6 h1 v1 h-1 z M19,6 h6 v1 h-6 z M7,7 h1 v1 h-1 z M20,7 h6 v1 h-6 z M5,8 h1 v1 h-1 z M9,8 h1 v1 h-1 z M20,8 h7 v1 h-7 z M8,9 h1 v1 h-1 z M17,9 h1 v1 h-1 z M21,9 h1 v3 h-1 z M25,9 h2 v2 h-2 z M4,10 h1 v3 h-1 z M15,10 h1 v1 h-1 z M9,11 h1 v1 h-1 z M13,11 h1 v1 h-1 z M25,11 h1 v1 h-1 z M15,12 h2 v1 h-2 z M21,12 h4 v1 h-4 z M4,13 h2 v2 h-2 z M14,13 h1 v1 h-1 z M16,13 h1 v2 h-1 z M22,13 h2 v1 h-2 z M9,14 h1 v1 h-1 z M22,14 h1 v1 h-1 z M4,15 h5 v2 h-5 z M18,15 h1 v1 h-1 z M17,16 h4 v1 h-4 z M4,17 h8 v1 h-8 z M15,17 h5 v1 h-5 z M5,18 h3 v2 h-3 z M11,18 h1 v1 h-1 z M15,18 h4 v1 h-4 z M11,19 h5 v2 h-5 z M6,20 h2 v1 h-2 z M7,21 h9 v1 h-9 z M9,22 h6 v1 h-6 z M11,23 h3 v1 h-3 z" fill="#2e7d32" />
-    <path d="M27,10 h1 v1 h-1 z M26,11 h2 v1 h-2 z M25,12 h3 v1 h-3 z M24,13 h4 v1 h-4 z M23,14 h5 v1 h-5 z M22,15 h3 v1 h-3 z M21,16 h4 v1 h-4 z M20,17 h5 v1 h-5 z M19,18 h8 v2 h-8 z M19,20 h4 v2 h-4 z M15,22 h8 v1 h-8 z M14,23 h7 v1 h-7 z" fill="#1b5e20" />
-    <path d="M12,5 h1 v2 h-1 z M8,7 h1 v1 h-1 z M20,12 h1 v1 h-1 z M9,15 h1 v1 h-1 z" fill="#81c784" />
-    {/* Blueberries */}
-    <path d="M17,6 h2 v1 h-2 z M16,7 h3 v1 h-3 z M11,8 h2 v1 h-2 z M16,8 h2 v1 h-2 z M10,9 h3 v1 h-3 z M23,9 h2 v1 h-2 z M10,10 h2 v1 h-2 z M22,10 h3 v1 h-3 z M22,11 h2 v1 h-2 z M7,12 h2 v1 h-2 z M6,13 h3 v1 h-3 z M20,13 h2 v1 h-2 z M6,14 h2 v1 h-2 z M19,14 h3 v1 h-3 z M19,15 h2 v1 h-2 z M26,15 h2 v1 h-2 z M13,16 h2 v1 h-2 z M25,16 h3 v1 h-3 z M12,17 h3 v1 h-3 z M25,17 h2 v1 h-2 z M9,18 h2 v1 h-2 z M12,18 h2 v1 h-2 z M8,19 h3 v1 h-3 z M17,19 h2 v1 h-2 z M8,20 h2 v1 h-2 z M16,20 h3 v1 h-3 z M24,20 h2 v1 h-2 z M16,21 h2 v1 h-2 z M23,21 h3 v1 h-3 z M23,22 h2 v1 h-2 z" fill="#3f51b5" />
-    <path d="M18,8 h1 v1 h-1 z M12,10 h1 v1 h-1 z M24,11 h1 v1 h-1 z M8,14 h1 v1 h-1 z M21,15 h1 v1 h-1 z M27,17 h1 v1 h-1 z M14,18 h1 v1 h-1 z M10,20 h1 v1 h-1 z M18,21 h1 v1 h-1 z M25,22 h1 v1 h-1 z" fill="#1a237e" />
-    <path d="M16,6 h1 v1 h-1 z M10,8 h1 v1 h-1 z M22,9 h1 v1 h-1 z M6,12 h1 v1 h-1 z M19,13 h1 v1 h-1 z M25,15 h1 v1 h-1 z M12,16 h1 v1 h-1 z M8,18 h1 v1 h-1 z M16,19 h1 v1 h-1 z M23,20 h1 v1 h-1 z" fill="#9fa8da" />
-  </svg>
-));
-
-const KittenSprite = React.memo(({ gray = false, hat = null }) => {
-  const fur = gray ? "#bdbdbd" : "#ffb74d";
-  const shade = gray ? "#9e9e9e" : "#fb8c00";
-  // Wizard hat colours: [cone, cone shade, brim]
-  const hatColors = hat === 'purple' ? ["#7e57c2", "#5e35b1", "#4527a0"] : ["#42a5f5", "#1e88e5", "#1565c0"];
-
-  return (
-    <svg viewBox="0 0 14 11" className="w-full h-full drop-shadow-sm" overflow="visible" shapeRendering="crispEdges">
-      {hat && (
-        <>
-          {/* Wizard hat (the cone rises above the sprite box) */}
-          <path d="M7,0 h8 v1 h-8 z" fill={hatColors[2]} />
-          <path d="M8,-1 h6 v1 h-6 z M9,-2 h5 v1 h-5 z M9,-3 h4 v1 h-4 z M10,-4 h3 v1 h-3 z M10,-5 h2 v1 h-2 z M11,-6 h1 v1 h-1 z" fill={hatColors[0]} />
-          <path d="M13,-2 h1 v2 h-1 z M12,-4 h1 v2 h-1 z M11,-5 h1 v1 h-1 z" fill={hatColors[1]} />
-          <path d="M11,-3 h1 v3 h-1 z M10,-2 h3 v1 h-3 z M10,-4 h1 v1 h-1 z" fill="#fdd835" />
-        </>
-      )}
-      {/* Head, ears & body */}
-      <path d="M9,0 h1 v1 h-1 z M12,0 h1 v1 h-1 z M8,1 h6 v3 h-6 z M4,4 h9 v1 h-9 z M3,5 h11 v1 h-11 z M3,6 h10 v2 h-10 z M3,8 h9 v1 h-9 z" fill={fur} />
-      {/* Legs, tail & tabby stripes */}
-      <path d="M3,9 h2 v2 h-2 z M6,9 h2 v2 h-2 z M9,9 h2 v2 h-2 z M1,5 h1 v3 h-1 z M2,8 h1 v1 h-1 z M5,5 h1 v1 h-1 z M7,5 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill={shade} />
-      {/* Ears, nose & eyes */}
-      <path d="M9,1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M13,4 h1 v1 h-1 z" fill="#f48fb1" />
-      <path d="M10,3 h1 v1 h-1 z M12,3 h1 v1 h-1 z" fill="#43a047" />
-    </svg>
-  );
-});
-
-// Which tile each damaged plot, soil bed and planted crop is drawn with
-const DAMAGED_PLOT_SPRITES = { compaction: CompactedPlotSprite, erosion: ErodingPlotSprite, drainage: FloodedPlotSprite };
-const SOIL_BED_SPRITES = { tomato: LoamBedSprite, succulent: SandyBedSprite, blueberry: AcidicBedSprite };
-const PLANT_SPRITES = { tomato: TomatoPlantSprite, succulent: SucculentsSprite, blueberry: BlueberryBushSprite };
-
-const PixelBox = ({ children, className = "" }) => (
-  <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
-    {children}
-  </div>
-);
-
-const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal', bottomClass = 'bottom-4' }) => {
-  let imgSrc = `${BASE}/wallace.png`;
-  let fbSrc = `${BASE}/wallace.png`;
-
-  if (emotion === 'sad' || emotion === 'angry') {
-    imgSrc = `${BASE}/sad.png`;
-    fbSrc = `${BASE}/sad.png`;
-  } else if (emotion === 'surprised') {
-    imgSrc = `${BASE}/surprised.png`;
-    fbSrc = `${BASE}/surprised.png`;
-  }
-
-  return (
-    <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up`}>
-      <PixelBox className="flex gap-4 items-start relative shadow-2xl bg-[rgba(244,226,184,0.85)]">
-        {(portrait || name === 'Wallace') && (
-          <div className="flex flex-col items-center shrink-0">
-            <div className="w-20 h-20 bg-[#d7ccc8] border-4 border-[#5d4037] flex items-center justify-center text-4xl overflow-hidden relative">
-              {name === 'Wallace' ? (
-                <>
-                  <img src={imgSrc} alt={`Wallace ${emotion}`} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = fbSrc; }} />
-                  {emotion === 'angry' && <div className="absolute top-1 right-1 text-2xl animate-bounce drop-shadow-md">💢</div>}
-                </>
-              ) : (
-                <div className={`w-full h-full flex items-center justify-center ${name === 'You' || name === 'Instructor' ? '' : 'p-2'}`}>{portrait}</div>
-              )}
-            </div>
-            {name && <span className="text-xs font-bold text-[#5d4037] mt-1">{name}</span>}
-          </div>
-        )}
-        <div className="flex-1 pr-10">
-          {name && !(portrait || name === 'Wallace') && <h3 className="font-bold text-xl mb-1 text-[#5d4037]">{name}</h3>}
-          <p className="text-sm md:text-base leading-relaxed break-words">{text}</p>
-        </div>
-        {!hideNext && (
-          <button 
-            onClick={onNext}
-            className="absolute bottom-2 right-2 animate-bounce text-xl bg-[#8b5a2b] text-white px-3 py-1 rounded hover:bg-[#5d4037]"
-          >
-            ▼
-          </button>
-        )}
-      </PixelBox>
-    </div>
-  );
-};
-
-// The classroom is drawn on a 242x167 "bit" grid; this places a sprite on that grid so the whole scene scales together.
-const classroomSpot = (x, y, w, h) => ({ left: `${x / 2.42}%`, top: `${y / 1.67}%`, width: `${w / 2.42}%`, height: `${h / 1.67}%` });
-
-const ClassroomScene = ({ farmerEyes = 'open', farmerJolts = false, instructorAngry = false }) => (
-  <div className="w-full max-w-[372px] md:max-w-[500px] border-8 border-[#5d4037] shadow-2xl mb-4 md:mb-24">
-    <div className="aspect-[242/167] bg-[#d7ccc8] relative overflow-hidden">
-      <div className="absolute inset-0"><ClassroomBackdropSprite /></div>
-      <div className="absolute" style={classroomSpot(37, 53, 48, 52)}>
-        <InstructorSprite />
-        {instructorAngry && <div className="absolute -top-[10%] left-[42%] text-2xl animate-bounce text-red-500 font-bold">💢</div>}
-      </div>
-      <div className="absolute" style={classroomSpot(152, 118, 40, 18)}><ClassDeskSprite paper="#fbcfe8" /></div>
-      <div className="absolute" style={classroomSpot(152, 96, 40, 26)}><StudentPonytailSprite /></div>
-      <div className="absolute" style={classroomSpot(10, 136, 40, 18)}><ClassDeskSprite /></div>
-      <div className="absolute" style={classroomSpot(10, 114, 40, 26)}><StudentBlondeSprite /></div>
-      <div className="absolute" style={classroomSpot(192, 136, 40, 18)}><ClassDeskSprite paper="#fdd835" /></div>
-      <div className="absolute" style={classroomSpot(192, 114, 40, 26)}><StudentBrownHairSprite /></div>
-      <div className={`absolute ${farmerJolts ? 'animate-[bounce_0.5s_ease-out_2]' : ''}`} style={classroomSpot(101, 114, 40, 38)}>
-        <SeatedFarmerSprite eyes={farmerEyes} />
-        {farmerJolts && <div key="alert-bubble" className="absolute -top-4 right-0 text-xl animate-pulse text-red-600 font-bold">❗</div>}
-      </div>
-      <div className="absolute" style={classroomSpot(101, 140, 40, 18)}><ClassDeskSprite /></div>
-    </div>
+// Watering can tipping over a bin or plot, with droplets falling from the spout
+const WateringPour = () => (
+  <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+    <div className="w-12 h-10 animate-pour origin-right"><WateringCanSprite /></div>
+    <div className="flex justify-end gap-1 mt-2 pr-1">{[1,2,3,4].map(i => <div key={i} className="w-1 h-2 bg-blue-400 animate-droplet" style={{ animationDelay: `${i * 0.1}s` }}></div>)}</div>
   </div>
 );
 
@@ -1969,7 +237,24 @@ export default function App() {
   const [plantedBeds, setPlantedBeds] = useState({});
   const [isStirring, setIsStirring] = useState(false);
   const [isWatering, setIsWatering] = useState(false);
-  const [isWorking, setIsWorking] = useState(false); 
+  const [isWorking, setIsWorking] = useState(false);
+
+  // One-at-a-time sorting (Don't Compost This! and feeding the worms)
+  const [sortQueue, setSortQueue] = useState([]);
+  const [sortedCount, setSortedCount] = useState(0);
+  // Worm bin: 0 = make bedding, 1 = feed the worms, 2 = making castings
+  const [wormPhase, setWormPhase] = useState(0);
+  const [wormBedding, setWormBedding] = useState({ paper: false, water: false });
+  const [wormFed, setWormFed] = useState([]);
+  // Tapping a kitten bumps its counter, which replays its hop / spell animation
+  const [kittenTaps, setKittenTaps] = useState({ orange: 0, gray: 0 });
+
+  const handleKittenTap = (kitten) => {
+    playSfx(kittenTossSound);
+    if (cauldron.includes('Magic')) playSfx(magicSound);
+    setKittenTaps(t => ({ ...t, [kitten]: t[kitten] + 1 }));
+  };
+
 
   const [heldItem, setHeldItem] = useState(null);
   const [groundItems, setGroundItems] = useState([]);
@@ -1978,7 +263,11 @@ export default function App() {
   const wallacePosRef = useRef({ x: 100, y: 165 });
   const [wallaceRenderPos, setWallaceRenderPos] = useState({ x: 100, y: 165 });
   const wallaceDirRef = useRef('right');
-  const [wallaceDir, setWallaceDir] = useState('right');
+  // The game loop moves these two directly (see MovingActor) instead of re-rendering the whole game each frame
+  const farmerApi = useRef(null);
+  const wallaceApi = useRef(null);
+  const nearPlotRef = useRef(null);
+  const [nearPlotId, setNearPlotId] = useState(null);
   const farmerHistoryRef = useRef(Array(45).fill({ x: 100, y: 165 }));
   const keys = useRef({});
   const targetPosRef = useRef(null);
@@ -2273,14 +562,33 @@ export default function App() {
 
   const handleStartDream = () => { setGameState('DREAM'); };
 
-  const jumpToChapter = (stage) => {
-    setDreamStage(stage); setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
+  // Clears every level's progress (used by chapter jumps, Play Again and the end credits)
+  const resetProgress = () => {
+    setDialogIndex(0); setCauldron([]); setCompletedExamples([]);
     setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false);
-    setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]);
+    setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setCrows([]); setHeldItem(null);
+    setSortQueue([]); setSortedCount(0); setWormPhase(0); setWormBedding({ paper: false, water: false }); setWormFed([]);
+  };
+
+  const returnToTitle = () => {
+    stopAllSfx(); resetProgress(); setLives(3);
+    setGameState('TITLE'); setDreamStage('INTRO_DIALOG');
+  };
+
+  const jumpToChapter = (stage, savedLives = 3) => {
+    resetProgress();
+    setDreamStage(stage);
     setAudioDismissed(true); setIsChapterSelectOpen(false);
-    setLives(stage === 'NIGHTMARE_END' ? 0 : 3); setCrows([]);
+    setLives(stage === 'NIGHTMARE_END' ? 0 : savedLives);
     setGameState('DREAM');
   };
+
+  // Save the level you're on (and your hearts) so a page refresh offers "Continue"
+  useEffect(() => {
+    if (gameState !== 'DREAM') return;
+    if (PLAYABLE_STAGES.includes(dreamStage) && lives > 0) writeSave({ stage: dreamStage, lives });
+    else if (['NIGHTMARE_END', 'END_DIALOG', 'WAKE_UP'].includes(dreamStage)) clearSave();
+  }, [gameState, dreamStage, lives]);
 
   // Watch for game over / lives empty
   useEffect(() => {
@@ -2340,14 +648,23 @@ export default function App() {
     }
   }, [gameState]);
 
+  const placeFarmer = (x, y) => {
+    farmerPosRef.current = { x, y, isWalking: false };
+    wallacePosRef.current = { x: x - 16, y: y + 8 }; farmerHistoryRef.current = [];
+    targetPosRef.current = null;
+    // start positions for when the actors mount; once mounted they're moved through their api
+    setFarmerRenderPos({ x, y, isWalking: false }); setWallaceRenderPos({ ...wallacePosRef.current });
+    farmerApi.current?.({ x, y, isWalking: false });
+    wallaceApi.current?.({ ...wallacePosRef.current, dir: wallaceDirRef.current });
+  };
+
   const initializeGroundItems = () => {
     const items = [...SOIL_COMPONENTS, ...FALSE_COMPONENTS]
       .sort(() => Math.random() - 0.5)
-      .map((name, idx) => ({ id: `craft-${idx}`, name, x: 20 + Math.random() * 260, y: 110 + Math.random() * 140 }));
+      .map((name, idx) => ({ id: `craft-${idx}`, name, icon: INGREDIENT_ICONS[name], x: 20 + Math.random() * 240, y: 110 + Math.random() * 140 }));
     setGroundItems(items);
     setCauldron([]); setHeldItem(null);
-    farmerPosRef.current = { x: 150, y: 150, isWalking: false };
-    setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
+    placeFarmer(150, 150);
   };
 
   const initializeExamplesItems = (phase = 0) => {
@@ -2359,32 +676,46 @@ export default function App() {
     const positionedItems = items.map((item) => ({ ...item, x: 40 + Math.random() * 220, y: 110 + Math.random() * 140 }));
     setGroundItems(positionedItems); setHeldItem(null);
     if (phase === 0) {
-      farmerPosRef.current = { x: 150, y: 150, isWalking: false };
-      setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
+      placeFarmer(150, 150);
       setCompletedExamples([]); setMatchPhase(0); setCombinedBins([]);
     }
+  };
+
+
+  // Puts the next scrap from the sorting queue next to the kitchen caddy
+  const SORT_SPOT = { NO_COMPOST: { x: 128, y: 158 }, WORM_BIN: { x: 108, y: 162 } };
+  const dealNextScrap = (queue, stage) => {
+    const [next, ...rest] = queue;
+    setGroundItems(next ? [{ ...next, ...SORT_SPOT[stage] }] : []);
+    setSortQueue(rest);
   };
 
   useEffect(() => {
      if (dreamStage === 'CRAFT_SOIL') initializeGroundItems();
      else if (dreamStage === 'MATCH_EXAMPLES') initializeExamplesItems(0);
-     else if (dreamStage === 'FIX_PLOTS') {
-       farmerPosRef.current = { x: 150, y: 220, isWalking: false };
-       setFarmerRenderPos({ x: 150, y: 220, isWalking: false });
-       wallacePosRef.current = { x: 134, y: 228 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
+     else if (dreamStage === 'FIX_PLOTS' || dreamStage === 'COMPOST_DOCTOR') {
+       placeFarmer(150, 220);
        setGroundItems([]); setHeldItem(null); setAppliedItems([]);
+       setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]);
+     } else if (dreamStage === 'NO_COMPOST') {
+       placeFarmer(150, 210);
+       setHeldItem(null); setSortedCount(0);
+       dealNextScrap(shuffled(NO_COMPOST_ITEMS), 'NO_COMPOST');
+     } else if (dreamStage === 'WORM_BIN') {
+       placeFarmer(150, 200);
+       setHeldItem(null); setSortedCount(0); setSortQueue([]);
+       setWormPhase(0); setWormBedding({ paper: false, water: false }); setWormFed([]);
+       setGroundItems(WORM_BEDDING_ITEMS.map((item, i) => ({ ...item, x: i === 0 ? 12 : 196, y: i === 0 ? 132 : 150 })));
      } else if (dreamStage === 'PLANT_SEEDS') {
-       const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
-       setGroundItems(seeds); setHeldItem(null);
-       farmerPosRef.current = { x: 150, y: 150, isWalking: false };
-       setFarmerRenderPos({ x: 150, y: 150, isWalking: false });
-       wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
+       const seeds = shuffled(PLANTS).map((p, i) => ({ ...p, x: 8 + (i * 82), y: i % 2 ? 188 : 158 }));
+       setGroundItems(seeds); setHeldItem(null); setPlantedBeds({});
+       placeFarmer(150, 212);
      }
   }, [dreamStage]);
 
   useEffect(() => {
     if (dreamStage === 'CRAFT_SOIL' && cauldron.length === 4) {
-      const isCorrect = cauldron.every(c => SOIL_COMPONENTS.includes(c));
+      const isCorrect = SOIL_COMPONENTS.every(c => cauldron.includes(c));
       if (isCorrect) {
         setIsStirring(true); showToast("Stirring it all together...", 'surprised');
         playSfx(pitchforkSound);
@@ -2428,12 +759,13 @@ export default function App() {
     return () => ro.disconnect();
   }, []);
 
+  // Fix Plots and Compost Doctor play the same way, each with its own set of problems
+  const isPlotStage = dreamStage === 'FIX_PLOTS' || dreamStage === 'COMPOST_DOCTOR';
+  const activeProblems = dreamStage === 'COMPOST_DOCTOR' ? COMPOST_PROBLEMS : SOIL_PROBLEMS;
+
   const handleApplyItemToPlot = () => {
     // Check if the held item is correct for the active plot
-    let isCorrectTool = false;
-    if (activePlot.id === 'compaction' && (heldItem.id === 'tool_p' || heldItem.id === 'item_om')) isCorrectTool = true;
-    if (activePlot.id === 'erosion' && (heldItem.id === 'item_cc' || heldItem.id === 'item_m')) isCorrectTool = true;
-    if (activePlot.id === 'drainage' && (heldItem.id === 'tool_h' || heldItem.id === 'item_om2')) isCorrectTool = true;
+    const isCorrectTool = activePlot.fixItems.some(item => item.id === heldItem.id);
 
     if (!isCorrectTool) {
         loseLife("Wallace: That ain't the right material for this problem!", 'sad');
@@ -2460,40 +792,36 @@ export default function App() {
      setIsWorking(true);
      showToast(`Fixing the ${activePlot.name}...`, 'surprised');
      
-     if (activePlot.id === 'compaction') { setIsStirring(true); playSfx(pitchforkSound); }
-     if (activePlot.id === 'erosion') { playSfx(patDirtSound); }
-     if (activePlot.id === 'drainage') { setIsWorking(true); playSfx(hammerSound); }
-     
+     if (activePlot.fixAnim === 'stir') { setIsStirring(true); playSfx(pitchforkSound); }
+     if (activePlot.fixAnim === 'pat') { playSfx(patDirtSound); }
+     if (activePlot.fixAnim === 'hammer') { playSfx(hammerSound); }
+     if (activePlot.fixAnim === 'water') { setIsWatering(true); playSfx(wateringCanSound); }
+
+     const stage = dreamStage;
      setTimeout(() => {
         setIsWorking(false); setIsStirring(false); setIsWatering(false);
         const newFixedPlots = [...fixedPlots, activePlot.id];
         setFixedPlots(newFixedPlots);
         setActivePlot(null); setPlotItems([]); setAppliedItems([]);
         showToast(`${activePlot.name} Fixed!`, 'surprised');
-        
-        if (newFixedPlots.length === 3) {
-          const seeds = PLANTS.slice(0, 3).map((p, i) => ({ ...p, x: 50 + (i * 100), y: 230 }));
-          setGroundItems(seeds); setHeldItem(null); 
-          farmerPosRef.current = { x: 150, y: 150, isWalking: false };
-          setFarmerRenderPos({ ...farmerPosRef.current });
-          wallacePosRef.current = { x: 134, y: 158 }; setWallaceRenderPos({ ...wallacePosRef.current }); farmerHistoryRef.current = [];
-          setPlantedBeds({}); 
-          setDreamStage('PLANT_SEEDS');
+
+        if (newFixedPlots.length === activeProblems.length) {
+          setTimeout(() => setDreamStage(stage === 'COMPOST_DOCTOR' ? 'WORM_BIN' : 'PLANT_SEEDS'), 1500);
         }
      }, 3000);
   };
 
   useEffect(() => {
-    if (!['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) || isFixModalOpen || isWorking || lives <= 0) return;
+    if (!PLAYABLE_STAGES.includes(dreamStage) || isFixModalOpen || isWorking || lives <= 0) return;
 
     let animationFrameId;
-    let lastFrameTime = performance.now();
+    let lastFrameTime = null;
     const basePace = 1.5; // Walking pace per 60fps frame
     const maxX = 340 - 40; const maxY = 300 - 40;
 
     const loop = (now) => {
        // Scale movement by elapsed time so walking speed doesn't depend on the frame rate
-       const frames = Math.min((now - lastFrameTime) / (1000 / 60), 4);
+       const frames = lastFrameTime === null ? 1 : Math.min((now - lastFrameTime) / (1000 / 60), 4);
        lastFrameTime = now;
        const speed = basePace * frames;
        let moved = false;
@@ -2523,10 +851,16 @@ export default function App() {
            farmerPosRef.current.x = Math.max(0, Math.min(farmerPosRef.current.x, maxX));
            farmerPosRef.current.y = Math.max(0, Math.min(farmerPosRef.current.y, maxY));
            farmerPosRef.current.isWalking = true;
-           setFarmerRenderPos({ x: farmerPosRef.current.x, y: farmerPosRef.current.y, isWalking: true });
+           farmerApi.current?.({ x: farmerPosRef.current.x, y: farmerPosRef.current.y, isWalking: true });
        } else if (farmerPosRef.current.isWalking) {
            farmerPosRef.current.isWalking = false;
-           setFarmerRenderPos(prev => ({ ...prev, isWalking: false }));
+           farmerApi.current?.(prev => ({ ...prev, isWalking: false }));
+       }
+       if (moved && isPlotStage) {
+         // only re-render the game when the 'Press E' prompt moves to a different plot
+         const fc = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
+         const near = activeProblems.find(plot => !fixedPlots.includes(plot.id) && !answeredPlots.includes(plot.id) && Math.hypot(fc.x - (plot.x + 32), fc.y - (plot.y + 32)) < 50)?.id ?? null;
+         if (near !== nearPlotRef.current) { nearPlotRef.current = near; setNearPlotId(near); }
        }
        if (moved) {
          farmerHistoryRef.current.push({ x: farmerPosRef.current.x, y: farmerPosRef.current.y });
@@ -2535,18 +869,18 @@ export default function App() {
        if (farmerHistoryRef.current.length > 0) {
          const trailPos = farmerHistoryRef.current[0];
          const prevWX = wallacePosRef.current.x;
+         const prevWY = wallacePosRef.current.y;
          const follow = 1 - Math.pow(0.93, frames);
          wallacePosRef.current.x += (trailPos.x - wallacePosRef.current.x) * follow;
          wallacePosRef.current.y += (trailPos.y - wallacePosRef.current.y) * follow;
          const deltaX = wallacePosRef.current.x - prevWX;
          if (Math.abs(deltaX) > 0.05) {
            const newDir = deltaX > 0 ? 'right' : 'left';
-           if (newDir !== wallaceDirRef.current) {
-             wallaceDirRef.current = newDir;
-             setWallaceDir(newDir);
-           }
+           if (newDir !== wallaceDirRef.current) wallaceDirRef.current = newDir;
          }
-         setWallaceRenderPos({ x: wallacePosRef.current.x, y: wallacePosRef.current.y });
+         if (Math.abs(deltaX) > 0.01 || Math.abs(wallacePosRef.current.y - prevWY) > 0.01) {
+           wallaceApi.current?.({ x: wallacePosRef.current.x, y: wallacePosRef.current.y, dir: wallaceDirRef.current });
+         }
        }
        animationFrameId = requestAnimationFrame(loop);
     };
@@ -2573,7 +907,7 @@ export default function App() {
               // Bins go back to their spot instead of becoming a second copy on the ground
               setHeldItem(null); showToast(`Put the ${heldItem.name} back.`); return;
             }
-            if (dreamStage === 'FIX_PLOTS') {
+            if (isPlotStage) {
                 setPlotItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
             } else {
                 setGroundItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
@@ -2601,11 +935,29 @@ export default function App() {
             });
          }
          
-         if (!closest && dreamStage === 'FIX_PLOTS' && plotItems.length > 0) {
+         if (!closest && isPlotStage && plotItems.length > 0) {
             plotItems.forEach(item => {
                const dist = Math.hypot(farmerPosRef.current.x + 20 - (item.x + 10), farmerPosRef.current.y + 20 - (item.y + 10));
                if (dist < 60) { minDist = dist; closest = item; }
             });
+         }
+
+         // Nothing to pick up: if Riot or Beyonce is close by, Space makes them cluck
+         if (!closest) {
+            const field = gameFieldRef.current?.firstElementChild;
+            const hens = field ? [...field.querySelectorAll('[data-hen]')] : [];
+            if (hens.length) {
+               const fr = field.getBoundingClientRect();
+               const scale = fr.width / 340, border = 4 * scale;
+               const fc = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
+               let nearestHen = null, best = 48;
+               hens.forEach(el => {
+                  const r = el.getBoundingClientRect();
+                  const d = Math.hypot((r.left + r.width / 2 - fr.left - border) / scale - fc.x, (r.top + r.height / 2 - fr.top - border) / scale - fc.y);
+                  if (d < best) { best = d; nearestHen = el.dataset.hen; }
+               });
+               if (nearestHen) { handleHenClick({ stopPropagation() {} }, nearestHen); return; }
+            }
          }
 
          if (closest) {
@@ -2619,7 +971,7 @@ export default function App() {
       if (e.key === 'e' || e.key === 'E') {
          const farmerCenter = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
          
-         if (dreamStage === 'FIX_PLOTS') {
+         if (isPlotStage) {
             if (heldItem && activePlot && !isWorking) {
                const plotCenter = { x: activePlot.x + 32, y: activePlot.y + 32 };
                if (Math.hypot(farmerCenter.x - plotCenter.x, farmerCenter.y - plotCenter.y) < 80) {
@@ -2632,7 +984,7 @@ export default function App() {
               const isWorkingOnPlot = activePlot?.id && answeredPlots.includes(activePlot.id) && !fixedPlots.includes(activePlot.id);
               if (!isWorkingOnPlot) {
                 let nearbyPlot = null;
-                SOIL_PROBLEMS.forEach(plot => {
+                activeProblems.forEach(plot => {
                    if (fixedPlots.includes(plot.id) || answeredPlots.includes(plot.id)) return;
                    const dist = Math.hypot(farmerCenter.x - (plot.x + 32), farmerCenter.y - (plot.y + 32));
                    if (dist < 80) nearbyPlot = plot;
@@ -2651,9 +1003,9 @@ export default function App() {
          if (dreamStage === 'CRAFT_SOIL') {
              const binCenter = { x: 170, y: 50 };
              if (Math.hypot(farmerCenter.x - binCenter.x, farmerCenter.y - binCenter.y) < 110) {
-                setCauldron(prev => [...prev, heldItem.name || heldItem]); setHeldItem(null);
-                if ((heldItem.name || heldItem) === '✨ Magic') { playSfx(magicSound); }
-                else if ((heldItem.name || heldItem) === '🐱 Kittens') { playSfx(kittenTossSound); }
+                setCauldron(prev => [...prev, heldItem.name]); setHeldItem(null);
+                if (heldItem.name === 'Magic') { playSfx(magicSound); }
+                else if (heldItem.name === 'Kittens') { playSfx(kittenTossSound); }
                 else { playSfx(tossBinSound); }
              } else showToast("Get closer to the mixing bin!");
          } else if (dreamStage === 'MATCH_EXAMPLES') {
@@ -2686,7 +1038,7 @@ export default function App() {
                      setTimeout(() => {
                         setIsWorking(false);
                         setIsChopping(false);
-                        setHeldItem(prev => ({...prev, name: 'Chopped Veggies', sprite: '🥗', isChopped: true}));
+                        setHeldItem(prev => ({...prev, name: 'Chopped Veggies', icon: ChoppedVeggiesIcon, isChopped: true}));
                         showToast("All chopped up!");
                      }, 1500);
                   } else {
@@ -2704,7 +1056,7 @@ export default function App() {
                      setTimeout(() => {
                         setIsWorking(false);
                         setIsPrepping(false);
-                        setHeldItem(prev => ({...prev, name: 'Clean Cardboard', isPrepped: true}));
+                        setHeldItem(prev => ({...prev, name: 'Clean Cardboard', icon: CleanCardboardIcon, isPrepped: true}));
                         showToast("Tape & stickers removed!");
                      }, 1500);
                   } else {
@@ -2740,10 +1092,60 @@ export default function App() {
              } else if (matchPhase === 3 && heldItem.id === 'ex_a' && distToPile < 80) {
                setIsStirring(true); setHeldItem(null); showToast("Aerating...", 'surprised');
                playSfx(pitchforkSound);
-               setTimeout(() => { setIsStirring(false); showToast("Compost complete!", 'surprised'); setTimeout(() => setDreamStage('FIX_PLOTS'), 2000); }, 2500);
+               setTimeout(() => { setIsStirring(false); showToast("Compost complete!", 'surprised'); setTimeout(() => setDreamStage('NO_COMPOST'), 2000); }, 2500);
+             }
+         } else if (dreamStage === 'NO_COMPOST') {
+             const near = (spot, r) => Math.hypot(farmerCenter.x - spot.x, farmerCenter.y - spot.y) < r;
+             const dest = near(NO_COMPOST_SPOTS.compost, 75) ? 'compost' : near(NO_COMPOST_SPOTS.trash, 70) ? 'trash' : null;
+             if (!dest) { showToast("Take it to the Compost bin or the Trash!"); return; }
+             if (heldItem.bin === dest) {
+                setHeldItem(null); playSfx(tossBinSound); setSortedCount(n => n + 1);
+                showToast(`${dest === 'compost' ? 'Into the compost!' : 'Into the trash!'} ${heldItem.why}`, 'surprised');
+                if (sortQueue.length === 0) setTimeout(() => setDreamStage('COMPOST_DOCTOR'), 2500);
+                else dealNextScrap(sortQueue, 'NO_COMPOST');
+             } else {
+                loseLife(`Wallace: ${heldItem.bin === 'trash' ? `Not in the compost! ${heldItem.why}` : `That belongs in the compost! ${heldItem.why}`}`, 'sad');
+             }
+         } else if (dreamStage === 'WORM_BIN') {
+             const near = (spot, r) => Math.hypot(farmerCenter.x - spot.x, farmerCenter.y - spot.y) < r;
+             const nearBin = near(WORM_BIN_SPOTS.bin, 80);
+             if (wormPhase === 0) {
+                if (!nearBin) { showToast("Bring it to the worm bin!"); return; }
+                if (heldItem.id === 'wb_paper') {
+                   setWormBedding(b => ({ ...b, paper: true })); setHeldItem(null); playSfx(tossBinSound);
+                   showToast("Shredded newspaper makes fluffy bedding!", 'surprised');
+                } else if (heldItem.id === 'wb_water') {
+                   if (!wormBedding.paper) { showToast("Add the shredded newspaper first!"); return; }
+                   setHeldItem(null); setIsWatering(true); setIsWorking(true); playSfx(wateringCanSound);
+                   showToast("Damp like a wrung-out sponge. Perfect!", 'surprised');
+                   setTimeout(() => {
+                      setIsWatering(false); setIsWorking(false);
+                      setWormBedding({ paper: true, water: true }); setWormPhase(1);
+                      showToast("The red wigglers moved in! Time to feed them.", 'surprised');
+                      dealNextScrap(shuffled(WORM_FOODS), 'WORM_BIN');
+                   }, 2500);
+                }
+                return;
+             }
+             if (wormPhase !== 1) return;
+             const dest = nearBin ? 'worms' : near(WORM_BIN_SPOTS.compost, 66) ? 'compost' : null;
+             if (!dest) { showToast("Feed the worm bin, or use the compost pile!"); return; }
+             if (heldItem.bin === dest) {
+                setHeldItem(null); playSfx(tossBinSound); setSortedCount(n => n + 1);
+                if (dest === 'worms') setWormFed(f => [...f, heldItem]);
+                showToast(dest === 'worms' ? `Yum! ${heldItem.why}` : `${heldItem.why} The big compost pile can handle it.`, 'surprised');
+                if (sortQueue.length === 0) {
+                   setWormPhase(2);
+                   setTimeout(() => showToast("Munch, munch... worm castings! Black gold for your garden!", 'surprised'), 1500);
+                   setTimeout(() => setDreamStage('FIX_PLOTS'), 5000);
+                } else dealNextScrap(sortQueue, 'WORM_BIN');
+             } else if (heldItem.bin === 'worms') {
+                showToast("That's great worm food. Give it to the worms!");
+             } else {
+                loseLife(`Wallace: Not in the worm bin! ${heldItem.why}`, 'sad');
              }
          } else if (dreamStage === 'PLANT_SEEDS') {
-             const beds = [{ id: 0, x: 25, y: 30, soil: PLANTS[0].soil }, { id: 1, x: 135, y: 30, soil: PLANTS[1].soil }, { id: 2, x: 245, y: 30, soil: PLANTS[2].soil }];
+             const beds = PLANTS.map((p, i) => ({ id: i, ...BED_SPOTS[i], soil: p.soil }));
              let closestBed = null;
              beds.forEach(bed => { if (Math.hypot(farmerCenter.x - (bed.x + 32), farmerCenter.y - (bed.y + 32)) < 70) closestBed = bed; });
              if (closestBed) {
@@ -2752,7 +1154,7 @@ export default function App() {
                    setPlantedBeds(prev => ({ ...prev, [closestBed.id]: heldItem })); 
                    setHeldItem(null); 
                    showToast(`Planted!`, 'surprised'); 
-                   if (Object.keys(plantedBeds).length === 2) setTimeout(() => setDreamStage('END_DIALOG'), 1500); 
+                   if (Object.keys(plantedBeds).length === PLANTS.length - 1) setTimeout(() => setDreamStage('END_DIALOG'), 1500); 
                 }
                 else {
                    loseLife("Wallace: Wrong soil!", 'sad');
@@ -2783,30 +1185,19 @@ export default function App() {
         window.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('blur', handleBlur);
     };
-  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, isChopping, isPrepping, plotItems, appliedItems, fixedPlots, answeredPlots, plantedBeds, lives]);
+  }, [dreamStage, heldItem, groundItems, matchPhase, completedExamples, combinedBins, activePlot, isFixModalOpen, isWorking, isChopping, isPrepping, plotItems, appliedItems, fixedPlots, answeredPlots, plantedBeds, lives, sortQueue, sortedCount, wormPhase, wormBedding]);
 
   const handleFixPlotChoice = (plotId, isCorrect) => {
     if (isCorrect) {
       setWallaceEmotion('surprised');
       setIsFixModalOpen(false);
       setAnsweredPlots(prev => [...prev, plotId]);
-      let items = [];
-      if (plotId === 'compaction') {
-        items = [
-          { id: 'tool_p', name: 'Pitchfork', type: 'tool', x: activePlot.x - 40, y: activePlot.y + 40, component: PitchforkSprite },
-          { id: 'item_om', name: 'Compost Bag', x: activePlot.x + 70, y: activePlot.y + 40, component: CompostBagSprite }
-        ];
-      } else if (plotId === 'erosion') {
-        items = [
-          { id: 'item_cc', name: 'Cover Crop Seeds', sprite: '🌱', x: activePlot.x - 40, y: activePlot.y + 40 },
-          { id: 'item_m', name: 'Mulch', x: activePlot.x + 70, y: activePlot.y + 40, component: MulchSprite }
-        ];
-      } else if (plotId === 'drainage') {
-        items = [
-          { id: 'item_om2', name: 'Compost Bag', x: activePlot.x - 40, y: activePlot.y + 40, component: CompostBagSprite },
-          { id: 'tool_h', name: 'Hammer', type: 'tool', x: activePlot.x + 70, y: activePlot.y + 40, component: HammerSprite }
-        ];
-      }
+      // Drop the two fix items either side of the plot, kept inside the field
+      const items = activePlot.fixItems.map((item, i) => ({
+        ...item,
+        x: Math.max(4, Math.min(activePlot.x + (i === 0 ? -40 : 70), 308)),
+        y: activePlot.y + 40,
+      }));
       setPlotItems(items);
       setAppliedItems([]);
       showToast("Correct! Bring BOTH materials to the plot one by one.", 'surprised');
@@ -2816,7 +1207,9 @@ export default function App() {
   };
 
   // --- RENDERERS ---
-  const renderTitle = () => (
+  const renderTitle = () => {
+    const savedGame = readSave();
+    return (
     <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
       {/* Volume Control */}
@@ -2824,11 +1217,11 @@ export default function App() {
         <button
           onClick={toggleMusic}
           aria-label={isMusicPlaying ? 'Turn music off' : 'Turn music on'}
-          className="bg-[#8b5a2b] text-white px-2 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] whitespace-nowrap"
+          className="bg-[#8b5a2b] text-white px-2 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] whitespace-nowrap inline-flex items-center gap-1.5"
         >
-          🎵 {isMusicPlaying ? 'ON' : 'OFF'}
+          <span className="w-3.5 h-3.5 block" aria-hidden="true"><MusicNoteIcon on={isMusicPlaying} /></span>{isMusicPlaying ? 'ON' : 'OFF'}
         </button>
-        <span className="text-sm select-none" aria-hidden="true">{volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}</span>
+        <span className="w-5 h-4 block select-none" aria-hidden="true"><SpeakerIcon level={volume === 0 ? 0 : volume < 0.5 ? 1 : 2} /></span>
         <input
           type="range"
           min="0"
@@ -2980,7 +1373,17 @@ export default function App() {
           <div className="w-16 h-16"><FarmerSprite /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite /></div>
         </div>
-        <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3 relative z-20 pointer-events-auto">New Game</button>
+        {savedGame ? (
+          // A saved game puts Continue beside New Game so the card stays the same height
+          <div className="flex gap-2 mb-3 relative z-20">
+            <button onClick={() => jumpToChapter(savedGame.stage, savedGame.lives)} className="flex-1 bg-[#4caf50] text-white px-2 py-2 font-bold text-base md:text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 pointer-events-auto leading-tight">
+              Continue<span className="block text-[10px] md:text-xs tracking-normal normal-case font-normal">Day {dayOf(savedGame.stage)}</span>
+            </button>
+            <button onClick={() => { clearSave(); setGameState('INTRO'); }} className="flex-1 bg-[#689f38] text-white px-2 py-2 font-bold text-base md:text-xl uppercase tracking-wider hover:bg-[#558b2f] border-b-4 border-[#33691e] active:border-b-0 active:translate-y-1 pointer-events-auto">New Game</button>
+          </div>
+        ) : (
+          <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3 relative z-20 pointer-events-auto">New Game</button>
+        )}
         <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full relative z-20 pointer-events-auto">Chapter Select</button>
         <div className="mt-3 text-sm md:text-base leading-5 md:leading-6 tracking-[0.15em]">
           <span className="stardew-credit hover:scale-110 hover:rotate-3 transition-transform inline-block select-none">Made by Ybresciani</span>
@@ -2988,6 +1391,7 @@ export default function App() {
       </PixelBox>
     </div>
   );
+  };
 
   const renderCutscene = (script, onComplete) => (
     <div key="scene-cutscene" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
@@ -3023,10 +1427,37 @@ export default function App() {
   );
 
   const renderDream = () => {
-    const currentDay = dreamStage === 'CRAFT_SOIL' ? 'Day 1' :
-                       dreamStage === 'MATCH_EXAMPLES' ? 'Day 2' :
-                       dreamStage === 'FIX_PLOTS' ? 'Day 3' :
-                       dreamStage === 'PLANT_SEEDS' ? 'Day 4' : 'Day 5';
+    const currentDay = `Day ${dayOf(dreamStage)}`;
+    const heldBubble = heldItem && (() => {
+                         const HeldIcon = heldItem.icon || heldItem.component;
+                         return (
+                           <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
+                              {HeldIcon ? <div className="w-4 h-4"><HeldIcon /></div> : heldItem.sprite && <div className="w-4 h-4"><span>{heldItem.sprite}</span></div>}
+                              <span>{heldItem.name}</span>
+                           </div>
+                         );
+                       })();
+    const plotHint = activePlot ? (appliedItems.length < 2 ? "Gather the 2 materials!" : "Finishing work...") : null;
+    const stageHint = {
+      CRAFT_SOIL: "Gather Minerals, Organic Material, Water, and Air.",
+      MATCH_EXAMPLES: ["Chop veggies, remove tape from cardboard, then sort into Greens & Browns!", "Pick up the full bins and dump them into the center compost pile!", "Grab the watering can and water the pile!", "Grab the pitchfork and aerate the pile!"][matchPhase],
+      NO_COMPOST: `Compost or trash? Sorted ${sortedCount} of ${NO_COMPOST_ITEMS.length}`,
+      COMPOST_DOCTOR: plotHint || "Walk to a sick compost pile and press E.",
+      WORM_BIN: ["Bring shredded newspaper, then water, to the worm bin.", `Feed the worms: ${sortedCount} of ${WORM_FOODS.length} sorted`, "The worms are making castings!"][wormPhase],
+      FIX_PLOTS: plotHint || "Walk to a damaged plot and press E.",
+      PLANT_SEEDS: "Match the plants to their preferred soil!",
+    }[dreamStage];
+    const wallaceLine = {
+      CRAFT_SOIL: "First, let's investigate what soil is made of! Toss those four components into the soil bin!",
+      MATCH_EXAMPLES: ["We need more organic material. Let's make some compost! Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!", "Now bring those full bins to the center pile!", "Needs some moisture! Give it a good watering.", "Last step, let's get some air in there. Pitchfork time!"][matchPhase],
+      NO_COMPOST: "Not everything belongs in compost! Grab each scrap from the kitchen caddy and toss it in the Compost bin or the Trash.",
+      COMPOST_DOCTOR: activePlot ? activePlot.hint : "Uh-oh, these compost piles are sick! Walk up to one and press E to play compost doctor.",
+      WORM_BIN: ["Welcome to my family's worm bin! Worms need cozy bedding: bring shredded newspaper, then water it till it's damp like a wrung-out sponge.", "My cousins are hungry! Worm food goes in the worm bin. Citrus, onions and hot peppers upset our tummies, so those go in the big compost pile.", "Munch, munch! Those castings are black gold for your garden!"][wormPhase],
+      FIX_PLOTS: activePlot ? activePlot.hint : "Let's fix up this garden before we plant.",
+      PLANT_SEEDS: "Final stretch! Get those seeds in the right dirt.",
+    }[dreamStage];
+    // Holding a Compost Doctor fix or a seed packet: Wallace hints where it goes
+    const wallaceSays = heldItem?.clue || wallaceLine;
 
     return (
       <div key="scene-dream" className={`min-h-screen ${dreamStage === 'NIGHTMARE_END' ? 'bg-[#7a3535]' : 'bg-[#7ec850]'} relative overflow-hidden font-mono p-4 flex flex-col items-center`}>
@@ -3179,28 +1610,20 @@ export default function App() {
           <div className="max-w-3xl w-full mt-8 relative z-40 pb-48">
             <div className="flex justify-between items-center mb-3">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
-               {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+               {PLAYABLE_STAGES.includes(dreamStage) && (
                  <div className="text-xs font-bold text-[#5d4037] bg-white/50 px-4 py-2 rounded-full border-2 border-[#8b5a2b] animate-pulse text-center">
-                   {dreamStage === 'CRAFT_SOIL' && "Gather Minerals, Organic Material, Water, and Air."}
-                   {dreamStage === 'MATCH_EXAMPLES' && (
-                     matchPhase === 0 ? "Chop veggies, remove tape from cardboard, then sort into Greens & Browns!" :
-                     matchPhase === 1 ? "Pick up the full bins and dump them into the center compost pile!" :
-                     matchPhase === 2 ? "Grab the watering can and water the pile!" :
-                     "Grab the pitchfork and aerate the pile!"
-                   )}
-                   {dreamStage === 'FIX_PLOTS' && (activePlot ? (appliedItems.length < 2 ? `Gather the 2 materials!` : "Finishing work...") : "Walk to a damaged plot and press E.")}
-                   {dreamStage === 'PLANT_SEEDS' && "Match the plants to their preferred soil!"}
+                   {stageHint}
                  </div>
                )}
                <PixelBox className="py-2 px-4 flex gap-4 items-center relative overflow-visible">
-                  <span ref={heartsRef} className="text-red-500 font-bold text-lg tracking-widest drop-shadow-md relative z-10">
-                     {'❤️'.repeat(Math.max(0, lives))}{'🖤'.repeat(Math.max(0, 3 - lives))}
+                  <span ref={heartsRef} className="flex gap-1 relative z-10" aria-label={`${Math.max(0, lives)} of 3 hearts left`}>
+                     {[0, 1, 2].map(i => <span key={i} className="w-5 h-5 block"><LifeHeartSprite empty={i >= lives} /></span>)}
                   </span>
-                  <button onClick={toggleMusic} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] relative z-10">🎵 {isMusicPlaying ? 'ON' : 'OFF'}</button>
+                  <button onClick={toggleMusic} aria-label={isMusicPlaying ? 'Turn music off' : 'Turn music on'} className="bg-[#8b5a2b] text-white px-3 py-1 text-xs hover:bg-[#5d4037] border-2 border-[#3e2723] relative z-10 inline-flex items-center gap-1.5"><span className="w-3.5 h-3.5 block" aria-hidden="true"><MusicNoteIcon on={isMusicPlaying} /></span>{isMusicPlaying ? 'ON' : 'OFF'}</button>
                </PixelBox>
             </div>
 
-            {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+            {PLAYABLE_STAGES.includes(dreamStage) && (
               <div className="text-center animate-fade-in relative flex flex-col items-center">
 
 
@@ -3215,28 +1638,31 @@ export default function App() {
                      y: Math.max(0, Math.min(y, 300 - 40)),
                    };
                  }}>
-                    
+
                     {dreamStage === 'CRAFT_SOIL' && (
                       <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-28 z-10">
                          <ComposterSprite />
-                         {cauldron.includes('🐱 Kittens') && (
-                            <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] overflow-hidden pointer-events-none">
-                              {/* Magic in the bin turns them into wizard kittens */}
-                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk"><div className="w-full h-full animate-kitten-trot"><KittenSprite hat={cauldron.includes('✨ Magic') ? 'purple' : null} /></div></div>
-                              <div className="absolute top-0 left-0 w-7 h-5 animate-kitten-walk" style={{ animationDelay: '-4.5s' }}><div className="w-full h-full animate-kitten-trot"><KittenSprite gray hat={cauldron.includes('✨ Magic') ? 'blue' : null} /></div></div>
-                            </div>
+                         {cauldron.includes('Kittens') && (
+                            <CompostKittens wizard={cauldron.includes('Magic')} taps={kittenTaps} onTap={handleKittenTap} />
                          )}
                          {/* Sits over the composter's open top */}
-                         <div className={`absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] flex flex-wrap items-center content-center justify-center overflow-hidden transition-all duration-300 ${cauldron.includes('✨ Magic') ? 'animate-rainbow-glow' : ''}`}>
+                         <div className={`absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] flex flex-wrap items-center content-center justify-center overflow-hidden pointer-events-none transition-all duration-300 ${cauldron.includes('Magic') ? 'animate-rainbow-glow' : ''}`}>
                             {cauldron.length === 0 && <span className="text-[#8d6e63] text-xs font-bold">BIN</span>}
-                            {cauldron.map((item, idx) => <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] leading-none px-0.5 py-px m-px font-bold rounded relative z-30">{item}</span>)}
+                            {cauldron.map((item, idx) => {
+                               const Icon = INGREDIENT_ICONS[item];
+                               return (
+                                 <span key={`cauldron-${idx}`} className="bg-[#d7ccc8] text-[8px] leading-none px-0.5 py-px m-px font-bold rounded relative z-30 inline-flex items-center gap-0.5">
+                                   {Icon && <span className="w-2.5 h-2.5 inline-block"><Icon /></span>}{item}
+                                 </span>
+                               );
+                            })}
 
-                            {cauldron.includes('✨ Magic') && (
+                            {cauldron.includes('Magic') && (
                                <>
-                                 <div className="absolute top-2 left-4 text-xs animate-sparkle" style={{animationDelay: '0s'}}>✨</div>
-                                 <div className="absolute bottom-4 right-6 text-sm animate-sparkle" style={{animationDelay: '0.3s'}}>✨</div>
-                                 <div className="absolute top-6 right-2 text-xs animate-sparkle" style={{animationDelay: '0.6s'}}>✨</div>
-                                 <div className="absolute bottom-2 left-6 text-sm animate-sparkle" style={{animationDelay: '0.9s'}}>✨</div>
+                                 <div className="absolute top-2 left-4 w-3 h-3 animate-sparkle" style={{animationDelay: '0s'}}><SparkleSprite /></div>
+                                 <div className="absolute bottom-4 right-6 w-4 h-4 animate-sparkle" style={{animationDelay: '0.3s'}}><SparkleSprite color="#b388ff" /></div>
+                                 <div className="absolute top-6 right-2 w-3 h-3 animate-sparkle" style={{animationDelay: '0.6s'}}><SparkleSprite /></div>
+                                 <div className="absolute bottom-2 left-6 w-4 h-4 animate-sparkle" style={{animationDelay: '0.9s'}}><SparkleSprite color="#64b5f6" /></div>
                                </>
                             )}
                          </div>
@@ -3253,48 +1679,87 @@ export default function App() {
                               <div key={bin.id} className={`absolute w-20 h-20 flex flex-col items-center justify-center z-10 transition-opacity duration-500 ${isCombined ? 'opacity-30 grayscale' : 'opacity-100'}`} style={{ transform: `translate(${bin.x}px, ${bin.y}px)` }}>
                                 <>
                                   <div className="w-14 h-20 mt-2"><BucketComponent /></div>
-                                  <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">{bin.label}</span>
+                                  <span className={`absolute -bottom-3 ${FIELD_LABEL}`}>{bin.label}</span>
                                 </>
                               </div>
                            );
                         })}
-                        
+
                         {matchPhase === 0 && (
                           <>
                             <div className="absolute w-16 h-16 flex flex-col items-center justify-center z-10" style={{ transform: `translate(100px, 15px)` }}>
                               <CuttingStationSprite isChopping={isChopping} />
-                              <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">Cutting Board</span>
+                              <span className={`absolute -bottom-3 ${FIELD_LABEL}`}>Cutting Board</span>
                             </div>
                             <div className="absolute w-16 h-16 flex flex-col items-center justify-center z-10" style={{ transform: `translate(164px, 15px)` }}>
                               <PrepStationSprite isPrepping={isPrepping} />
-                              <span className="absolute -bottom-3 text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap">Prep Station</span>
+                              <span className={`absolute -bottom-3 ${FIELD_LABEL}`}>Prep Station</span>
                             </div>
                           </>
                         )}
 
                         <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 transition-all duration-700 flex items-center justify-center z-5 ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
                            <ComposterSprite greens={combinedBins.includes('bin_n')} browns={combinedBins.includes('bin_c')} wet={isWatering || matchPhase >= 3} />
-                           {isWatering && (
-                             <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                               <div className="w-12 h-10 animate-pour origin-right"><WateringCanSprite /></div>
-                               <div className="flex justify-end gap-1 mt-2 pr-1">{[1,2,3,4].map(i => <div key={i} className="w-1 h-2 bg-blue-400 animate-droplet" style={{ animationDelay: `${i * 0.1}s` }}></div>)}</div>
-                             </div>
-                           )}
+                           {isWatering && <WateringPour />}
                            {isStirring && <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] bg-black/40 flex items-center justify-center z-20"><div className="w-10 h-14 animate-stir"><PitchforkSprite/></div></div>}
                         </div>
+                        {matchPhase >= 1 && <PeckingHens x={14} y={140} span={76} hearts={henHearts} onHenClick={handleHenClick} />}
                       </>
                     )}
 
-                    {dreamStage === 'FIX_PLOTS' && (
+                    {dreamStage === 'NO_COMPOST' && (
                       <>
-                        {SOIL_PROBLEMS.map(plot => {
+                        <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(34px, 16px)' }}>
+                          <ComposterSprite greens browns />
+                          <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Compost</span>
+                        </div>
+                        <div className="absolute z-10" style={{ width: 72, height: 84, transform: 'translate(230px, 20px)' }}>
+                          <TrashCanSprite />
+                          <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Trash</span>
+                        </div>
+                        <div className="absolute w-10 h-9 z-10" style={{ transform: 'translate(150px, 112px)' }}><ScrapBucketSprite /></div>
+                        <PeckingHens x={12} y={124} span={74} hearts={henHearts} onHenClick={handleHenClick} />
+                      </>
+                    )}
+
+                    {dreamStage === 'WORM_BIN' && (
+                      <>
+                        <div className="absolute z-10" style={{ width: 120, height: 90, transform: 'translate(114px, 20px)' }}>
+                          <WormBinSprite state={wormPhase === 2 ? 'castings' : wormBedding.water ? 'damp' : wormBedding.paper ? 'dry' : 'empty'} />
+                          {/* The bedding area inside the tote */}
+                          <div className="absolute overflow-hidden" style={{ left: '6.25%', top: '8.3%', width: '87.5%', height: '55.6%' }}>
+                            {wormPhase === 1 && wormFed.map((food, i) => (
+                              <div key={food.id} className="absolute w-4 h-4" style={{ left: `${8 + i * 30}%`, top: i % 2 ? '48%' : '12%' }}><food.icon /></div>
+                            ))}
+                            {wormBedding.water && [0, 1, 2, 3].map(i => (
+                              <div key={i} className="absolute animate-wiggler" style={{ width: 20, height: 6, left: `${6 + i * 22}%`, top: `${22 + (i % 2) * 38}%`, animationDelay: `${-i * 0.8}s` }}><WigglerSprite /></div>
+                            ))}
+                          </div>
+                          {isWatering && <WateringPour />}
+                          <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Worm Bin</span>
+                        </div>
+                        {wormPhase >= 1 && (
+                          <>
+                            <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(240px, 14px)' }}>
+                              <ComposterSprite greens browns />
+                              <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Compost Pile</span>
+                            </div>
+                            <div className="absolute w-10 h-9 z-10" style={{ transform: 'translate(58px, 150px)' }}><ScrapBucketSprite /></div>
+                          </>
+                        )}
+                      </>
+                    )}
+
+                    {isPlotStage && (
+                      <>
+                        {activeProblems.map(plot => {
                            const isFixed = fixedPlots.includes(plot.id);
                            const isWorkingOnPlot = activePlot?.id && answeredPlots.includes(activePlot.id) && !fixedPlots.includes(activePlot.id);
-                           const PlotSprite = isFixed ? GardenPlotSprite : DAMAGED_PLOT_SPRITES[plot.id];
+                           const PlotSprite = isFixed ? plot.fixedTile : plot.tile;
                            return (
                              <div key={plot.id} className={`absolute w-16 h-16 flex items-center justify-center z-10 ${isFixed ? '' : 'animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
                                 <div className="absolute inset-0"><PlotSprite /></div>
-                                {(!isFixed && !answeredPlots.includes(plot.id) && !isWorkingOnPlot && Math.hypot(farmerRenderPos.x + 20 - (plot.x + 32), farmerRenderPos.y + 20 - (plot.y + 32)) < 50) && (
+                                {(!isFixed && !answeredPlots.includes(plot.id) && !isWorkingOnPlot && nearPlotId === plot.id) && (
                                     <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
                                 )}
                                 {activePlot?.id === plot.id && appliedItems.length > 0 && (
@@ -3303,83 +1768,83 @@ export default function App() {
                              </div>
                            );
                         })}
-                        {plotItems.map(item => (
-                          <div key={item.id} className="absolute z-20 flex flex-col items-center" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
-                             <div className="w-6 h-6">{item.component ? <item.component /> : <span className="text-lg">{item.sprite}</span>}</div>
-                             <span className="text-[6px] font-bold bg-white/80 px-0.5 rounded leading-none">{item.name}</span>
-                          </div>
-                        ))}
-                        {isStirring && activePlot && <div className="absolute z-40 animate-stir" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="w-10 h-14"><PitchforkSprite/></div></div>}
-                        {isWorking && activePlot?.id === 'drainage' && (
-                            <div className="absolute z-40" style={{ transform: `translate(${activePlot.x + 20}px, ${activePlot.y + 20}px)` }}><div className="animate-hammer w-10 h-10"><HammerSprite/></div></div>
+                        {plotItems.map(item => {
+                          const Icon = item.icon || item.component;
+                          return (
+                            <div key={item.id} className="absolute z-20 flex flex-col items-center" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
+                               <div className="w-6 h-6">{Icon ? <Icon /> : <span className="text-lg">{item.sprite}</span>}</div>
+                               <span className="text-[6px] font-bold bg-white/80 px-0.5 rounded leading-none">{item.name}</span>
+                            </div>
+                          );
+                        })}
+                        {/* Tools are centred on the plot; the outer box positions, the inner one animates (both use transform) */}
+                        {isStirring && activePlot && <div className="absolute z-40 w-16 h-16 flex items-center justify-center pointer-events-none" style={{ transform: `translate(${activePlot.x}px, ${activePlot.y}px)` }}><div className="w-10 h-14 animate-stir"><PitchforkSprite/></div></div>}
+                        {isWorking && activePlot?.fixAnim === 'hammer' && (
+                            <div className="absolute z-40 w-16 h-16 flex items-center justify-center pointer-events-none" style={{ transform: `translate(${activePlot.x}px, ${activePlot.y}px)` }}><div className="animate-hammer w-10 h-10"><HammerSprite/></div></div>
                         )}
+                        {isWatering && activePlot && (
+                            <div className="absolute z-40 w-16 h-16" style={{ transform: `translate(${activePlot.x}px, ${activePlot.y}px)` }}><WateringPour /></div>
+                        )}
+                        {dreamStage === 'COMPOST_DOCTOR' && <PeckingHens x={20} y={150} span={250} hearts={henHearts} onHenClick={handleHenClick} />}
                       </>
                     )}
 
                     {dreamStage === 'PLANT_SEEDS' && (
-                      PLANTS.slice(0, 3).map((p, index) => {
-                        const bed = { 0: { x: 25, y: 30 }, 1: { x: 135, y: 30 }, 2: { x: 245, y: 30 } }[index];
+                      PLANTS.map((p, index) => {
+                        const bed = BED_SPOTS[index];
                         const planted = plantedBeds[index];
-                        const BedSprite = SOIL_BED_SPRITES[p.id];
-                        const PlantSprite = planted ? PLANT_SPRITES[planted.id] : null;
+                        const BedSprite = p.bed;
+                        const PlantSprite = planted?.plant;
                         return (
-                          <React.Fragment key={`bed-fragment-${index}`}>
+                          <React.Fragment key={`bed-fragment-${p.id}`}>
+                            {p.shady && <div className="absolute z-[9] rounded-[40%] bg-[#1b2a12]/30 pointer-events-none" style={{ width: 84, height: 82, transform: `translate(${bed.x - 10}px, ${bed.y - 10}px)` }} />}
                             <div className="absolute w-16 h-16 z-10" style={{ transform: `translate(${bed.x}px, ${bed.y}px)` }}>
                               <BedSprite />
                               {PlantSprite && <div className="absolute inset-0"><PlantSprite /></div>}
+                              {p.shady && <div className="absolute inset-0 bg-[#0d1a08]/40 pointer-events-none" />}
                             </div>
-                            <div className="absolute w-[80px] bg-white border border-[#388e3c] text-[8px] leading-tight text-center font-bold p-1 rounded z-20 shadow-sm" style={{ transform: `translate(${bed.x - 8}px, ${bed.y + 70}px)` }}>{PLANTS[index].soil}</div>
+                            {p.shady && <div className="absolute z-[11] pointer-events-none" style={{ width: 90, height: 32, transform: `translate(${bed.x - 14}px, ${bed.y - 22}px)` }}><CanopySprite /></div>}
+                            <div className="absolute w-[76px] bg-white border border-[#388e3c] text-[8px] leading-tight text-center font-bold p-1 rounded z-20 shadow-sm" style={{ transform: `translate(${bed.x - 6}px, ${bed.y + 70}px)` }}>{p.soil}</div>
                           </React.Fragment>
                         )
                       })
                     )}
 
-                    {groundItems.map((item) => (
-                      <div key={item.id || item.name} className="absolute bg-white border-2 border-amber-600 px-2 py-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
-                        {item.sprite && <span className="text-sm">{item.sprite}</span>}
-                        <span>{item.name}</span>
-                      </div>
-                    ))}
+                    {groundItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div key={item.id || item.name} className="absolute bg-white border-2 border-amber-600 px-1.5 py-1 rounded text-[10px] font-bold shadow-md z-20 flex items-center gap-1 whitespace-nowrap" style={{ transform: `translate(${item.x}px, ${item.y}px)` }}>
+                          {Icon ? <span className="w-4 h-4 shrink-0"><Icon /></span> : item.sprite && <span className="text-sm">{item.sprite}</span>}
+                          <span>{item.name}</span>
+                        </div>
+                      );
+                    })}
 
-                    <div className="absolute w-8 h-10 z-[29]" style={{ transform: `translate(${wallaceRenderPos.x}px, ${wallaceRenderPos.y}px)`, willChange: 'transform' }}>
-                       <div className="w-full h-full animate-wallace-wobble">
-                         <div className="w-full h-full" style={{ transform: wallaceDir === 'left' ? 'scaleX(-1)' : undefined }}><WallaceFollowerSprite /></div>
-                       </div>
-                    </div>
+                    <MovingActor apiRef={wallaceApi} start={wallaceRenderPos} className="absolute w-8 h-10 z-[29]">
+                      {(pos) => (
+                        <div className="w-full h-full animate-wallace-wobble">
+                          <div className="w-full h-full" style={{ transform: pos.dir === 'left' ? 'scaleX(-1)' : undefined }}><WallaceFollowerSprite /></div>
+                        </div>
+                      )}
+                    </MovingActor>
 
-                    <div className="absolute w-10 h-10 z-30" style={{ transform: `translate(${farmerRenderPos.x}px, ${farmerRenderPos.y}px)`, willChange: 'transform' }}>
-                      <div className={farmerRenderPos.isWalking ? 'farmer-walking' : ''}>
-                       <FarmerSprite />
-                       {heldItem && (
-                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-300 text-amber-900 border-2 border-amber-600 px-1 py-0.5 text-[10px] font-bold rounded animate-bounce shadow-md flex items-center gap-1 min-w-max">
-                            {(heldItem.component || heldItem.sprite) && (
-                              <div className="w-4 h-4">{heldItem.component ? <heldItem.component /> : <span>{heldItem.sprite}</span>}</div>
-                            )}
-                            <span>{heldItem.name}</span>
-                         </div>
-                       )}
-
-                      </div>
-                    </div>
+                    <MovingActor apiRef={farmerApi} start={farmerRenderPos} className="absolute w-10 h-10 z-30">
+                      {(pos) => (
+                        <div className={pos.isWalking ? 'farmer-walking' : ''}>
+                          <FarmerSprite />
+                          {heldBubble}
+                        </div>
+                      )}
+                    </MovingActor>
                  </div>
                  </div>
 
 
-                <DialogBox name="Wallace" text={
-                   dreamStage === 'CRAFT_SOIL' ? "First, let's investigate what soil is made of! Toss those four components into the soil bin!" :
-                   dreamStage === 'MATCH_EXAMPLES' ? (
-                     matchPhase === 0 ? "We need more organic material. Let's make some compost! Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!" :
-                     matchPhase === 1 ? "Now bring those full bins to the center pile!" :
-                     matchPhase === 2 ? "Needs some moisture! Give it a good watering." :
-                     "Last step, let's get some air in there. Pitchfork time!"
-                   ) :
-                   dreamStage === 'FIX_PLOTS' ? (activePlot ? activePlot.hint : "Let's fix up this garden before we plant.") :
-                   "Final stretch! Get those seeds in the right dirt."
-                 } hideNext emotion={wallaceEmotion} bottomClass="bottom-16" />
+                <DialogBox name="Wallace" text={wallaceSays} hideNext emotion={wallaceEmotion} bottomClass="bottom-16" />
               </div>
             )}
 
-            {dreamStage === 'FIX_PLOTS' && isFixModalOpen && activePlot && (
+            {isPlotStage && isFixModalOpen && activePlot && (
               <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
                 <PixelBox className="w-full max-w-lg animate-fade-in">
                   <div className="flex justify-between items-center mb-4">
@@ -3389,9 +1854,9 @@ export default function App() {
                   <p className="mb-6 text-sm">{activePlot.description}</p>
                   <div className="space-y-3">
                     {activePlot.options.map((opt, i) => (
-                      <button 
-                        key={`opt-${i}`} 
-                        onClick={() => handleFixPlotChoice(activePlot.id, opt.correct)} 
+                      <button
+                        key={`opt-${i}`}
+                        onClick={() => handleFixPlotChoice(activePlot.id, opt.correct)}
                         className="w-full text-left bg-white p-3 border-2 border-stone-300 hover:border-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs"
                       >
                         ▶ {opt.text}
@@ -3570,15 +2035,13 @@ export default function App() {
       return (
         <div key="scene-wakeup-complete-bad" className="min-h-screen bg-[#8d6e63] flex flex-col items-center justify-center p-4 font-mono text-stone-800 relative overflow-hidden">
           <PixelBox className="text-center max-w-2xl w-full shadow-2xl relative z-10">
-            <div className="text-6xl mb-4 animate-bounce grayscale">🥀</div>
+            <div className="w-12 h-24 mx-auto mb-4 animate-bounce grayscale"><WiltedSunflowerSprite /></div>
             <h2 className="text-4xl font-extrabold text-[#3e2723] mb-6 border-b-4 border-[#5d4037] pb-4">Quest Failed...</h2>
             <div className="text-lg bg-[#a1887f] p-6 border-4 border-[#5d4037] text-left leading-relaxed shadow-inner mb-8">
               <p className="font-bold mb-4 text-[#3e2723]">You fell asleep and dreamt of a barren wasteland.</p>
               <p className="text-[#3e2723] font-medium">Try again to learn the true secrets of Master Composting!</p>
             </div>
-            <button onClick={() => {
-               stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]);
-            }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
+            <button onClick={returnToTitle} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Play Again</button>
           </PixelBox>
         </div>
       );
@@ -3588,24 +2051,27 @@ export default function App() {
       <div key="scene-wakeup-complete" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 font-mono text-stone-800 relative overflow-hidden">
         {/* Celebratory Background Sparkles */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[15%] left-[20%] text-6xl animate-sparkle" style={{animationDelay: '0.1s'}}>✨</div>
-          <div className="absolute top-[30%] right-[15%] text-5xl animate-sparkle" style={{animationDelay: '0.4s'}}>✨</div>
-          <div className="absolute bottom-[20%] left-[25%] text-7xl animate-sparkle" style={{animationDelay: '0.7s'}}>✨</div>
-          <div className="absolute top-[60%] right-[25%] text-4xl animate-sparkle" style={{animationDelay: '0.2s'}}>✨</div>
-          <div className="absolute top-[45%] left-[10%] text-5xl animate-sparkle" style={{animationDelay: '0.8s'}}>✨</div>
-          <div className="absolute bottom-[35%] right-[15%] text-6xl animate-sparkle" style={{animationDelay: '0.5s'}}>✨</div>
+          <div className="absolute top-[15%] left-[20%] w-14 h-14 animate-sparkle" style={{animationDelay: '0.1s'}}><SparkleSprite /></div>
+          <div className="absolute top-[30%] right-[15%] w-12 h-12 animate-sparkle" style={{animationDelay: '0.4s'}}><SparkleSprite /></div>
+          <div className="absolute bottom-[20%] left-[25%] w-16 h-16 animate-sparkle" style={{animationDelay: '0.7s'}}><SparkleSprite /></div>
+          <div className="absolute top-[60%] right-[25%] w-10 h-10 animate-sparkle" style={{animationDelay: '0.2s'}}><SparkleSprite /></div>
+          <div className="absolute top-[45%] left-[10%] w-12 h-12 animate-sparkle" style={{animationDelay: '0.8s'}}><SparkleSprite /></div>
+          <div className="absolute bottom-[35%] right-[15%] w-14 h-14 animate-sparkle" style={{animationDelay: '0.5s'}}><SparkleSprite /></div>
         </div>
 
         <PixelBox className="text-center max-w-2xl w-full shadow-2xl relative z-10">
-          <div className="text-6xl mb-4 animate-bounce">🌱</div>
+          <div className="w-16 h-16 mx-auto mb-4 animate-bounce"><SproutSprite /></div>
           <h2 className="text-4xl font-extrabold text-[#5d4037] mb-6 border-b-4 border-[#8b5a2b] pb-4">Quest Complete!</h2>
           <div className="text-lg bg-[#d7ccc8] p-6 border-4 border-[#8b5a2b] text-left leading-relaxed shadow-inner mb-8">
             <p className="font-bold mb-4 text-[#5d4037]">You successfully learned:</p>
             <ul className="list-disc list-inside space-y-2 text-[#3e2723] font-medium">
               <li key="learned-1">Soil Components: Organic Material, Minerals, Water, Air</li>
               <li key="learned-2">Compost Steps: Nitrogen (Greens), Carbon (Browns), Water, Air</li>
+              <li key="learned-4">What not to compost: meat, dairy, oily food, pet waste, sick plants</li>
+              <li key="learned-5">Fixing smelly, cold and pest-ridden compost piles</li>
+              <li key="learned-6">Worm composting: damp bedding and worm-friendly food</li>
               <li key="learned-3">Managing Compaction, Erosion, and Drainage</li>
-              <li key="learned-4">Optimal soil pairings for your garden</li>
+              <li key="learned-7">Optimal soil pairings for your garden</li>
             </ul>
           </div>
           <button onClick={() => setGameState('END_CREDITS')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full">Continue</button>
@@ -3624,7 +2090,7 @@ export default function App() {
       case 'END_CREDITS': return (
         <div key="scene-end-credits" className="fixed inset-0 bg-black flex items-center justify-center">
           <video src={endCreditsVideo} autoPlay playsInline className="w-screen h-screen object-contain"
-            onEnded={() => { stopAllSfx(); setGameState('TITLE'); setDreamStage('INTRO_DIALOG'); setDialogIndex(0); setCauldron([]); setCompletedExamples([]); setFixedPlots([]); setAnsweredPlots([]); setActivePlot(null); setPlotItems([]); setIsFixModalOpen(false); setAppliedItems([]); setPlantedBeds({}); setMatchPhase(0); setCombinedBins([]); setLives(3); setCrows([]); }} />
+            onEnded={returnToTitle} />
         </div>
       );
       default: return renderTitle();
@@ -3637,363 +2103,6 @@ export default function App() {
         <div style={{ fontSize: '3rem' }}>🔄</div>
         <p>Please rotate your device to portrait mode to play.</p>
       </div>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@700&display=swap');
-
-        .stardew-title {
-          font-family: 'Pixelify Sans', sans-serif;
-          color: #ffeb3b;
-          text-shadow: 
-            -3px -3px 0 #5d4037, 
-             0   -3px 0 #5d4037, 
-             3px -3px 0 #5d4037, 
-             3px  0   0 #5d4037, 
-             3px  3px 0 #5d4037, 
-             0    3px 0 #5d4037, 
-            -3px  3px 0 #5d4037, 
-            -3px  0   0 #5d4037,
-             0    8px 0 #3e2723;
-        }
-
-        .stardew-subtitle {
-          font-family: 'Pixelify Sans', sans-serif;
-          color: #8bc34a;
-          text-shadow: 
-            -2px -2px 0 #33691e, 
-             0   -2px 0 #33691e, 
-             2px -2px 0 #33691e, 
-             2px  0   0 #33691e, 
-             2px  2px 0 #33691e, 
-             0    2px 0 #33691e, 
-            -2px  2px 0 #33691e, 
-            -2px  0   0 #33691e,
-             0    5px 0 #1b5e20;
-        }
-
-        .stardew-quest {
-          font-family: 'Pixelify Sans', sans-serif;
-          color: #fff3c4;
-          text-shadow: 
-            -2px -2px 0 #5d4037, 
-             0   -2px 0 #5d4037, 
-             2px -2px 0 #5d4037, 
-             2px  0   0 #5d4037, 
-             2px  2px 0 #5d4037, 
-             0    2px 0 #5d4037, 
-            -2px  2px 0 #5d4037, 
-            -2px  0   0 #5d4037,
-             0    4px 0 #3e2723;
-        }
-
-        .stardew-credit {
-          font-family: 'Pixelify Sans', sans-serif;
-          color: #ffb74d;
-          text-shadow: 
-            -1px -1px 0 #5d4037, 
-             0   -1px 0 #5d4037, 
-             1px -1px 0 #5d4037, 
-             1px  0   0 #5d4037, 
-             1px  1px 0 #5d4037, 
-             0    1px 0 #5d4037, 
-            -1px  1px 0 #5d4037, 
-            -1px  0   0 #5d4037,
-             0    3px 0 #3e2723;
-        }
-
-        .garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
-        @keyframes walk-bounce { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-        .farmer-walking { animation: walk-bounce 350ms ease-in-out infinite; }
-        @keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
-        .animate-stir { animation: stir-animation 0.3s infinite linear; }
-        @keyframes pour-animation { 0% { transform: rotate(0deg); } 20% { transform: rotate(45deg); } 80% { transform: rotate(45deg); } 100% { transform: rotate(0deg); } }
-        .animate-pour { animation: pour-animation 3s forwards; }
-        @keyframes droplet-animation { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
-        .animate-droplet { animation: droplet-animation 0.5s infinite; }
-        @keyframes grow-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .animate-grow { animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .text-shadow { text-shadow: 2px 2px #3e2723; }
-
-        @keyframes hammer-animation {
-          0% { transform: rotate(0deg); }
-          40% { transform: rotate(45deg); }
-          60% { transform: rotate(-25deg); }
-          100% { transform: rotate(0deg); }
-        }
-        .animate-hammer { animation: hammer-animation 0.4s infinite ease-in-out; transform-origin: center bottom; }
-
-        @keyframes rainbow-glow {
-          0% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
-          16% { box-shadow: 0 0 15px 5px #ff7f00, inset 0 0 15px 5px #ff7f00; }
-          33% { box-shadow: 0 0 15px 5px #ffff00, inset 0 0 15px 5px #ffff00; }
-          50% { box-shadow: 0 0 15px 5px #00ff00, inset 0 0 15px 5px #00ff00; }
-          66% { box-shadow: 0 0 15px 5px #0000ff, inset 0 0 15px 5px #0000ff; }
-          83% { box-shadow: 0 0 15px 5px #4b0082, inset 0 0 15px 5px #4b0082; }
-          100% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
-        }
-        .animate-rainbow-glow { animation: rainbow-glow 2s linear infinite; }
-
-        @keyframes sparkle-anim {
-          0% { transform: scale(0) rotate(0deg); opacity: 0; }
-          50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
-          100% { transform: scale(0) rotate(360deg); opacity: 0; }
-        }
-        .animate-sparkle { animation: sparkle-anim 1.5s ease-in-out infinite; pointer-events: none; }
-
-        @keyframes tumbleweed-anim {
-          0% { transform: translateX(-100px) translateY(0px) rotate(0deg); }
-          20% { transform: translateX(0px) translateY(-40px) rotate(180deg); }
-          40% { transform: translateX(100px) translateY(0px) rotate(360deg); }
-          60% { transform: translateX(200px) translateY(-40px) rotate(540deg); }
-          80% { transform: translateX(300px) translateY(0px) rotate(720deg); }
-          100% { transform: translateX(400px) translateY(-40px) rotate(900deg); }
-        }
-        .animate-tumbleweed { animation: tumbleweed-anim 4s linear infinite; }
-
-        @keyframes flicker {
-          0% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.05); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        .animate-flicker { animation: flicker 0.2s infinite alternate; }
-
-        @keyframes shake-anim {
-          0%, 100% { transform: translate(0, 0); }
-          20% { transform: translate(-2px, 1px); }
-          40% { transform: translate(2px, -1px); }
-          60% { transform: translate(-1px, 2px); }
-          80% { transform: translate(1px, -2px); }
-        }
-        .animate-shake { animation: shake-anim 0.2s infinite linear; }
-
-        @keyframes lightning-flash {
-          0%, 90%, 100% { opacity: 0; }
-          92%, 96% { opacity: 1; }
-          94% { opacity: 0; }
-        }
-        .animate-lightning { animation: lightning-flash 3s infinite; }
-        .animate-lightning-delayed { animation: lightning-flash 4.5s infinite 2s; }
-
-        @keyframes wallace-wobble {
-          0% { transform: translateY(0px); }
-          100% { transform: translateY(-4px); }
-        }
-        .animate-wallace-wobble { animation: wallace-wobble 0.4s ease-in-out infinite alternate; }
-
-        /* KITTENS PADDING AROUND INSIDE THE COMPOST BIN (path loops inside the 80x64px opening) */
-        @keyframes kitten-walk {
-          0% { transform: translate(0px, 44px) scaleX(1); }
-          30% { transform: translate(52px, 44px) scaleX(1); }
-          40% { transform: translate(52px, 12px) scaleX(1); }
-          44% { transform: translate(52px, 12px) scaleX(-1); }
-          74% { transform: translate(0px, 12px) scaleX(-1); }
-          86% { transform: translate(0px, 44px) scaleX(-1); }
-          90%, 100% { transform: translate(0px, 44px) scaleX(1); }
-        }
-        .animate-kitten-walk { animation: kitten-walk 9s linear infinite; }
-        @keyframes kitten-trot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-        .animate-kitten-trot { animation: kitten-trot 0.3s ease-in-out infinite; }
-
-        @keyframes fly-around {
-          0% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(10px, -15px) rotate(10deg); }
-          50% { transform: translate(20px, 5px) rotate(-5deg); }
-          75% { transform: translate(5px, 15px) rotate(5deg); }
-          100% { transform: translate(0, 0) rotate(0deg); }
-        }
-        .animate-fly { animation: fly-around 8s infinite ease-in-out; }
-        .animate-fly-delayed { animation: fly-around 10s infinite ease-in-out 2s reverse; }
-        .animate-fly-fast { animation: fly-around 6s infinite ease-in-out 1s; }
-
-        @keyframes spread-fire {
-          0% { opacity: 0; transform: scale(0.1); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        .animate-spread { opacity: 0; animation: spread-fire 0.5s ease-out forwards; }
-
-        @keyframes sit-toggle {
-           0% { opacity: 1; }
-           1%, 7% { opacity: 0; }
-           8%, 83% { opacity: 1; }
-           84%, 99% { opacity: 0; }
-           100% { opacity: 1; }
-        }
-        @keyframes leap-toggle {
-           0% { opacity: 0; }
-           1%, 7% { opacity: 1; }
-           8%, 83% { opacity: 0; }
-           84%, 99% { opacity: 1; }
-           100% { opacity: 0; }
-        }
-        .frog-sit { animation: sit-toggle 14s infinite ease-in-out; }
-        .frog-leap { animation: leap-toggle 14s infinite ease-in-out; }
-
-        @keyframes pond-ripple {
-           0%, 100% { opacity: 0; transform: translateY(0); }
-           50% { opacity: 1; transform: translateY(-1px); }
-        }
-        .animate-pond-ripple-1 { animation: pond-ripple 3s infinite ease-in-out; }
-        .animate-pond-ripple-2 { animation: pond-ripple 4s infinite ease-in-out 1s; }
-        .animate-pond-ripple-3 { animation: pond-ripple 3.5s infinite ease-in-out 2s; }
-
-        @keyframes frog-splash-anim {
-           0%, 7.9% { opacity: 0; transform: translate(-40px, 10px) scale(0.5); }
-           8% { opacity: 1; transform: translate(-40px, 10px) scale(1); }
-           10% { opacity: 1; transform: translate(-40px, 10px) scale(1.5); }
-           13%, 100% { opacity: 0; transform: translate(-40px, 10px) scale(2); }
-        }
-        .animate-frog-splash { animation: frog-splash-anim 14s infinite ease-out; }
-
-        @keyframes frog-action {
-          0% { transform: translate(0px, 0px) scaleX(1); }
-          4% { transform: translate(-20px, -20px) scaleX(1) rotate(-15deg); }
-          8% { transform: translate(-40px, 10px) scaleX(1) rotate(0deg); }
-          25% { transform: translate(-70px, 20px) scaleX(1); }
-          30% { transform: translate(-70px, 20px) scaleX(-1); }
-          55% { transform: translate(-20px, 5px) scaleX(-1); }
-          60% { transform: translate(-20px, 5px) scaleX(1); }
-          84% { transform: translate(-50px, 15px) scaleX(1); }
-          92% { transform: translate(-25px, -15px) scaleX(1) rotate(15deg); }
-          100% { transform: translate(0px, 0px) scaleX(1); }
-        }
-        .animate-frog { animation: frog-action 14s infinite ease-in-out; }
-
-        /* NEW ANIMATIONS FOR TITLE SCREEN */
-        @keyframes sakura-fall {
-          0% { transform: translateY(-20px) translateX(0) rotate(0deg) scale(0.5); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(110vh) translateX(var(--tx)) rotate(720deg) scale(1); opacity: 0; }
-        }
-        .animate-sakura-fall { animation: sakura-fall linear forwards; }
-
-        @keyframes bug-burst {
-          0% { transform: translate(0, 0) scale(0) rotate(var(--rot)); opacity: 1; }
-          20% { transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2)) scale(1.5) rotate(var(--rot)); opacity: 1; }
-          100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
-        }
-        .animate-bug-burst { animation: bug-burst ease-out forwards; }
-
-        @keyframes crawl-lr {
-          0% { left: -10%; transform: scaleX(-1); }
-          100% { left: 110%; transform: scaleX(-1); }
-        }
-        @keyframes crawl-rl {
-          0% { left: 110%; transform: scaleX(1); }
-          100% { left: -10%; transform: scaleX(1); }
-        }
-        .animate-crawl-lr { animation: crawl-lr linear infinite; }
-        .animate-crawl-rl { animation: crawl-rl linear infinite; }
-
-        @keyframes bee-zoom-out {
-          0% { transform: scale(1) translate(0,0); opacity: 1; }
-          100% { transform: scale(15) translate(10px, -20px) rotate(45deg); opacity: 0; }
-        }
-        .animate-bee-zoom { animation: bee-zoom-out 0.4s ease-in forwards !important; }
-
-        @keyframes butterfly-fly {
-          0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
-          20% { opacity: 1; transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(1.2); }
-          70% { opacity: 1; }
-          100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
-        }
-        .animate-butterfly-burst { animation: butterfly-fly forwards; pointer-events: none; }
-
-        @keyframes butterfly-flap {
-          0%, 100% { transform: scaleX(1) translateY(0); }
-          50% { transform: scaleX(0.2) translateY(-2px); }
-        }
-        .animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
-
-        @keyframes float-up-fade {
-          0% { transform: translateY(0) scale(1); opacity: 1; }
-          100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
-        }
-        .animate-float-up { animation: float-up-fade 1s ease-out forwards; }
-
-        /* RABBIT ANIMATIONS */
-        @keyframes rabbit-dash {
-          0% { left: -20%; }
-          3% { left: 120%; }
-          100% { left: 120%; }
-        }
-        .animate-rabbit-dash { animation: rabbit-dash 120s linear infinite 10s; }
-        
-        @keyframes rabbit-hop-fast {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
-        }
-        .animate-rabbit-hop { animation: rabbit-hop-fast 0.25s infinite; }
-
-        /* HENS ANIMATION */
-        @keyframes hen-walk {
-          0% { transform: translateY(180px); opacity: 0; }
-          5% { opacity: 1; }
-          100% { transform: translateY(0px); opacity: 1; }
-        }
-        .animate-hen-walk { animation: hen-walk 4s ease-out forwards; opacity: 0; }
-        
-        @keyframes hen-hop {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        .animate-hen-hop { animation: hen-hop 0.3s infinite alternate ease-in-out; }
-
-        /* CUTTING ANIMATION */
-        @keyframes chop-fast {
-          0%, 100% { transform: rotate(0deg) translateY(0px); }
-          50% { transform: rotate(-25deg) translateY(-8px); }
-        }
-        .animate-chop-fast { animation: chop-fast 0.2s infinite ease-in-out; }
-
-        /* SNIPPING ANIMATION */
-        @keyframes snip-top {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(15deg); }
-        }
-        @keyframes snip-bottom {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(-15deg); }
-        }
-        .animate-snip-top { animation: snip-top 0.2s infinite ease-in-out; }
-        .animate-snip-bottom { animation: snip-bottom 0.2s infinite ease-in-out; }
-
-        /* BUCKET SMELL & GLITTER */
-        @keyframes smell-waft {
-          0% { stroke-dashoffset: 100; opacity: 0; }
-          20% { opacity: 0.7; }
-          80% { opacity: 0.7; }
-          100% { stroke-dashoffset: -100; opacity: 0; }
-        }
-        .animate-smell-1 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0s; }
-        .animate-smell-2 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0.8s; }
-        .animate-smell-3 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 1.6s; }
-
-        @keyframes bucket-sparkle {
-          0% { transform: scale(0) rotate(0deg); opacity: 0; }
-          50% { transform: scale(1.2) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 2px #ffea00); }
-          100% { transform: scale(0) rotate(360deg); opacity: 0; }
-        }
-        .animate-sparkle-1 { transform-origin: 10px 8px; animation: bucket-sparkle 1.5s infinite alternate 0.2s; }
-        .animate-sparkle-2 { transform-origin: 50px 18px; animation: bucket-sparkle 1.5s infinite alternate 0.5s; }
-        .animate-sparkle-3 { transform-origin: 25px 3px; animation: bucket-sparkle 1.5s infinite alternate 0.8s; }
-
-        /* OIIA CAT SPIN */
-        @keyframes oiia-spin {
-          from { transform: rotateY(0deg); }
-          to { transform: rotateY(360deg); }
-        }
-        .animate-cat-spin { animation: oiia-spin 0.46s linear infinite; }
-
-        /* CROW ANIMATION */
-        @keyframes crow-flap-anim {
-          0%, 100% { transform: scaleY(1); }
-          50% { transform: scaleY(-1); }
-        }
-        .animate-crow-flap {
-          animation: crow-flap-anim 0.25s infinite;
-        }
-
-      `}</style>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
 
       {/* CROW STEALING LIFE ANIMATION OVERLAY */}
@@ -4007,23 +2116,16 @@ export default function App() {
             <PixelBox className="text-center animate-bounce max-w-sm mx-4">
                <h3 className="text-2xl mb-4 font-bold text-amber-900">Master Composter Quest</h3>
                <p className="text-sm mb-6 font-mono">Turn on audio for the best experience!</p>
-               <button onClick={() => { setAudioDismissed(true); playAudio(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg">Enter Game 🎵</button>
+               <button onClick={() => { setAudioDismissed(true); playAudio(); }} className="bg-emerald-500 text-white px-6 py-4 font-bold text-lg hover:bg-emerald-600 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 w-full rounded-lg inline-flex items-center justify-center gap-2">Enter Game <span className="w-5 h-5 block" aria-hidden="true"><MusicNoteIcon /></span></button>
             </PixelBox>
          </div>
       )}
       {isChapterSelectOpen && (
         <div key="chapter-select-overlay" className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
           <PixelBox className="text-center max-w-sm mx-4 w-full">
-            <h3 className="text-2xl mb-6 foAVnt-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
-            <div className="flex flex-col gap-2 mb-4">
-              {[
-                { label: '🌙 The Dream',     stage: 'INTRO_DIALOG'  },
-                { label: '🪣 Craft Soil',     stage: 'CRAFT_SOIL'    },
-                { label: '🔄 Match Examples',  stage: 'MATCH_EXAMPLES'},
-                { label: '🛠️ Fix Plots',       stage: 'FIX_PLOTS'     },
-                { label: '🌱 Plant Seeds',     stage: 'PLANT_SEEDS'   },
-                { label: '💀 Nightmare',       stage: 'NIGHTMARE_END' },
-              ].map(({ label, stage }) => (
+            <h3 className="text-2xl mb-6 font-bold text-amber-900 border-b-4 border-[#8b5a2b] pb-3">Select Chapter</h3>
+            <div className="flex flex-col gap-2 mb-4 max-h-[60vh] overflow-y-auto pr-1">
+              {[{ label: '🌙 The Dream', stage: 'INTRO_DIALOG' }, ...DREAM_LEVELS, { label: '💀 Nightmare', stage: 'NIGHTMARE_END' }].map(({ label, stage }) => (
                 <button key={stage} onClick={() => jumpToChapter(stage)} className="bg-[#fff8e1] text-[#3e2723] px-4 py-3 font-bold text-sm text-left hover:bg-[#ffe082] border-2 border-[#8b5a2b] active:translate-y-0.5 w-full font-mono">
                   {label}
                 </button>

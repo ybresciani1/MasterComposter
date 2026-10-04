@@ -26,31 +26,41 @@ Node version is pinned to 24.15.0 (see `.nvmrc`).
 
 **Master Composter Valley** is a single-page educational web game built with React 19 + Vite + Tailwind CSS 4.
 
+### Files
+
+- `src/App.jsx` — the game state machine, all game logic (movement loop, input handling) and the scene renderers.
+- `src/data/gameData.js` — level content: `DREAM_LEVELS` (play order, which sets the "Day N" label and the chapter list), Craft Soil ingredients, compost items, the sorting lists, plot/pile problems (each with its tile, fix items and fix animation), and plants with their beds.
+- `src/data/assets.js` — `BASE` asset URL and every sound/video URL.
+- `src/sprites/*.jsx` — pixel-art SVG sprites (`characters`, `animals`, `critters`, `plants`, `scenery`, `tools`, `props`, `garden` tiles, `nightmare`, and 16x16 `icons`).
+- `src/components/` — `PixelBox`/`DialogBox` (`ui.jsx`), `ClassroomScene`, `CrowOverlay`, `PeckingHens`, `CompostKittens`, portraits.
+
 ### Game State Machine
 
-The entire game lives in `src/App.jsx` as a monolithic component. The top-level `gamePhase` state drives which scene renders:
+The top-level `gameState` drives which scene renders:
 
 ```
-TITLE → INTRO → CLASS → SLEEP_TRANSITION → DREAM → WAKE_UP → TITLE
+TITLE → INTRO → CLASS → SLEEP_TRANSITION → DREAM → END_CREDITS → TITLE
 ```
 
-Within `DREAM`, a nested `dreamPhase` state progresses through:
+Within `DREAM`, `dreamStage` progresses through the levels in `DREAM_LEVELS`:
 
 ```
-INTRO_DIALOG → CRAFT_SOIL → MATCH_EXAMPLES → FIX_PLOTS → PLANT_SEEDS → END_DIALOG
+INTRO_DIALOG → CRAFT_SOIL → MATCH_EXAMPLES → NO_COMPOST → COMPOST_DOCTOR → WORM_BIN → FIX_PLOTS → PLANT_SEEDS → END_DIALOG → WAKE_UP
 ```
 
-### Key Patterns in App.jsx
+Losing all hearts jumps to `NIGHTMARE_END` instead. `FIX_PLOTS` and `COMPOST_DOCTOR` share one implementation driven by `SOIL_PROBLEMS` / `COMPOST_PROBLEMS`; `NO_COMPOST` and the feeding half of `WORM_BIN` share the one-scrap-at-a-time sorting queue.
 
-- **State**: 20+ `useState` hooks manage game state; `farmerPosRef` is a `useRef` for the character position that updates via `requestAnimationFrame` without re-renders.
-- **Movement loop**: WASD/arrow keys update position; a sinusoidal bounce is applied for animation. Collision detection uses Euclidean distance (`Math.hypot`).
-- **Game data**: All domain data (soil components, compost examples, soil problems, plants) is defined as module-level constants at the top of `App.jsx`. Each entity has an `id`, `name`, and domain-specific fields.
-- **Sprites**: Characters and tools are inline SVG React components defined in `App.jsx` (FarmerSprite, WormSprite, tool sprites, crop sprites).
-- **UI primitives**: `PixelBox` and `DialogBox` are small inline components for the retro pixel aesthetic.
+### Key Patterns
+
+- **State**: `useState` hooks in `App` manage game state; `farmerPosRef` holds the character position, updated in a `requestAnimationFrame` loop that scales movement by elapsed time (walking speed doesn't depend on frame rate).
+- **Smooth movement**: the farmer and Wallace are `MovingActor`s that the loop moves through `farmerApi`/`wallaceApi`, so walking re-renders only those two, not all of `App`. Don't put per-frame values in `App` state — it makes walking jitter.
+- **Collision**: distance checks with `Math.hypot` against spot centres in the 340x300 play field.
+- **Sprites**: SVG built from 1-unit rects with `shapeRendering="crispEdges"`, wrapped in `React.memo`. The house style is a 2x-resolution grid with base/shade/highlight tones and no outlines; match it for new art. Wallace (`WallaceFollowerSprite`) and the Polish hens (`PolishHenSprite`) intentionally keep their original style.
+- **Save**: the current level and hearts are saved to `localStorage` (`mc-save`) so the title can offer Continue.
 - **Audio**: Background music plays via an `<audio>` element with a toggle button; browser autoplay restrictions are handled with try/catch.
 
 ### Styling
 
 - Tailwind CSS 4 via the Vite plugin (no `tailwind.config.js` — config is in `vite.config.js`).
-- CSS custom properties and typography in `src/index.css`.
-- Component-specific styles in `src/App.css`.
+- CSS custom properties and typography in `src/index.css`; the Pixelify Sans font is linked in `index.html`.
+- Game animations (keyframes) and title text styles in `src/game.css`.

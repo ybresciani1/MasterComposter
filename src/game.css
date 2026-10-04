@@ -1,0 +1,388 @@
+/* Game-specific animations and text styles (Tailwind handles the rest) */
+.stardew-title {
+  font-family: 'Pixelify Sans', sans-serif;
+  color: #ffeb3b;
+  text-shadow: 
+    -3px -3px 0 #5d4037, 
+     0   -3px 0 #5d4037, 
+     3px -3px 0 #5d4037, 
+     3px  0   0 #5d4037, 
+     3px  3px 0 #5d4037, 
+     0    3px 0 #5d4037, 
+    -3px  3px 0 #5d4037, 
+    -3px  0   0 #5d4037,
+     0    8px 0 #3e2723;
+}
+
+.stardew-subtitle {
+  font-family: 'Pixelify Sans', sans-serif;
+  color: #8bc34a;
+  text-shadow: 
+    -2px -2px 0 #33691e, 
+     0   -2px 0 #33691e, 
+     2px -2px 0 #33691e, 
+     2px  0   0 #33691e, 
+     2px  2px 0 #33691e, 
+     0    2px 0 #33691e, 
+    -2px  2px 0 #33691e, 
+    -2px  0   0 #33691e,
+     0    5px 0 #1b5e20;
+}
+
+.stardew-quest {
+  font-family: 'Pixelify Sans', sans-serif;
+  color: #fff3c4;
+  text-shadow: 
+    -2px -2px 0 #5d4037, 
+     0   -2px 0 #5d4037, 
+     2px -2px 0 #5d4037, 
+     2px  0   0 #5d4037, 
+     2px  2px 0 #5d4037, 
+     0    2px 0 #5d4037, 
+    -2px  2px 0 #5d4037, 
+    -2px  0   0 #5d4037,
+     0    4px 0 #3e2723;
+}
+
+.stardew-credit {
+  font-family: 'Pixelify Sans', sans-serif;
+  color: #ffb74d;
+  text-shadow: 
+    -1px -1px 0 #5d4037, 
+     0   -1px 0 #5d4037, 
+     1px -1px 0 #5d4037, 
+     1px  0   0 #5d4037, 
+     1px  1px 0 #5d4037, 
+     0    1px 0 #5d4037, 
+    -1px  1px 0 #5d4037, 
+    -1px  0   0 #5d4037,
+     0    3px 0 #3e2723;
+}
+
+.garden-grid { background-image: radial-gradient(#8d6e63 1px, transparent 1px); background-size: 20px 20px; }
+@keyframes walk-bounce { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+.farmer-walking { animation: walk-bounce 350ms ease-in-out infinite; }
+@keyframes stir-animation { 0% { transform: translate(-5px, -5px) rotate(-10deg); } 50% { transform: translate(5px, 5px) rotate(10deg); } 100% { transform: translate(-5px, -5px) rotate(-10deg); } }
+.animate-stir { animation: stir-animation 0.3s infinite linear; }
+@keyframes pour-animation { 0% { transform: rotate(0deg); } 20% { transform: rotate(45deg); } 80% { transform: rotate(45deg); } 100% { transform: rotate(0deg); } }
+.animate-pour { animation: pour-animation 3s forwards; }
+@keyframes droplet-animation { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
+.animate-droplet { animation: droplet-animation 0.5s infinite; }
+@keyframes grow-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.animate-grow { animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.text-shadow { text-shadow: 2px 2px #3e2723; }
+
+@keyframes hammer-animation {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(45deg); }
+  60% { transform: rotate(-25deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-hammer { animation: hammer-animation 0.4s infinite ease-in-out; transform-origin: center bottom; }
+
+@keyframes rainbow-glow {
+  0% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
+  16% { box-shadow: 0 0 15px 5px #ff7f00, inset 0 0 15px 5px #ff7f00; }
+  33% { box-shadow: 0 0 15px 5px #ffff00, inset 0 0 15px 5px #ffff00; }
+  50% { box-shadow: 0 0 15px 5px #00ff00, inset 0 0 15px 5px #00ff00; }
+  66% { box-shadow: 0 0 15px 5px #0000ff, inset 0 0 15px 5px #0000ff; }
+  83% { box-shadow: 0 0 15px 5px #4b0082, inset 0 0 15px 5px #4b0082; }
+  100% { box-shadow: 0 0 15px 5px #ff0000, inset 0 0 15px 5px #ff0000; }
+}
+.animate-rainbow-glow { animation: rainbow-glow 2s linear infinite; }
+
+@keyframes sparkle-anim {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.animate-sparkle { animation: sparkle-anim 1.5s ease-in-out infinite; pointer-events: none; }
+
+@keyframes tumbleweed-anim {
+  0% { transform: translateX(-100px) translateY(0px) rotate(0deg); }
+  20% { transform: translateX(0px) translateY(-40px) rotate(180deg); }
+  40% { transform: translateX(100px) translateY(0px) rotate(360deg); }
+  60% { transform: translateX(200px) translateY(-40px) rotate(540deg); }
+  80% { transform: translateX(300px) translateY(0px) rotate(720deg); }
+  100% { transform: translateX(400px) translateY(-40px) rotate(900deg); }
+}
+.animate-tumbleweed { animation: tumbleweed-anim 4s linear infinite; }
+
+@keyframes flicker {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-flicker { animation: flicker 0.2s infinite alternate; }
+
+@keyframes shake-anim {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+}
+.animate-shake { animation: shake-anim 0.2s infinite linear; }
+
+@keyframes lightning-flash {
+  0%, 90%, 100% { opacity: 0; }
+  92%, 96% { opacity: 1; }
+  94% { opacity: 0; }
+}
+.animate-lightning { animation: lightning-flash 3s infinite; }
+.animate-lightning-delayed { animation: lightning-flash 4.5s infinite 2s; }
+
+@keyframes wallace-wobble {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
+}
+.animate-wallace-wobble { animation: wallace-wobble 0.4s ease-in-out infinite alternate; }
+
+/* KITTENS PADDING AROUND INSIDE THE COMPOST BIN (path loops inside the 80x64px opening) */
+@keyframes kitten-walk {
+  0% { transform: translate(0px, 44px) scaleX(1); }
+  30% { transform: translate(52px, 44px) scaleX(1); }
+  40% { transform: translate(52px, 12px) scaleX(1); }
+  44% { transform: translate(52px, 12px) scaleX(-1); }
+  74% { transform: translate(0px, 12px) scaleX(-1); }
+  86% { transform: translate(0px, 44px) scaleX(-1); }
+  90%, 100% { transform: translate(0px, 44px) scaleX(1); }
+}
+.animate-kitten-walk { animation: kitten-walk 9s linear infinite; }
+@keyframes kitten-trot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.animate-kitten-trot { animation: kitten-trot 0.3s ease-in-out infinite; }
+
+@keyframes fly-around {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -15px) rotate(10deg); }
+  50% { transform: translate(20px, 5px) rotate(-5deg); }
+  75% { transform: translate(5px, 15px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.animate-fly { animation: fly-around 8s infinite ease-in-out; }
+.animate-fly-delayed { animation: fly-around 10s infinite ease-in-out 2s reverse; }
+.animate-fly-fast { animation: fly-around 6s infinite ease-in-out 1s; }
+
+@keyframes spread-fire {
+  0% { opacity: 0; transform: scale(0.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-spread { opacity: 0; animation: spread-fire 0.5s ease-out forwards; }
+
+@keyframes sit-toggle {
+   0% { opacity: 1; }
+   1%, 7% { opacity: 0; }
+   8%, 83% { opacity: 1; }
+   84%, 99% { opacity: 0; }
+   100% { opacity: 1; }
+}
+@keyframes leap-toggle {
+   0% { opacity: 0; }
+   1%, 7% { opacity: 1; }
+   8%, 83% { opacity: 0; }
+   84%, 99% { opacity: 1; }
+   100% { opacity: 0; }
+}
+.frog-sit { animation: sit-toggle 14s infinite ease-in-out; }
+.frog-leap { animation: leap-toggle 14s infinite ease-in-out; }
+
+@keyframes pond-ripple {
+   0%, 100% { opacity: 0; transform: translateY(0); }
+   50% { opacity: 1; transform: translateY(-1px); }
+}
+.animate-pond-ripple-1 { animation: pond-ripple 3s infinite ease-in-out; }
+.animate-pond-ripple-2 { animation: pond-ripple 4s infinite ease-in-out 1s; }
+.animate-pond-ripple-3 { animation: pond-ripple 3.5s infinite ease-in-out 2s; }
+
+@keyframes frog-splash-anim {
+   0%, 7.9% { opacity: 0; transform: translate(-40px, 10px) scale(0.5); }
+   8% { opacity: 1; transform: translate(-40px, 10px) scale(1); }
+   10% { opacity: 1; transform: translate(-40px, 10px) scale(1.5); }
+   13%, 100% { opacity: 0; transform: translate(-40px, 10px) scale(2); }
+}
+.animate-frog-splash { animation: frog-splash-anim 14s infinite ease-out; }
+
+@keyframes frog-action {
+  0% { transform: translate(0px, 0px) scaleX(1); }
+  4% { transform: translate(-20px, -20px) scaleX(1) rotate(-15deg); }
+  8% { transform: translate(-40px, 10px) scaleX(1) rotate(0deg); }
+  25% { transform: translate(-70px, 20px) scaleX(1); }
+  30% { transform: translate(-70px, 20px) scaleX(-1); }
+  55% { transform: translate(-20px, 5px) scaleX(-1); }
+  60% { transform: translate(-20px, 5px) scaleX(1); }
+  84% { transform: translate(-50px, 15px) scaleX(1); }
+  92% { transform: translate(-25px, -15px) scaleX(1) rotate(15deg); }
+  100% { transform: translate(0px, 0px) scaleX(1); }
+}
+.animate-frog { animation: frog-action 14s infinite ease-in-out; }
+
+/* NEW ANIMATIONS FOR TITLE SCREEN */
+@keyframes sakura-fall {
+  0% { transform: translateY(-20px) translateX(0) rotate(0deg) scale(0.5); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(110vh) translateX(var(--tx)) rotate(720deg) scale(1); opacity: 0; }
+}
+.animate-sakura-fall { animation: sakura-fall linear forwards; }
+
+@keyframes bug-burst {
+  0% { transform: translate(0, 0) scale(0) rotate(var(--rot)); opacity: 1; }
+  20% { transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2)) scale(1.5) rotate(var(--rot)); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+.animate-bug-burst { animation: bug-burst ease-out forwards; }
+
+@keyframes crawl-lr {
+  0% { left: -10%; transform: scaleX(-1); }
+  100% { left: 110%; transform: scaleX(-1); }
+}
+@keyframes crawl-rl {
+  0% { left: 110%; transform: scaleX(1); }
+  100% { left: -10%; transform: scaleX(1); }
+}
+.animate-crawl-lr { animation: crawl-lr linear infinite; }
+.animate-crawl-rl { animation: crawl-rl linear infinite; }
+
+@keyframes bee-zoom-out {
+  0% { transform: scale(1) translate(0,0); opacity: 1; }
+  100% { transform: scale(15) translate(10px, -20px) rotate(45deg); opacity: 0; }
+}
+.animate-bee-zoom { animation: bee-zoom-out 0.4s ease-in forwards !important; }
+
+@keyframes butterfly-fly {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+  20% { opacity: 1; transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(1.2); }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+}
+.animate-butterfly-burst { animation: butterfly-fly forwards; pointer-events: none; }
+
+@keyframes butterfly-flap {
+  0%, 100% { transform: scaleX(1) translateY(0); }
+  50% { transform: scaleX(0.2) translateY(-2px); }
+}
+.animate-butterfly-flap { animation: butterfly-flap infinite alternate; transform-origin: center; }
+
+@keyframes float-up-fade {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
+}
+.animate-float-up { animation: float-up-fade 1s ease-out forwards; }
+
+/* RABBIT ANIMATIONS */
+@keyframes rabbit-dash {
+  0% { left: -20%; }
+  3% { left: 120%; }
+  100% { left: 120%; }
+}
+.animate-rabbit-dash { animation: rabbit-dash 120s linear infinite 10s; }
+
+@keyframes rabbit-hop-fast {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.animate-rabbit-hop { animation: rabbit-hop-fast 0.25s infinite; }
+
+/* HENS ANIMATION */
+@keyframes hen-walk {
+  0% { transform: translateY(180px); opacity: 0; }
+  5% { opacity: 1; }
+  100% { transform: translateY(0px); opacity: 1; }
+}
+.animate-hen-walk { animation: hen-walk 4s ease-out forwards; opacity: 0; }
+
+@keyframes hen-hop {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-hen-hop { animation: hen-hop 0.3s infinite alternate ease-in-out; }
+
+/* CUTTING ANIMATION */
+@keyframes chop-fast {
+  0%, 100% { transform: rotate(0deg) translateY(0px); }
+  50% { transform: rotate(-25deg) translateY(-8px); }
+}
+.animate-chop-fast { animation: chop-fast 0.2s infinite ease-in-out; }
+
+/* SNIPPING ANIMATION */
+@keyframes snip-top {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+@keyframes snip-bottom {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-15deg); }
+}
+.animate-snip-top { animation: snip-top 0.2s infinite ease-in-out; }
+.animate-snip-bottom { animation: snip-bottom 0.2s infinite ease-in-out; }
+
+/* BUCKET SMELL & GLITTER */
+@keyframes smell-waft {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { stroke-dashoffset: -100; opacity: 0; }
+}
+.animate-smell-1 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0s; }
+.animate-smell-2 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 0.8s; }
+.animate-smell-3 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: smell-waft 2.5s infinite linear 1.6s; }
+
+@keyframes bucket-sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 2px #ffea00); }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.animate-sparkle-1 { transform-origin: 10px 8px; animation: bucket-sparkle 1.5s infinite alternate 0.2s; }
+.animate-sparkle-2 { transform-origin: 50px 18px; animation: bucket-sparkle 1.5s infinite alternate 0.5s; }
+.animate-sparkle-3 { transform-origin: 25px 3px; animation: bucket-sparkle 1.5s infinite alternate 0.8s; }
+
+/* OIIA CAT SPIN */
+@keyframes oiia-spin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+.animate-cat-spin { animation: oiia-spin 0.46s linear infinite; }
+
+/* CROW ANIMATION */
+@keyframes crow-flap-anim {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(-1); }
+}
+.animate-crow-flap {
+  animation: crow-flap-anim 0.25s infinite;
+}
+
+/* HENS PECKING AROUND THE COMPOST (--hen-span set per level) */
+@keyframes hen-wander {
+  0% { transform: translateX(0) scaleX(1); }
+  42% { transform: translateX(var(--hen-span)) scaleX(1); }
+  50% { transform: translateX(var(--hen-span)) scaleX(-1); }
+  92% { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+.hen-wander { animation: hen-wander 14s ease-in-out infinite; }
+@keyframes hen-peck {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  60%, 70% { transform: rotate(28deg) translateY(2px); }
+  65%, 75% { transform: rotate(10deg); }
+}
+.hen-peck { animation: hen-peck 1.8s ease-in-out infinite; transform-origin: 50% 90%; }
+
+/* TAPPED KITTENS: a little hop, and wizard kittens throw sparkles */
+@keyframes kitten-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } }
+.animate-kitten-hop { animation: kitten-hop 0.35s ease-out; }
+@keyframes kitten-spell {
+  0% { transform: translate(0, 0) scale(0.2); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+}
+.animate-kitten-spell { animation: kitten-spell 0.8s ease-out forwards; }
+
+/* RED WIGGLERS IN THE WORM BIN */
+@keyframes wiggler {
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  45% { transform: translateX(10px) scaleX(1); }
+  50% { transform: translateX(10px) scaleX(-1); }
+  95% { transform: translateX(0) scaleX(-1); }
+}
+.animate-wiggler { animation: wiggler 3.2s ease-in-out infinite; }

@@ -68,11 +68,11 @@ body {
   box-sizing: border-box;
 }
 
+/* No colour here: an unlayered colour beats Tailwind's text-* classes and turned headings near-white in dark mode */
 h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
 }
 
 h1 {
