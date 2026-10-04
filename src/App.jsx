@@ -3,6 +3,7 @@ import { ClassroomScene } from './components/ClassroomScene.jsx';
 import { CrowOverlay } from './components/CrowOverlay.jsx';
 import { CompostKittens } from './components/CompostKittens.jsx';
 import { MovingActor } from './components/MovingActor.jsx';
+import { useSpaceKey } from './hooks/useSpaceKey.js';
 import { PeckingHens } from './components/PeckingHens.jsx';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
@@ -520,6 +521,12 @@ export default function App() {
     "You grab a quick breakfast bar, hop in the car, and get going to class."
   ];
 
+  const advanceCutscene = (script, onComplete) => {
+    if (dialogIndex < script.length - 1) setDialogIndex(dialogIndex + 1);
+    else { setDialogIndex(0); onComplete(); }
+  };
+  useSpaceKey(() => advanceCutscene(introStory, () => setGameState('CLASS')), gameState === 'INTRO');
+
   const classStory = [
     "10:00 AM - The Classroom.",
     "The instructor is talking about soil profiles. You're trying your best to pay attention.",
@@ -862,7 +869,7 @@ export default function App() {
            farmerApi.current?.(prev => ({ ...prev, isWalking: false }));
        }
        if (moved && isPlotStage) {
-         // only re-render the game when the 'Press E' prompt moves to a different plot
+         // only re-render the game when the 'Press Space' prompt moves to a different plot
          const fc = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
          const near = activeProblems.find(plot => !fixedPlots.includes(plot.id) && !answeredPlots.includes(plot.id) && Math.hypot(fc.x - (plot.x + 32), fc.y - (plot.y + 32)) < 50)?.id ?? null;
          if (near !== nearPlotRef.current) { nearPlotRef.current = near; setNearPlotId(near); }
@@ -901,8 +908,12 @@ export default function App() {
 
       if (['w','a','s','d','W','A','S','D',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
 
-      if (e.key === ' ' || e.code === 'Space') {
-         if (heldItem) {
+      const isSpace = e.key === ' ' || e.code === 'Space';
+      const isE = e.key === 'e' || e.key === 'E';
+      if ((!isSpace && !isE) || e.repeat) return; // holding a key down shouldn't pick up and use in one go
+
+      // E: put down what you are holding
+      const dropHeld = () => {
             if (heldItem.id === 'held_bin_n' || heldItem.id === 'held_bin_c') {
               const pileCenter = { x: 170, y: 150 };
               if (Math.hypot(farmerPosRef.current.x + 20 - pileCenter.x, farmerPosRef.current.y + 20 - pileCenter.y) < 80) {
@@ -917,8 +928,11 @@ export default function App() {
             } else {
                 setGroundItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
             }
-            setHeldItem(null); return;
-         }
+            setHeldItem(null);
+      };
+
+      // Space with empty hands: pick up the nearest item (or say hi to a nearby hen). Returns true if it did something.
+      const pickUp = () => {
          let closest = null; let minDist = 60;
          
          groundItems.forEach(item => {
@@ -961,7 +975,7 @@ export default function App() {
                   const d = Math.hypot((r.left + r.width / 2 - fr.left - border) / scale - fc.x, (r.top + r.height / 2 - fr.top - border) / scale - fc.y);
                   if (d < best) { best = d; nearestHen = el.dataset.hen; }
                });
-               if (nearestHen) { handleHenClick({ stopPropagation() {} }, nearestHen); return; }
+               if (nearestHen) { handleHenClick({ stopPropagation() {} }, nearestHen); return true; }
             }
          }
 
@@ -970,10 +984,13 @@ export default function App() {
             setGroundItems(prev => prev.filter(i => (i.id || i.name) !== (closest.id || closest.name)));
             setPlotItems(prev => prev.filter(i => i.id !== closest.id));
             showToast(`Picked up ${closest.name}!`);
+            return true;
          }
-      }
+         return false;
+      };
 
-      if (e.key === 'e' || e.key === 'E') {
+      // Space while holding something (or next to a plot): use it on whatever you are standing at
+      const interact = () => {
          const farmerCenter = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 20 };
          
          if (isPlotStage) {
@@ -1166,7 +1183,11 @@ export default function App() {
                 }
              }
          }
-      }
+      };
+
+      if (isE) { if (heldItem) dropHeld(); return; }
+      if (heldItem) { interact(); return; }
+      if (!pickUp()) interact();
     };
 
     const handleKeyUp = (e) => {
@@ -1402,7 +1423,7 @@ export default function App() {
     <div key="scene-cutscene" className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         <p className="text-white font-mono text-base md:text-xl leading-loose mb-8 md:mb-12 animate-pulse">{script[dialogIndex]}</p>
-        <button onClick={() => { if (dialogIndex < script.length - 1) setDialogIndex(dialogIndex + 1); else { setDialogIndex(0); onComplete(); } }} className="text-amber-500 font-mono text-lg hover:text-amber-300">[ Click to continue ]</button>
+        <button onClick={() => advanceCutscene(script, onComplete)} className="text-amber-500 font-mono text-lg hover:text-amber-300">[ Click or press Space to continue ]</button>
       </div>
     </div>
   );
@@ -1447,16 +1468,16 @@ export default function App() {
       CRAFT_SOIL: "Gather Minerals, Organic Material, Water, and Air.",
       MATCH_EXAMPLES: ["Chop veggies, remove tape from cardboard, then sort into Greens & Browns!", "Pick up the full bins and dump them into the center compost pile!", "Grab the watering can and water the pile!", "Grab the pitchfork and aerate the pile!"][matchPhase],
       NO_COMPOST: `Compost or trash? Sorted ${sortedCount} of ${NO_COMPOST_ITEMS.length}`,
-      COMPOST_DOCTOR: plotHint || "Walk to a sick compost pile and press E.",
+      COMPOST_DOCTOR: plotHint || "Walk to a sick compost pile and press Space.",
       WORM_BIN: ["Bring shredded newspaper, then water, to the worm bin.", `Feed the worms: ${sortedCount} of ${WORM_FOODS.length} sorted`, "The worms are making castings!"][wormPhase],
-      FIX_PLOTS: plotHint || "Walk to a damaged plot and press E.",
+      FIX_PLOTS: plotHint || "Walk to a damaged plot and press Space.",
       PLANT_SEEDS: "Match the plants to their preferred soil!",
     }[dreamStage];
     const wallaceLine = {
       CRAFT_SOIL: "First, let's investigate what soil is made of! Toss those four components into the soil bin!",
       MATCH_EXAMPLES: ["We need more organic material. Let's make some compost! Put green stuff in Greens and brown stuff in Browns! Chop veggies, and remove tape/stickers from cardboard first!", "Now bring those full bins to the center pile!", "Needs some moisture! Give it a good watering.", "Last step, let's get some air in there. Pitchfork time!"][matchPhase],
       NO_COMPOST: "Not everything belongs in compost! Grab each scrap from the kitchen caddy and toss it in the Compost bin or the Trash.",
-      COMPOST_DOCTOR: activePlot ? activePlot.hint : "Uh-oh, these compost piles are sick! Walk up to one and press E to play compost doctor.",
+      COMPOST_DOCTOR: activePlot ? activePlot.hint : "Uh-oh, these compost piles are sick! Walk up to one and press Space to play compost doctor.",
       WORM_BIN: ["Welcome to my family's worm bin! Worms need cozy bedding: bring shredded newspaper, then water it till it's damp like a wrung-out sponge.", "My cousins are hungry! Worm food goes in the worm bin. Citrus, onions and hot peppers upset our tummies, so those go in the big compost pile.", "Munch, munch! Those castings are black gold for your garden!"][wormPhase],
       FIX_PLOTS: activePlot ? activePlot.hint : "Let's fix up this garden before we plant.",
       PLANT_SEEDS: "Final stretch! Get those seeds in the right dirt.",
@@ -1765,7 +1786,7 @@ export default function App() {
                              <div key={plot.id} className={`absolute w-16 h-16 flex items-center justify-center z-10 ${isFixed ? '' : 'animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
                                 <div className="absolute inset-0"><PlotSprite /></div>
                                 {(!isFixed && !answeredPlots.includes(plot.id) && !isWorkingOnPlot && nearPlotId === plot.id) && (
-                                    <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press E</div>
+                                    <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press Space</div>
                                 )}
                                 {activePlot?.id === plot.id && appliedItems.length > 0 && (
                                     <div className="absolute -bottom-6 text-[8px] bg-amber-100 px-1 rounded border border-amber-600 font-bold whitespace-nowrap">{appliedItems.length}/2 Ready</div>
@@ -1999,7 +2020,7 @@ export default function App() {
                       window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
                     }}
                   >
-                    <span>Pick Up / Drop</span>
+                    <span>Pick Up / Use</span>
                     <span className="text-[8px] font-normal opacity-80">Space</span>
                   </button>
                   <button
@@ -2012,7 +2033,7 @@ export default function App() {
                       window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e', code: 'KeyE', bubbles: true }));
                     }}
                   >
-                    <span>Interact</span>
+                    <span>Drop</span>
                     <span className="text-[8px] font-normal opacity-80">E</span>
                   </button>
                 </div>

@@ -1,4 +1,5 @@
 import { BASE } from '../data/assets.js';
+import { useSpaceKey } from '../hooks/useSpaceKey.js';
 
 export const PixelBox = ({ children, className = "" }) => (
   <div className={`bg-[#f4e2b8] border-4 border-[#8b5a2b] shadow-[inset_0_0_0_4px_#a0522d] p-4 font-mono text-[#3e2723] ${className}`}>
@@ -7,6 +8,9 @@ export const PixelBox = ({ children, className = "" }) => (
 );
 
 export const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'normal', bottomClass = 'bottom-4' }) => {
+  // Space works like clicking ▼
+  useSpaceKey(onNext, Boolean(onNext) && !hideNext);
+
   let imgSrc = `${BASE}/wallace.png`;
   let fbSrc = `${BASE}/wallace.png`;
 
@@ -43,6 +47,8 @@ export const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'n
         {!hideNext && (
           <button 
             onClick={onNext}
+            title="Next (Space)"
+            aria-label="Next"
             className="absolute bottom-2 right-2 animate-bounce text-xl bg-[#8b5a2b] text-white px-3 py-1 rounded hover:bg-[#5d4037]"
           >
             ▼
