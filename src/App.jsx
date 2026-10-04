@@ -37,7 +37,12 @@ const shuffled = (list) => [...list].sort(() => Math.random() - 0.5);
 
 // Centres of the drop-off spots in the 340x300 field (used for both drawing and distance checks)
 const NO_COMPOST_SPOTS = { compost: { x: 82, y: 64 }, trash: { x: 266, y: 62 } };
-const WORM_BIN_SPOTS = { bin: { x: 174, y: 65 }, compost: { x: 288, y: 62 } };
+// Worm bin (120 wide) and compost pile (96 wide) are evenly spaced across the 332px-wide field interior
+const WORM_BIN_SPOTS = { bin: { x: 99, y: 65 }, compost: { x: 246, y: 62 } };
+
+// Tailwind sizes are rem-based and the root font is 18px on wide screens (16px below 1024px), so things in the
+// play field grew on big screens. Pinning Tailwind's size variables here keeps the field identical everywhere.
+const FIELD_UNITS = { '--spacing': '4px', '--text-xs': '12px', '--text-sm': '14px', '--text-base': '16px', '--text-lg': '18px', lineHeight: '23.2px' };
 
 const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
@@ -1628,7 +1633,7 @@ export default function App() {
 
 
                  <div ref={gameFieldRef} style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
-                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
+                 <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ ...FIELD_UNITS, transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
                    if (isFixModalOpen || isWorking || lives <= 0) return;
                    const rect = e.currentTarget.getBoundingClientRect();
                    const x = (e.clientX - rect.left) / gameScale - 20;
@@ -1724,7 +1729,7 @@ export default function App() {
 
                     {dreamStage === 'WORM_BIN' && (
                       <>
-                        <div className="absolute z-10" style={{ width: 120, height: 90, transform: 'translate(114px, 20px)' }}>
+                        <div className="absolute z-10" style={{ width: 120, height: 90, transform: 'translate(39px, 20px)' }}>
                           <WormBinSprite state={wormPhase === 2 ? 'castings' : wormBedding.water ? 'damp' : wormBedding.paper ? 'dry' : 'empty'} />
                           {/* The bedding area inside the tote */}
                           <div className="absolute overflow-hidden" style={{ left: '6.25%', top: '8.3%', width: '87.5%', height: '55.6%' }}>
@@ -1740,7 +1745,7 @@ export default function App() {
                         </div>
                         {wormPhase >= 1 && (
                           <>
-                            <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(240px, 14px)' }}>
+                            <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(198px, 14px)' }}>
                               <ComposterSprite greens browns />
                               <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Compost Pile</span>
                             </div>
@@ -1872,7 +1877,7 @@ export default function App() {
             {dreamStage === 'NIGHTMARE_END' && (
               <div className="animate-fade-in relative pt-4" style={{ height: 300 * gameScale + 16 }}>
                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', left: '50%', transform: 'translateX(-50%)', overflow: 'hidden' }}>
-                <div style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0, width: '340px', height: '300px' }}>
+                <div style={{ ...FIELD_UNITS, transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0, width: '340px', height: '300px' }}>
                 <div className="w-[340px] h-[300px] bg-[#4e342e] border-4 border-[#212121] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4 animate-shake">
                    <div className="absolute top-10 w-full h-full garden-grid opacity-10 pointer-events-none grayscale"></div>
                    
@@ -1922,7 +1927,7 @@ export default function App() {
             {dreamStage === 'END_DIALOG' && (
               <div className="animate-fade-in relative" style={{ height: 300 * gameScale }}>
                 <div style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', left: '50%', transform: 'translateX(-50%)', overflow: 'hidden' }}>
-                <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4" style={{ transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
+                <div className="w-[340px] h-[300px] bg-[#81c784] border-4 border-[#388e3c] relative overflow-hidden rounded-xl shadow-inner flex flex-wrap justify-center items-center gap-4 p-4" style={{ ...FIELD_UNITS, transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}>
                    {[...Array(9)].map((_, i) => {
                      const Sprites = [CornSprite, CarrotSprite, MelonSprite];
                      const Sprite = Sprites[i % 3];
