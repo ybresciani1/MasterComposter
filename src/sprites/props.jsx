@@ -257,3 +257,92 @@ export const AlebrijeSprite = React.memo(({ kind = 'cat', palette = ['#ec407a', 
     </svg>
   );
 });
+
+// Little slatted compost bin for the Compost Awareness Week title. level 0-3 is how full it is; 4 is finished compost
+// with a sprout popping out
+export const MiniCompostBinSprite = React.memo(({ level = 0 }) => (
+  <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* What's piled up inside */}
+    {level >= 1 && level < 4 && <>
+      <path d="M5,4 h5 v2 h-5 z" fill="#7cb342" />
+      <path d="M6,4 h1 v1 h-1 z M9,5 h1 v1 h-1 z" fill="#e53935" />
+    </>}
+    {level >= 2 && level < 4 && <path d="M3,5 h3 v1 h-3 z M10,4 h3 v2 h-3 z" fill="#a1887f" />}
+    {level === 3 && <>
+      <path d="M4,3 h8 v1 h-8 z M6,2 h4 v1 h-4 z" fill="#8bc34a" />
+      <path d="M5,3 h1 v1 h-1 z M10,3 h1 v1 h-1 z M7,2 h1 v1 h-1 z" fill="#8d6e63" />
+    </>}
+    {level === 4 && <>
+      <path d="M3,4 h10 v2 h-10 z M5,3 h6 v1 h-6 z" fill="#4e342e" />
+      <path d="M4,5 h1 v1 h-1 z M8,4 h1 v1 h-1 z M11,5 h1 v1 h-1 z" fill="#3e2723" />
+      <path d="M8,0 h1 v3 h-1 z" fill="#558b2f" />
+      <path d="M6,0 h2 v1 h-2 z M9,1 h2 v1 h-2 z" fill="#7cb342" />
+      <path d="M6,0 h1 v1 h-1 z M10,1 h1 v1 h-1 z" fill="#aed581" />
+    </>}
+    {/* Bin: rim, slatted walls, dark opening and corner posts */}
+    <path d="M1,6 h14 v10 h-14 z" fill="#8d6e63" />
+    <path d="M1,6 h14 v1 h-14 z" fill="#a1887f" />
+    <path d="M3,7 h10 v1 h-10 z" fill="#3e2723" />
+    <path d="M3,10 h10 v1 h-10 z M3,13 h10 v1 h-10 z" fill="#6d4c41" />
+    <path d="M1,6 h2 v10 h-2 z M13,6 h2 v10 h-2 z" fill="#795548" />
+    <path d="M1,6 h1 v10 h-1 z" fill="#a1887f" />
+    <path d="M14,7 h1 v9 h-1 z" fill="#5d4037" />
+  </svg>
+));
+
+// Mound of dirt with a hole, for the party worms on the Compost Awareness Week title
+export const DirtMoundSprite = React.memo(() => (
+  <svg viewBox="0 0 12 4" className="w-full h-full" shapeRendering="crispEdges">
+    <path d="M2,1 h8 v1 h-8 z M0,2 h12 v2 h-12 z" fill="#6d4c41" />
+    <path d="M3,1 h6 v1 h-6 z M1,2 h1 v1 h-1 z" fill="#8d6e63" />
+    <path d="M3,2 h6 v1 h-6 z" fill="#2e1b12" />
+    <path d="M0,3 h12 v1 h-12 z" fill="#5d4037" />
+  </svg>
+));
+
+// Wallace's cousin in a party hat, popping up to celebrate Compost Awareness Week
+export const PartyWormSprite = React.memo(() => (
+  <svg viewBox="0 0 7 15" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    {/* Party hat */}
+    <path d="M3,0 h1 v1 h-1 z" fill="#fdd835" />
+    <path d="M3,1 h1 v1 h-1 z M2,2 h3 v2 h-3 z" fill="#ab47bc" />
+    <path d="M2,3 h3 v1 h-3 z" fill="#4fc3f7" />
+    {/* Worm */}
+    <path d="M2,4 h3 v1 h-3 z M1,5 h5 v10 h-5 z" fill="#f48fb1" />
+    <path d="M1,8 h5 v1 h-5 z M1,11 h5 v1 h-5 z M1,14 h5 v1 h-5 z M5,5 h1 v10 h-1 z" fill="#d81b60" />
+    <path d="M2,5 h1 v1 h-1 z" fill="#f8bbd0" />
+    <path d="M2,6 h1 v1 h-1 z M4,6 h1 v1 h-1 z M3,7 h1 v1 h-1 z" fill="#3e2723" />
+  </svg>
+));
+
+// A scrap of confetti; `color` picks its colour
+export const ConfettiSprite = React.memo(({ color = '#ec407a' }) => (
+  <svg viewBox="0 0 3 2" className="w-full h-full" shapeRendering="crispEdges">
+    <path d="M0,0 h3 v2 h-3 z" fill={color} />
+    <path d="M0,0 h1 v1 h-1 z" fill="#ffffff" opacity="0.45" />
+  </svg>
+));
+
+// Party bunting for Compost Awareness Week: pennants with a leaf, an apple core, a worm, a banana peel and a sprout.
+// [pennant, pennant shade, icon, icon colour, second icon part, its colour]
+const BUNTING = [
+  ['#fdd835', '#f9a825', 'M4,4 h1 v1 h-1 z M5,3 h2 v2 h-2 z', '#43a047'],
+  ['#66bb6a', '#388e3c', 'M3,3 h2 v1 h-2 z M3,5 h2 v1 h-2 z', '#e53935', 'M3,4 h2 v1 h-2 z', '#fff3e0'],
+  ['#4fc3f7', '#0288d1', 'M2,4 h1 v1 h-1 z M3,3 h1 v1 h-1 z M4,4 h1 v1 h-1 z M5,3 h1 v1 h-1 z', '#f48fb1'],
+  ['#f48fb1', '#d81b60', 'M2,3 h1 v1 h-1 z M3,4 h2 v1 h-2 z M5,3 h1 v1 h-1 z', '#fdd835'],
+  ['#a1887f', '#6d4c41', 'M4,3 h1 v3 h-1 z', '#7cb342', 'M3,3 h1 v1 h-1 z M5,4 h1 v1 h-1 z', '#aed581'],
+];
+const BUNTING_STRING = [...Array(62)].map((_, x) => `M${x},${[1, 2, 2, 2, 2, 1][x % 6]} h1 v1 h-1 z`).join(' ');
+export const PartyBuntingSprite = React.memo(() => (
+  <svg viewBox="0 0 62 10" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d={BUNTING_STRING} fill="#8d6e63" />
+    {BUNTING.map(([base, shade, icon, iconColor, icon2, icon2Color], i) => (
+      <g key={i} transform={`translate(${2 + i * 12} 0)`}>
+        <path d="M0,2 h8 v2 h-8 z M1,4 h6 v2 h-6 z M2,6 h4 v2 h-4 z M3,8 h2 v1 h-2 z" fill={base} />
+        <path d="M0,2 h1 v2 h-1 z M1,4 h1 v2 h-1 z M2,6 h1 v2 h-1 z M3,8 h1 v1 h-1 z" fill={shade} />
+        <path d={icon} fill={iconColor} />
+        {icon2 && <path d={icon2} fill={icon2Color} />}
+      </g>
+    ))}
+  </svg>
+));

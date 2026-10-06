@@ -536,3 +536,24 @@
 .animate-alebrije-bob { animation: alebrije-bob 1.4s ease-in-out infinite; }
 .animate-alebrije-hop { animation: kitten-hop 0.45s ease-out; }
 .animate-skull-wiggle { animation: dog-pet 0.6s ease-in-out; transform-origin: 50% 100%; }
+
+/* Earth Day title: the globe's land scrolls past; seedlings pop into flowers */
+@keyframes earth-spin { from { transform: translateX(0); } to { transform: translateX(-16px); } }
+.earth-spin { animation: earth-spin 8s steps(16) infinite; }
+@keyframes bloom-pop {
+  0% { transform: scale(0.2, 0.1); }
+  60% { transform: scale(1.1, 1.15); }
+  100% { transform: scale(1, 1); }
+}
+.animate-bloom-pop { animation: bloom-pop 0.45s ease-out; transform-origin: 50% 100%; }
+
+/* Compost Awareness Week title: bins jolt as scraps land and steam when done; worms pop out of their holes */
+.animate-bin-jolt { animation: kitten-hop 0.3s ease-out; }
+@keyframes steam-rise {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.85; }
+  100% { transform: translate(var(--sx), -26px) scale(1.4); opacity: 0; }
+}
+.animate-steam { animation: steam-rise 1.4s ease-out forwards; }
+.party-worm { transform: translateY(72%); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.party-worm-up { transform: translateY(0); }

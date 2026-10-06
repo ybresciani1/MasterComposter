@@ -6,7 +6,7 @@ import { MovingActor } from './components/MovingActor.jsx';
 import { useSpaceKey } from './hooks/useSpaceKey.js';
 import { PeckingHens, HenSparkles } from './components/PeckingHens.jsx';
 import { WormOnAString, AchievementToast } from './components/EasterEggs.jsx';
-import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite, playJingle } from './audio/synth.js';
+import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite, playJingle, playGrow, playPartyHorn } from './audio/synth.js';
 import { getHoliday, HOLIDAYS } from './data/holidays.js';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
@@ -17,10 +17,10 @@ import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
 import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
-import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite, CandleSprite, SugarSkullSprite, AlebrijeSprite } from './sprites/props.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite, CandleSprite, SugarSkullSprite, AlebrijeSprite, MiniCompostBinSprite, DirtMoundSprite, PartyWormSprite, ConfettiSprite, PartyBuntingSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
-import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite, MarigoldPetalSprite } from './sprites/plants.jsx';
-import { PondSprite, BarnSprite, SiloSprite, CobwebSprite, SnowflakeSprite } from './sprites/scenery.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite, MarigoldPetalSprite, SeedlingSprite, FallingLeafSprite } from './sprites/plants.jsx';
+import { PondSprite, BarnSprite, SiloSprite, CobwebSprite, SnowflakeSprite, EarthSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
 const PLAYABLE_STAGES = DREAM_LEVELS.map(l => l.stage);
@@ -85,10 +85,23 @@ const TITLE_LIGHT_UPS = {
   christmas: { Sprite: ChristmasTreeSprite, aspect: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, burstClass: '' },
 };
 const BURST_EVERY = 3;
+// Earth Day: the title flowers start as seedlings and grow when tapped (every third lets out bees).
+// Compost Awareness Week: they're little compost bins; three taps fill one, then it steams and sprouts.
+const BEE_BURST = { Sprite: BeeSprite, cls: 'animate-spider-skitter' };
+const CONFETTI_COLORS = ['#7cb342', '#8d6e63', '#fdd835', '#4fc3f7', '#f48fb1'];
+const CONFETTI_BURST = { Sprite: ConfettiSprite, size: 'w-3 h-2', colors: CONFETTI_COLORS, count: 10 };
+const BIN_FULL = 3, BIN_DONE = 4;
+// Party worms popping out of dirt mounds beside the Compost Week title card: [side, top %, how far across]
+const PARTY_WORM_HOLES = [['left', 22, 0.65], ['left', 48, 0.4], ['left', 72, 0.7], ['right', 26, 0.6], ['right', 52, 0.4], ['right', 76, 0.65]];
+// The pair either side of the farmer and Wallace on the title (other holidays use their compost-pile decor)
+const FinishedBinSprite = () => <MiniCompostBinSprite level={BIN_DONE} />;
+const TITLE_SIDE_DECOR = { earthday: [EarthSprite, SeedlingSprite], compostweek: [FinishedBinSprite, PartyWormSprite] };
 // Things drifting down the title: snow at Christmas, marigold petals at Día de los Muertos
 const TITLE_FALLING = {
   christmas: { Sprite: SnowflakeSprite, anim: 'animate-snow-fall' },
   muertos: { Sprite: MarigoldPetalSprite, anim: 'animate-petal-fall' },
+  earthday: { Sprite: FallingLeafSprite, anim: 'animate-petal-fall' },
+  compostweek: { Sprite: ConfettiSprite, anim: 'animate-petal-fall', colors: ['#7cb342', '#8d6e63', '#fdd835', '#4fc3f7', '#f48fb1'] },
 };
 // Sugar skulls and alebrijes dotted around the Día de los Muertos title, in the open space either side of the title
 // card (which is 32rem wide): [kind, side, top %, how far across that side's space, size, colours, face left].
@@ -209,23 +222,58 @@ export default function App() {
     setLitTitleDecor(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
     if (!lighting) return;
     titleLightUp.sound(volumeRef.current);
-    if (!titleLightUp.Alt && i % BURST_EVERY === 0) releaseTitleBurst(e);
+    if (!titleLightUp.Alt && i % BURST_EVERY === 0) releaseTitleBurst(e, { Sprite: titleLightUp.Burst, cls: titleLightUp.burstClass, style: titleLightUp.burstStyle });
+  };
+  // Earth Day: tap a seedling to grow it into the flower that belongs in that spot
+  const [grownFlowers, setGrownFlowers] = useState([]);
+  const handleSeedlingTap = (e, i) => {
+    setGrownFlowers(prev => [...prev, i]);
+    playGrow(volumeRef.current);
+    if (i % BURST_EVERY === 0) releaseTitleBurst(e, BEE_BURST);
+  };
+  // Compost Awareness Week: each tap tosses a scrap in; a full bin steams and sprouts, and a finished one throws confetti
+  const [binFill, setBinFill] = useState({});
+  const [steamingBins, setSteamingBins] = useState([]);
+  const handleBinTap = (e, i) => {
+    const fill = binFill[i] ?? 0;
+    if (fill === BIN_DONE) { playPartyHorn(volumeRef.current); releaseTitleBurst(e, CONFETTI_BURST); return; }
+    if (fill === BIN_FULL) return; // already composting
+    playSfx(tossBinSound);
+    setBinFill(prev => ({ ...prev, [i]: fill + 1 }));
+    if (fill + 1 < BIN_FULL) return;
+    const target = e.currentTarget;
+    setTimeout(() => {
+      setBinFill(prev => ({ ...prev, [i]: BIN_DONE }));
+      setSteamingBins(prev => [...prev, i]);
+      playGrow(volumeRef.current);
+      releaseTitleBurst({ currentTarget: target }, CONFETTI_BURST);
+      setTimeout(() => setSteamingBins(prev => prev.filter(b => b !== i)), 1500);
+    }, 700);
+  };
+  // Compost Awareness Week: party worms pop out of their mounds when tapped, then duck back down
+  const [poppedWorms, setPoppedWorms] = useState({});
+  const handleWormHoleTap = (i) => {
+    const id = ++eggIdRef.current;
+    setPoppedWorms(prev => ({ ...prev, [i]: id }));
+    playPartyHorn(volumeRef.current);
+    setTimeout(() => setPoppedWorms(prev => (prev[i] === id ? { ...prev, [i]: undefined } : prev)), 3000);
   };
   const [extraTaps, setExtraTaps] = useState({}); // replays a sugar skull's wiggle or an alebrije's hop
   const handleExtraTap = (i) => setExtraTaps(t => ({ ...t, [i]: (t[i] ?? 0) + 1 }));
   const handleTitleAltTap = (e) => {
     playSfx(butterflyTapSound);
-    releaseTitleBurst(e);
+    releaseTitleBurst(e, { Sprite: titleLightUp.Burst, cls: titleLightUp.burstClass, style: titleLightUp.burstStyle });
   };
-  const releaseTitleBurst = (e) => {
+  // kind: { Sprite, cls (animates each critter), style, size, colors, count }
+  const releaseTitleBurst = (e, kind) => {
     const r = e.currentTarget.getBoundingClientRect();
     const id = ++eggIdRef.current;
-    const critters = [...Array(5)].map(() => {
+    const critters = [...Array(kind.count ?? 5)].map((_, n) => {
       const angle = Math.random() * Math.PI * 2;
       const dist = 70 + Math.random() * 110;
-      return { tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist, rot: angle + Math.PI / 2, duration: 1.2 + Math.random() * 0.7 };
+      return { tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist, rot: angle + Math.PI / 2, duration: 1.2 + Math.random() * 0.7, color: kind.colors?.[n % kind.colors.length] };
     });
-    setTitleBursts(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top + r.height * 0.7, critters }]);
+    setTitleBursts(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top + r.height * 0.7, critters, kind }]);
     setTimeout(() => setTitleBursts(prev => prev.filter(b => b.id !== id)), 2000);
   };
 
@@ -1465,6 +1513,7 @@ export default function App() {
   // --- RENDERERS ---
   const renderTitle = () => {
     const savedGame = readSave();
+    const [LeftDecor, RightDecor] = TITLE_SIDE_DECOR[holiday] ?? [HolidayDecor, HolidayDecor];
     return (
     <div key="scene-title" className="min-h-screen bg-[#7ec850] flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
@@ -1503,6 +1552,28 @@ export default function App() {
       <div className="absolute inset-0 pointer-events-none z-[6] overflow-hidden">
         {TITLE_FLOWERS.map((flower, i) => {
           const [position, size, Flower, tilt] = flower;
+          // Earth Day: seedlings that grow into this spot's flower when tapped
+          if (holiday === 'earthday' && !grownFlowers.includes(i)) return (
+            <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleSeedlingTap(e, i)}>
+              <div className="w-[60%] mx-auto aspect-square"><SeedlingSprite /></div>
+            </div>
+          );
+          if (holiday === 'earthday') return (
+            <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}>
+              <div className="w-full h-full animate-bloom-pop"><Flower /></div>
+            </div>
+          );
+          // Compost Awareness Week: little bins that fill up as you tap them
+          if (holiday === 'compostweek') return (
+            <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleBinTap(e, i)}>
+              <div className="relative w-[85%] mx-auto aspect-square">
+                {steamingBins.includes(i) && [-6, 0, 6].map((sx, n) => (
+                  <div key={n} className="absolute top-0 left-1/2 w-2 h-2 rounded-full bg-white/80 animate-steam pointer-events-none" style={{ '--sx': `${sx}px`, animationDelay: `${n * 0.15}s` }} />
+                ))}
+                <div key={binFill[i] ?? 0} className={`w-full h-full ${binFill[i] ? 'animate-bin-jolt' : ''}`}><MiniCompostBinSprite level={binFill[i] ?? 0} /></div>
+              </div>
+            </div>
+          );
           // Halloween, Día de los Muertos and Christmas swap the flowers for jack-o'-lanterns / candles / trees that light up when tapped
           if (titleLightUp?.Alt && i % 2 === 1) return (
             <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={handleTitleAltTap}><titleLightUp.Alt /></div>
@@ -1515,6 +1586,15 @@ export default function App() {
             <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}><Flower /></div>
           );
         })}
+        {holiday === 'compostweek' && PARTY_WORM_HOLES.map(([side, top, across], i) => (
+          <div key={`worm-${i}`} className={`absolute w-10 h-12 md:w-12 md:h-14 ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleWormHoleTap(i)}>
+            <div className="absolute bottom-0 inset-x-0 h-3 md:h-3.5"><DirtMoundSprite /></div>
+            {/* The worm rises out of the hole: it's clipped at the hole's mouth */}
+            <div className="absolute inset-x-0 top-0 bottom-1.5 overflow-hidden">
+              <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-10 md:w-6 md:h-12 party-worm ${poppedWorms[i] ? 'party-worm-up' : ''}`}><PartyWormSprite /></div>
+            </div>
+          </div>
+        ))}
         {holiday === 'muertos' && MUERTOS_EXTRAS.map(([kind, side, top, across, size, colors, faceLeft], i) => (
           <div key={`extra-${i}`} className={`absolute ${size} ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleExtraTap(i)}>
             <div className={`w-full h-full ${kind === 'skull' ? '' : 'animate-alebrije-bob'}`}>
@@ -1565,7 +1645,7 @@ export default function App() {
         <div key={`tb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
           {burst.critters.map((c, i) => (
             <div key={i} className="absolute -left-2.5 -top-2.5 animate-spider-scurry" style={{ '--tx': `${c.tx}px`, '--ty': `${c.ty}px`, animationDuration: `${c.duration}s` }}>
-              <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`w-5 h-5 ${titleLightUp?.burstClass ?? ''}`} style={titleLightUp?.burstStyle}>{titleLightUp && <titleLightUp.Burst />}</div></div>
+              <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`${burst.kind.size ?? 'w-5 h-5'} ${burst.kind.cls ?? ''}`} style={burst.kind.style}><burst.kind.Sprite color={c.color} /></div></div>
             </div>
           ))}
         </div>
@@ -1575,7 +1655,7 @@ export default function App() {
       {titleFalling && (
         <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden" aria-hidden="true">
           {FALLING_BITS.map(([left, size, duration, delay, drift], i) => (
-            <div key={i} className={`absolute -top-4 ${titleFalling.anim}`} style={{ left: `${left}%`, width: size, height: size, animationDuration: `${duration}s`, animationDelay: `${delay}s`, '--tx': `${drift}px` }}><titleFalling.Sprite /></div>
+            <div key={i} className={`absolute -top-4 ${titleFalling.anim}`} style={{ left: `${left}%`, width: size, height: size, animationDuration: `${duration}s`, animationDelay: `${delay}s`, '--tx': `${drift}px` }}><titleFalling.Sprite color={titleFalling.colors?.[i % titleFalling.colors.length]} /></div>
           ))}
         </div>
       )}
@@ -1648,6 +1728,7 @@ export default function App() {
         <div className="mb-8 mt-4 leading-tight">
           {holiday === 'muertos' && <div className="w-56 max-w-full h-12 mx-auto -mt-2 mb-1"><PapelPicadoSprite /></div>}
           {holiday === 'christmas' && <div className="w-64 max-w-full h-8 mx-auto -mt-2 mb-2"><ChristmasLightsSprite /></div>}
+          {holiday === 'compostweek' && <div className="w-64 max-w-full h-10 mx-auto -mt-2 mb-1"><PartyBuntingSprite /></div>}
           {holiday && <div className="stardew-credit text-base md:text-lg tracking-wider mb-3 select-none">{HOLIDAYS[holiday].banner}</div>}
           <h1 className="font-bold mb-2 leading-none">
             <span 
@@ -1669,10 +1750,10 @@ export default function App() {
           </h2>
         </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
-          {HolidayDecor && <div className="w-12 h-12"><HolidayDecor /></div>}
+          {LeftDecor && <div className="w-12 h-12"><LeftDecor /></div>}
           <div className="w-16 h-16"><FarmerSprite costume={holiday} /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite costume={holiday} /></div>
-          {HolidayDecor && <div className="w-10 h-10"><HolidayDecor /></div>}
+          {RightDecor && <div className="w-10 h-10"><RightDecor /></div>}
         </div>
         {savedGame ? (
           // A saved game puts Continue beside New Game so the card stays the same height

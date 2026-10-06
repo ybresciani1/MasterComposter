@@ -172,3 +172,24 @@ export const MarigoldPetalSprite = React.memo(() => (
     <path d="M1,1 h1 v1 h-1 z" fill="#ffb74d" />
   </svg>
 ));
+
+// Seedling in a little mound of soil; on the Earth Day title it grows into a flower when tapped
+export const SeedlingSprite = React.memo(() => (
+  <svg viewBox="0 0 8 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,6 h6 v2 h-6 z" fill="#6d4c41" />
+    <path d="M2,6 h4 v1 h-4 z" fill="#8d6e63" />
+    <path d="M4,3 h1 v3 h-1 z" fill="#558b2f" />
+    <path d="M2,2 h2 v2 h-2 z M5,1 h2 v2 h-2 z" fill="#7cb342" />
+    <path d="M3,3 h1 v1 h-1 z M5,2 h1 v1 h-1 z" fill="#558b2f" />
+    <path d="M2,2 h1 v1 h-1 z M6,1 h1 v1 h-1 z" fill="#aed581" />
+  </svg>
+));
+
+// A green leaf tumbling down the Earth Day title
+export const FallingLeafSprite = React.memo(() => (
+  <svg viewBox="0 0 5 5" className="w-full h-full" shapeRendering="crispEdges">
+    <path d="M2,0 h3 v1 h-3 z M1,1 h4 v1 h-4 z M0,2 h4 v1 h-4 z M0,3 h3 v1 h-3 z M0,4 h1 v1 h-1 z" fill="#66bb6a" />
+    <path d="M3,1 h1 v1 h-1 z M2,2 h1 v1 h-1 z M1,3 h1 v1 h-1 z M0,4 h1 v1 h-1 z" fill="#43a047" />
+    <path d="M3,0 h1 v1 h-1 z" fill="#a5d6a7" />
+  </svg>
+));

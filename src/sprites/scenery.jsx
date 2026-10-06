@@ -271,3 +271,29 @@ export const SnowflakeSprite = React.memo(() => (
     <path d="M1,1 h1 v1 h-1 z M3,1 h1 v1 h-1 z M1,3 h1 v1 h-1 z M3,3 h1 v1 h-1 z" fill="#e3f2fd" />
   </svg>
 ));
+
+// Smiling pixel Earth for the Earth Day title. The land scrolls past in whole-pixel steps (see .earth-spin), clipped
+// to the globe, so the planet slowly turns.
+const GLOBE = 'M5,1 h6 v1 h-6 z M3,2 h10 v1 h-10 z M2,3 h12 v2 h-12 z M1,5 h14 v6 h-14 z M2,11 h12 v2 h-12 z M3,13 h10 v1 h-10 z M5,14 h6 v1 h-6 z';
+const LAND = 'M3,3 h3 v1 h-3 z M10,3 h2 v1 h-2 z M2,4 h5 v1 h-5 z M9,4 h4 v1 h-4 z M2,5 h4 v1 h-4 z M9,5 h5 v1 h-5 z M3,6 h2 v1 h-2 z M10,6 h3 v1 h-3 z M14,6 h1 v1 h-1 z M4,7 h1 v1 h-1 z M11,7 h1 v1 h-1 z M14,7 h2 v1 h-2 z M4,8 h2 v1 h-2 z M13,8 h3 v1 h-3 z M5,9 h2 v1 h-2 z M12,9 h3 v1 h-3 z M1,10 h2 v1 h-2 z M5,10 h2 v1 h-2 z M1,11 h3 v1 h-3 z M6,11 h1 v1 h-1 z M2,12 h2 v1 h-2 z M9,12 h2 v1 h-2 z M9,13 h3 v1 h-3 z';
+export const EarthSprite = React.memo(() => {
+  const clipId = React.useId();
+  return (
+    <svg viewBox="0 0 16 16" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+      <clipPath id={clipId}><path d={GLOBE} /></clipPath>
+      <path d={GLOBE} fill="#42a5f5" />
+      <g clipPath={`url(#${clipId})`}>
+        {/* Two copies of the land side by side so the scroll wraps seamlessly */}
+        <g className="earth-spin">
+          <path d={LAND} fill="#66bb6a" />
+          <path d={LAND} fill="#66bb6a" transform="translate(16 0)" />
+        </g>
+      </g>
+      {/* Shading, a shine and a happy face stay put while the land turns */}
+      <path d="M13,4 h1 v1 h-1 z M14,5 h1 v6 h-1 z M13,11 h1 v2 h-1 z M12,13 h1 v1 h-1 z M5,14 h6 v1 h-6 z" fill="#1565c0" opacity="0.55" />
+      <path d="M4,2 h2 v1 h-2 z M3,3 h1 v1 h-1 z" fill="#e3f2fd" opacity="0.8" />
+      <path d="M5,7 h1 v2 h-1 z M10,7 h1 v2 h-1 z M6,10 h4 v1 h-4 z M5,9 h1 v1 h-1 z M10,9 h1 v1 h-1 z" fill="#1a237e" />
+      <path d="M3,9 h2 v1 h-2 z M11,9 h2 v1 h-2 z" fill="#f48fb1" opacity="0.8" />
+    </svg>
+  );
+});

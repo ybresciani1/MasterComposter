@@ -122,3 +122,39 @@ export const playJingle = (volume) => play(volume, (ac, t, out) => {
     bell.stop(start + 0.4); shimmer.stop(start + 0.4);
   });
 });
+
+// A springy rising "bloop" as a seedling shoots up into a flower
+export const playGrow = (volume) => play(volume, (ac, t, out) => {
+  const tone = ac.createOscillator();
+  tone.type = 'triangle';
+  tone.frequency.setValueAtTime(330, t);
+  tone.frequency.exponentialRampToValueAtTime(990, t + 0.18);
+  const env = ac.createGain();
+  env.gain.setValueAtTime(0.0001, t);
+  env.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+  tone.connect(env).connect(out);
+  tone.start(t);
+  tone.stop(t + 0.32);
+});
+
+// A tiny party-horn toot for a worm popping out of its hole
+export const playPartyHorn = (volume) => play(volume, (ac, t, out) => {
+  const horn = ac.createOscillator();
+  horn.type = 'sawtooth';
+  horn.frequency.setValueAtTime(520, t);
+  horn.frequency.linearRampToValueAtTime(700, t + 0.08);
+  horn.frequency.setValueAtTime(700, t + 0.25);
+  const kazoo = ac.createBiquadFilter();
+  kazoo.type = 'bandpass';
+  kazoo.frequency.value = 1200;
+  kazoo.Q.value = 2;
+  const env = ac.createGain();
+  env.gain.setValueAtTime(0.0001, t);
+  env.gain.exponentialRampToValueAtTime(0.4, t + 0.03);
+  env.gain.setValueAtTime(0.4, t + 0.22);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  horn.connect(kazoo).connect(env).connect(out);
+  horn.start(t);
+  horn.stop(t + 0.34);
+});

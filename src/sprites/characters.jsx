@@ -1,7 +1,7 @@
 import React from 'react';
 
-// `costume` swaps her sun hat for a holiday one (a witch hat at Halloween, a Catrina crown of roses and
-// gold spikes at Día de los Muertos, a Santa hat at Christmas)
+// `costume` dresses her up for the holidays: a witch hat at Halloween, a Catrina crown of roses and gold spikes at
+// Día de los Muertos, a Santa hat at Christmas, a sunflower crown on Earth Day and a party hat for Compost Week
 export const FarmerSprite = React.memo(({ costume }) => (
   // overflow visible lets the tall witch hat and the Catrina crown's halo rise above the sprite's box
   <svg viewBox="0 0 24 27" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges" overflow="visible">
@@ -26,6 +26,26 @@ export const FarmerSprite = React.memo(({ costume }) => (
       <path d="M6,6 h1 v1 h-1 z M11,1 h1 v1 h-1 z M18,3 h1 v1 h-1 z M5,4 h1 v1 h-1 z M12,2 h1 v1 h-1 z M17,7 h1 v1 h-1 z" fill="#ffffff" />
       <path d="M8,4 h1 v1 h-1 z M7,5 h3 v1 h-3 z M8,6 h1 v1 h-1 z M12,3 h1 v1 h-1 z M11,4 h3 v1 h-3 z M12,5 h1 v1 h-1 z M16,4 h1 v1 h-1 z M15,5 h3 v1 h-3 z M16,6 h1 v1 h-1 z" fill="#e53935" />
       <path d="M8,5 h1 v1 h-1 z M12,4 h1 v1 h-1 z M16,5 h1 v1 h-1 z" fill="#7f0000" />
+    </> : costume === 'earthday' ? <>
+      {/* Sunflower crown on a leafy band */}
+      <path d="M8,2 h8 v1 h-8 z M7,3 h10 v1 h-10 z M6,4 h12 v2 h-12 z" fill="#d84315" />
+      <path d="M5,4 h14 v1 h-14 z M4,5 h2 v1 h-2 z M18,5 h2 v1 h-2 z" fill="#43a047" />
+      <path d="M4,5 h1 v1 h-1 z M19,5 h1 v1 h-1 z" fill="#2e7d32" />
+      <path d="M6,3 h1 v1 h-1 z M5,4 h3 v1 h-3 z M6,5 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M5,3 h1 v1 h-1 z M7,3 h1 v1 h-1 z M5,5 h1 v1 h-1 z M7,5 h1 v1 h-1 z" fill="#f9a825" />
+      <path d="M6,4 h1 v1 h-1 z" fill="#6d4c41" />
+      <path d="M9,2 h1 v1 h-1 z M8,3 h3 v1 h-3 z M9,4 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M8,2 h1 v1 h-1 z M10,2 h1 v1 h-1 z M8,4 h1 v1 h-1 z M10,4 h1 v1 h-1 z" fill="#f9a825" />
+      <path d="M9,3 h1 v1 h-1 z" fill="#6d4c41" />
+      <path d="M12,1 h1 v1 h-1 z M11,2 h3 v1 h-3 z M12,3 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M11,1 h1 v1 h-1 z M13,1 h1 v1 h-1 z M11,3 h1 v1 h-1 z M13,3 h1 v1 h-1 z" fill="#f9a825" />
+      <path d="M12,2 h1 v1 h-1 z" fill="#6d4c41" />
+      <path d="M15,2 h1 v1 h-1 z M14,3 h3 v1 h-3 z M15,4 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M14,2 h1 v1 h-1 z M16,2 h1 v1 h-1 z M14,4 h1 v1 h-1 z M16,4 h1 v1 h-1 z" fill="#f9a825" />
+      <path d="M15,3 h1 v1 h-1 z" fill="#6d4c41" />
+      <path d="M18,3 h1 v1 h-1 z M17,4 h3 v1 h-3 z M18,5 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M17,3 h1 v1 h-1 z M19,3 h1 v1 h-1 z M17,5 h1 v1 h-1 z M19,5 h1 v1 h-1 z" fill="#f9a825" />
+      <path d="M18,4 h1 v1 h-1 z" fill="#6d4c41" />
     </> : costume === 'christmas' ? <>
       {/* Santa hat flopping to one side, with a fur brim and pompom */}
       <path d="M12,0 h5 v1 h-5 z M9,1 h10 v1 h-10 z M7,2 h10 v2 h-10 z" fill="#e53935" />
@@ -41,6 +61,14 @@ export const FarmerSprite = React.memo(({ costume }) => (
       <path d="M8,3 h8 v1 h-8 z" fill="#d81b60" />
       <path d="M7,1 h1 v1 h-1 z M6,2 h1 v1 h-1 z M8,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#ff4081" />
       <path d="M7,2 h1 v1 h-1 z" fill="#fdd835" />
+    </>}
+    {costume === 'compostweek' && <>
+      {/* Party hat perched on top of her sun hat */}
+      <path d="M10,-2 h5 v2 h-5 z M11,-4 h3 v2 h-3 z M12,-5 h1 v1 h-1 z" fill="#ab47bc" />
+      <path d="M10,-2 h1 v2 h-1 z M11,-4 h1 v2 h-1 z" fill="#8e24aa" />
+      <path d="M10,-1 h5 v1 h-5 z M11,-3 h3 v1 h-3 z" fill="#4fc3f7" />
+      <path d="M11,-7 h3 v2 h-3 z" fill="#fdd835" />
+      <path d="M12,-7 h1 v1 h-1 z" fill="#fff59d" />
     </>}
     {/* Hair & braids */}
     <path d="M7,6 h10 v1 h-10 z M6,7 h1 v1 h-1 z M17,7 h1 v1 h-1 z M7,8 h1 v1 h-1 z M16,8 h1 v1 h-1 z M6,9 h1 v1 h-1 z M17,9 h1 v1 h-1 z M7,10 h1 v1 h-1 z M16,10 h1 v1 h-1 z M6,11 h1 v1 h-1 z M17,11 h1 v1 h-1 z M7,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z M6,13 h1 v1 h-1 z M17,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z M6,15 h1 v1 h-1 z M17,15 h1 v1 h-1 z M7,16 h1 v1 h-1 z M16,16 h1 v1 h-1 z M7,18 h1 v2 h-1 z M16,18 h1 v2 h-1 z" fill="#d84315" />
