@@ -127,3 +127,13 @@ export const GrassSprite = React.memo(() => (
     <path d="M4,15 h12 v1 h-12 z" fill="#43a047" />
   </svg>
 ));
+
+// A lush tuft for the play field (the "Touch Grass" spot)
+export const GrassTuftSprite = React.memo(() => (
+  <svg viewBox="0 0 16 12" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M1,6 h1 v6 h-1 z M3,3 h1 v9 h-1 z M4,5 h1 v7 h-1 z M6,1 h1 v11 h-1 z M7,4 h1 v8 h-1 z M9,2 h1 v10 h-1 z M10,5 h1 v7 h-1 z M12,4 h1 v8 h-1 z M13,8 h1 v4 h-1 z M14,7 h1 v5 h-1 z" fill="#66bb6a" />
+    <path d="M2,8 h1 v4 h-1 z M5,6 h1 v6 h-1 z M8,6 h1 v6 h-1 z M11,7 h1 v5 h-1 z" fill="#43a047" />
+    <path d="M3,3 h1 v1 h-1 z M6,1 h1 v1 h-1 z M9,2 h1 v1 h-1 z M12,4 h1 v1 h-1 z M1,6 h1 v1 h-1 z M14,7 h1 v1 h-1 z" fill="#a5d6a7" />
+    <path d="M1,11 h14 v1 h-14 z" fill="#2e7d32" />
+  </svg>
+));

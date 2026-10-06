@@ -32,7 +32,9 @@ Node version is pinned to 24.15.0 (see `.nvmrc`).
 - `src/data/gameData.js` — level content: `DREAM_LEVELS` (play order, which sets the "Day N" label and the chapter list), Craft Soil ingredients, compost items, the sorting lists, plot/pile problems (each with its tile, fix items and fix animation), and plants with their beds.
 - `src/data/assets.js` — `BASE` asset URL and every sound/video URL.
 - `src/sprites/*.jsx` — pixel-art SVG sprites (`characters`, `animals`, `critters`, `plants`, `scenery`, `tools`, `props`, `garden` tiles, `nightmare`, and 16x16 `icons`).
-- `src/components/` — `PixelBox`/`DialogBox` (`ui.jsx`), `ClassroomScene`, `CrowOverlay`, `PeckingHens`, `CompostKittens`, portraits.
+- `src/components/` — `PixelBox`/`DialogBox` (`ui.jsx`), `ClassroomScene`, `CrowOverlay`, `PeckingHens`, `CompostKittens`, portraits, and `EasterEggs` (worm-on-a-string overlay, achievement card).
+- `src/data/holidays.js` — date-based holiday skins (Halloween, Día de los Muertos, Christmas, Earth Day, Compost Awareness Week); preview one with `?holiday=halloween` / `muertos` / `christmas` / `earthday` / `compostweek`.
+- `src/audio/synth.js` — Web Audio sound effects for easter eggs that have no recorded sound (goat scream, slip, achievement chime).
 
 ### Game State Machine
 

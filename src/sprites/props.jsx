@@ -100,3 +100,55 @@ export const WormBinSprite = React.memo(({ state = "empty" }) => (
     </>}
   </svg>
 ));
+
+// Jack-o'-lantern that sits on the compost at Halloween
+export const PumpkinSprite = React.memo(() => (
+  <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M7,0 h2 v3 h-2 z" fill="#6d4c41" />
+    <path d="M8,0 h1 v2 h-1 z" fill="#8d6e63" />
+    <path d="M9,1 h3 v1 h-3 z M10,2 h2 v1 h-2 z" fill="#7cb342" />
+    <path d="M4,3 h8 v1 h-8 z M2,4 h12 v1 h-12 z M1,5 h14 v6 h-14 z M2,11 h12 v1 h-12 z M4,12 h8 v1 h-8 z" fill="#fb8c00" />
+    <path d="M5,4 h1 v8 h-1 z M10,4 h1 v8 h-1 z" fill="#ef6c00" />
+    <path d="M1,5 h1 v6 h-1 z M2,11 h2 v1 h-2 z M4,12 h8 v1 h-8 z" fill="#e65100" />
+    <path d="M11,4 h2 v1 h-2 z M12,5 h1 v3 h-1 z" fill="#ffb74d" />
+    {/* Glowing face */}
+    <path d="M4,6 h1 v1 h-1 z M3,7 h2 v1 h-2 z M11,6 h1 v1 h-1 z M11,7 h2 v1 h-2 z M7,8 h2 v1 h-2 z M3,9 h10 v1 h-10 z M4,10 h8 v1 h-8 z" fill="#ffd54f" />
+    <path d="M4,10 h8 v1 h-8 z" fill="#ffb300" />
+    <path d="M6,9 h1 v1 h-1 z M9,10 h1 v1 h-1 z" fill="#fb8c00" />
+  </svg>
+));
+
+// Wrapped present that sits on the compost at Christmas
+export const PresentSprite = React.memo(() => (
+  <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Bow */}
+    <path d="M4,0 h3 v1 h-3 z M3,1 h1 v2 h-1 z M6,1 h1 v2 h-1 z M9,0 h3 v1 h-3 z M9,1 h1 v2 h-1 z M12,1 h1 v2 h-1 z" fill="#66bb6a" />
+    <path d="M7,1 h2 v2 h-2 z" fill="#2e7d32" />
+    {/* Lid and box */}
+    <path d="M0,3 h16 v3 h-16 z M1,6 h14 v8 h-14 z" fill="#e53935" />
+    <path d="M0,3 h16 v1 h-16 z M13,7 h1 v3 h-1 z" fill="#ff8a80" />
+    <path d="M0,5 h16 v1 h-16 z M1,6 h1 v8 h-1 z M1,13 h14 v1 h-14 z" fill="#c62828" />
+    {/* Ribbon */}
+    <path d="M7,3 h2 v11 h-2 z" fill="#43a047" />
+    <path d="M7,5 h2 v1 h-2 z M7,13 h2 v1 h-2 z" fill="#2e7d32" />
+    <path d="M8,3 h1 v1 h-1 z" fill="#81c784" />
+  </svg>
+));
+
+// Papel picado garland strung across the title at Día de los Muertos
+const PICADO_COLORS = [['#ec407a', '#c2185b'], ['#ff9800', '#e65100'], ['#26c6da', '#00838f'], ['#ab47bc', '#7b1fa2'], ['#66bb6a', '#2e7d32']];
+export const PapelPicadoSprite = React.memo(() => (
+  <svg viewBox="0 0 62 14" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d="M0,1 h62 v1 h-62 z" fill="#8d6e63" />
+    {PICADO_COLORS.map(([base, shade], i) => {
+      const x = 2 + i * 12;
+      return (
+        <g key={base}>
+          {/* Flag with a zigzag hem and cut-out holes */}
+          <path fillRule="evenodd" fill={base} d={`M${x},2 h10 v9 h-1 v1 h-1 v1 h-1 v-1 h-1 v-1 h-2 v1 h-1 v1 h-1 v-1 h-1 v-1 h-1 z M${x + 4},4 h2 v2 h-2 z M${x + 2},7 h1 v1 h-1 z M${x + 7},7 h1 v1 h-1 z M${x + 4},8 h2 v1 h-2 z`} />
+          <path d={`M${x},2 h1 v9 h-1 z`} fill={shade} />
+        </g>
+      );
+    })}
+  </svg>
+));

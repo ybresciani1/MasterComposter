@@ -23,7 +23,7 @@ export const DialogBox = ({ name, portrait, text, onNext, hideNext, emotion = 'n
   }
 
   return (
-    <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 animate-fade-in-up`}>
+    <div className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 w-full max-w-3xl px-2 md:px-4 z-50 pointer-events-auto animate-fade-in-up`}>
       <PixelBox className="flex gap-4 items-start relative shadow-2xl bg-[rgba(244,226,184,0.85)]">
         {(portrait || name === 'Wallace') && (
           <div className="flex flex-col items-center shrink-0">

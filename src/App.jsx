@@ -4,7 +4,10 @@ import { CrowOverlay } from './components/CrowOverlay.jsx';
 import { CompostKittens } from './components/CompostKittens.jsx';
 import { MovingActor } from './components/MovingActor.jsx';
 import { useSpaceKey } from './hooks/useSpaceKey.js';
-import { PeckingHens } from './components/PeckingHens.jsx';
+import { PeckingHens, HenSparkles } from './components/PeckingHens.jsx';
+import { WormOnAString, AchievementToast } from './components/EasterEggs.jsx';
+import { unlockSynth, playGoatScream, playSlip, playAchievement } from './audio/synth.js';
+import { getHoliday, HOLIDAYS } from './data/holidays.js';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
 import { backgroundMusic, wowSound, endCreditsVideo, pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound, nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound, woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, oiiaCatSound, wateringCanSound, loseHeartSound, riotBeyonceTapSound, kittenTossSound, SOUND_URLS } from './data/assets.js';
@@ -14,9 +17,9 @@ import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
 import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
-import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite } from './sprites/props.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
-import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite } from './sprites/plants.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite } from './sprites/plants.jsx';
 import { PondSprite, BarnSprite, SiloSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
@@ -44,6 +47,14 @@ const WORM_BIN_SPOTS = { bin: { x: 99, y: 65 }, compost: { x: 246, y: 62 } };
 // Tailwind sizes are rem-based and the root font is 18px on wide screens (16px below 1024px), so things in the
 // play field grew on big screens. Pinning Tailwind's size variables here keeps the field identical everywhere.
 const FIELD_UNITS = { '--spacing': '4px', '--text-xs': '12px', '--text-sm': '14px', '--text-base': '16px', '--text-lg': '18px', lineHeight: '23.2px' };
+
+// Easter eggs
+const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+const GRASS_SPOT = { x: 312, y: 242 }; // centre of the grass tuft, right side of the field (kept clear of the dialog box)
+const GRASS_SECONDS = 5;
+const IDLE_DANCE_MS = 30000;
+const HEN_CLUCKS_TO_FLIP = 10;
+const DECOR_IN_PILE = 'left-[50%] top-[22%] w-[32%] h-[30%]'; // inside a ComposterSprite's soil
 
 const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
@@ -75,14 +86,63 @@ export default function App() {
   const [isChopping, setIsChopping] = useState(false);
   const [isPrepping, setIsPrepping] = useState(false);
 
+  // Easter eggs
+  const [holiday] = useState(getHoliday);
+  const [wormString, setWormString] = useState(null);
+  const [achievement, setAchievement] = useState(null);
+  const touchedGrassRef = useRef(false);
+  const grassSinceRef = useRef(null);
+  const [dogPets, setDogPets] = useState([]);
+  const [goatScream, setGoatScream] = useState(null);
+  const [henFlip, setHenFlip] = useState(false);
+  const henCluckCountRef = useRef(0);
+  const [wallaceDancing, setWallaceDancing] = useState(false);
+  const wallaceDancingRef = useRef(false);
+  const lastActivityRef = useRef(0); // reset whenever dancing isn't possible (e.g. on the title screen)
+  const slipUntilRef = useRef(0);
+  const onPeelRef = useRef(false);
+  const eggIdRef = useRef(0); // ids for hearts, screams and achievements
+
   const handleHenClick = (e, henName) => {
     e.stopPropagation();
-    const id = Date.now() + Math.random();
+    const id = ++eggIdRef.current;
     setHenHearts(prev => [...prev, { id, hen: henName }]);
     playSfx(riotBeyonceTapSound);
     setTimeout(() => {
       setHenHearts(prev => prev.filter(h => h.id !== id));
     }, 1000);
+    // Every 10th cluck, Riot & Beyonce flip their crests together
+    henCluckCountRef.current += 1;
+    if (henCluckCountRef.current >= HEN_CLUCKS_TO_FLIP) {
+      henCluckCountRef.current = 0;
+      setHenFlip(true);
+      showToast("Riot & Beyonce: Flawless! ✨");
+      setTimeout(() => setHenFlip(false), 1700);
+    }
+  };
+
+  const handleDogPet = () => {
+    const id = ++eggIdRef.current;
+    setDogPets(prev => [...prev, { id }]);
+    setTimeout(() => setDogPets(prev => prev.filter(p => p.id !== id)), 1000);
+  };
+
+  const handleGoatScream = () => {
+    const id = ++eggIdRef.current;
+    setGoatScream(id);
+    playGoatScream(volumeRef.current);
+    setTimeout(() => setGoatScream(s => (s === id ? null : s)), 1200);
+  };
+
+  // Holiday decor (a jack-o'-lantern, marigolds, a present) sits on each compost pile
+  const HolidayDecor = HOLIDAYS[holiday]?.decor;
+  const holidayDecor = (className) => HolidayDecor && <div className={`absolute z-[15] pointer-events-none ${className}`}><HolidayDecor /></div>;
+
+  const showAchievement = (title, subtitle, icon) => {
+    const id = ++eggIdRef.current;
+    setAchievement({ id, title, subtitle, icon });
+    playAchievement(volumeRef.current);
+    setTimeout(() => setAchievement(a => (a?.id === id ? null : a)), 4500);
   };
 
   const triggerSakura = () => {
@@ -513,6 +573,58 @@ export default function App() {
     }
   }, [gameState, dreamStage, audioDismissed, isMusicPlaying]);
 
+  // Konami code (anywhere): Wallace lowers in on a string
+  useEffect(() => {
+    let progress = 0;
+    const onKey = (e) => {
+      if (e.repeat) return;
+      const key = e.key?.toLowerCase();
+      if (key === KONAMI[progress]) progress += 1;
+      else if (key === KONAMI[0]) progress = progress === 2 ? 2 : 1; // a third "up" still counts as the last two
+      else progress = 0;
+      if (progress === KONAMI.length) {
+        progress = 0;
+        const id = Date.now();
+        setWormString(id);
+        setTimeout(() => setWormString(w => (w === id ? null : w)), 6000);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Any key or tap counts as activity (and lets the synth sound effects play from timers later)
+  useEffect(() => {
+    const markActive = () => {
+      unlockSynth();
+      lastActivityRef.current = Date.now();
+      if (wallaceDancingRef.current) { wallaceDancingRef.current = false; setWallaceDancing(false); }
+    };
+    window.addEventListener('keydown', markActive);
+    window.addEventListener('pointerdown', markActive);
+    return () => {
+      window.removeEventListener('keydown', markActive);
+      window.removeEventListener('pointerdown', markActive);
+    };
+  }, []);
+
+  // Idle for 30 seconds in a level and Wallace breaks into The Worm
+  useEffect(() => {
+    const canDance = gameState === 'DREAM' && PLAYABLE_STAGES.includes(dreamStage) && !isFixModalOpen && lives > 0;
+    if (!canDance) {
+      lastActivityRef.current = Date.now();
+      if (wallaceDancingRef.current) { wallaceDancingRef.current = false; setWallaceDancing(false); }
+      return;
+    }
+    const timer = setInterval(() => {
+      if (wallaceDancingRef.current || Date.now() - lastActivityRef.current < IDLE_DANCE_MS) return;
+      wallaceDancingRef.current = true;
+      setWallaceDancing(true);
+      showToast("Wallace: Takin' a breather, partner? Time to bust a move!", 'surprised');
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameState, dreamStage, isFixModalOpen, lives]);
+
   const introStory = [
     "9:00 AM Saturday: You wake up and look around the room. You see a big red circle on today's date on your calendar.",
     "You couldn't sleep well. Dogs were barking, the neighbors were having a party, and the babies—oh, the sweet babies—were crying throughout the night.",
@@ -837,13 +949,14 @@ export default function App() {
        lastFrameTime = now;
        const speed = basePace * frames;
        let moved = false;
-       const k = keys.current;
+       const slipping = now < slipUntilRef.current; // spinning out on a banana peel: no steering
+       const k = slipping ? {} : keys.current;
        if (k['w'] || k['W'] || k['ArrowUp'] || k['arrowup']) { farmerPosRef.current.y -= speed; moved = true; }
        if (k['s'] || k['S'] || k['ArrowDown'] || k['arrowdown']) { farmerPosRef.current.y += speed; moved = true; }
        if (k['a'] || k['A'] || k['ArrowLeft'] || k['arrowleft']) { farmerPosRef.current.x -= speed; moved = true; }
        if (k['d'] || k['D'] || k['ArrowRight'] || k['arrowright']) { farmerPosRef.current.x += speed; moved = true; }
 
-       if (!moved && targetPosRef.current) {
+       if (!slipping && !moved && targetPosRef.current) {
          const dx = targetPosRef.current.x - farmerPosRef.current.x;
          const dy = targetPosRef.current.y - farmerPosRef.current.y;
          const dist = Math.hypot(dx, dy);
@@ -874,6 +987,30 @@ export default function App() {
          const near = activeProblems.find(plot => !fixedPlots.includes(plot.id) && !answeredPlots.includes(plot.id) && Math.hypot(fc.x - (plot.x + 32), fc.y - (plot.y + 32)) < 50)?.id ?? null;
          if (near !== nearPlotRef.current) { nearPlotRef.current = near; setNearPlotId(near); }
        }
+       // Easter eggs underfoot: a dropped banana peel, and the grass tuft in the corner
+       const feet = { x: farmerPosRef.current.x + 20, y: farmerPosRef.current.y + 36 };
+       if (!slipping) {
+         const onPeel = groundItems.some(item => item.dropped && item.name === 'Banana Peel' && feet.x >= item.x && feet.x <= item.x + 40 && feet.y >= item.y - 2 && feet.y <= item.y + 24);
+         if (onPeel && !onPeelRef.current) {
+           slipUntilRef.current = now + 900;
+           targetPosRef.current = null;
+           farmerApi.current?.(prev => ({ ...prev, isWalking: false, slipping: true }));
+           setTimeout(() => farmerApi.current?.(prev => ({ ...prev, slipping: false })), 900);
+           playSlip(volumeRef.current);
+           showToast("Wallace: Peel-ow! Watch your step, partner!", 'surprised');
+         }
+         onPeelRef.current = onPeel;
+       }
+       if (!touchedGrassRef.current) {
+         const onGrass = Math.hypot(farmerPosRef.current.x + 20 - GRASS_SPOT.x, farmerPosRef.current.y + 20 - GRASS_SPOT.y) < 18;
+         if (!onGrass) grassSinceRef.current = null;
+         else if (grassSinceRef.current === null) grassSinceRef.current = now;
+         else if (now - grassSinceRef.current >= GRASS_SECONDS * 1000) {
+           touchedGrassRef.current = true;
+           showAchievement('Touched Grass', '+1 sanity', GrassTuftSprite);
+         }
+       }
+
        if (moved) {
          farmerHistoryRef.current.push({ x: farmerPosRef.current.x, y: farmerPosRef.current.y });
          if (farmerHistoryRef.current.length > 45) farmerHistoryRef.current.shift();
@@ -926,7 +1063,9 @@ export default function App() {
             if (isPlotStage) {
                 setPlotItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
             } else {
-                setGroundItems(prev => [...prev, { ...heldItem, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
+                // dropped: true lets a banana peel trip you up when you walk back over it (you're standing on it now)
+                setGroundItems(prev => [...prev, { ...heldItem, dropped: true, x: farmerPosRef.current.x, y: Math.min(260, farmerPosRef.current.y + 20) }]);
+                onPeelRef.current = true;
             }
             setHeldItem(null);
       };
@@ -1376,6 +1515,8 @@ export default function App() {
 
       <PixelBox className="text-center max-w-lg w-full relative z-10">
         <div className="mb-8 mt-4 leading-tight">
+          {holiday === 'muertos' && <div className="w-56 max-w-full h-12 mx-auto -mt-2 mb-1"><PapelPicadoSprite /></div>}
+          {holiday && <div className="stardew-credit text-base md:text-lg tracking-wider mb-3 select-none">{HOLIDAYS[holiday].banner}</div>}
           <h1 className="font-bold mb-2 leading-none">
             <span 
                className="stardew-title text-6xl md:text-7xl cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform inline-block select-none" 
@@ -1396,8 +1537,10 @@ export default function App() {
           </h2>
         </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
+          {HolidayDecor && <div className="w-9 h-9"><HolidayDecor /></div>}
           <div className="w-16 h-16"><FarmerSprite /></div>
-          <div className="w-12 h-16"><WallaceFollowerSprite /></div>
+          <div className="w-12 h-16"><WallaceFollowerSprite costume={holiday} /></div>
+          {HolidayDecor && <div className="w-7 h-7"><HolidayDecor /></div>}
         </div>
         {savedGame ? (
           // A saved game puts Continue beside New Game so the card stays the same height
@@ -1576,7 +1719,15 @@ export default function App() {
           <div className="absolute bottom-52 right-12 w-12 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonPigSprite /> : <PigSprite />}</div>
           
           <div className="absolute bottom-56 right-36 w-12 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonSheepSprite /> : <SheepSprite />}</div>
-          <div className="absolute bottom-44 right-44 w-10 h-10 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonGoatSprite /> : <GoatSprite />}</div>
+          {/* Tap the goat: it screams. On wide screens it grazes beside the field's top right */}
+          <div className="absolute bottom-44 right-44 lg:bottom-auto lg:right-auto lg:top-[362px] lg:left-[calc(50%+439px)] w-10 h-10 opacity-90 cursor-pointer" onClick={handleGoatScream}>
+            {goatScream && (
+              <div key={goatScream} className="absolute -top-7 left-6 animate-scream-pop pointer-events-none">
+                <div className="animate-goat-scream bg-white border-2 border-[#212121] rounded-sm px-1 text-[9px] font-bold text-[#212121] whitespace-nowrap">AAAAAH!</div>
+              </div>
+            )}
+            <div className={`w-full h-full ${goatScream ? 'animate-goat-scream' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonGoatSprite /> : <GoatSprite />}</div>
+          </div>
           
           <div className="absolute bottom-48 left-20 w-6 h-6 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickenSprite /> : <ChickenSprite />}</div>
           <div className="absolute bottom-52 left-28 w-8 h-8 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonRoosterSprite /> : <RoosterSprite />}</div>
@@ -1585,7 +1736,12 @@ export default function App() {
 
           {/* Pets */}
           <div ref={catRef} className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
-          <div className="absolute bottom-50 left-72 w-10 h-8 opacity-90 z-10">{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
+          {/* Can you pet the dog? Yes: tap it. On wide screens it sits beside the field's top left */}
+          <div className="absolute bottom-50 left-72 lg:bottom-auto lg:top-[372px] lg:left-[calc(50%-351px)] w-10 h-8 opacity-90 z-10 cursor-pointer" onClick={handleDogPet}>
+            {dogPets.map(p => <div key={p.id} className="absolute -top-5 left-2.5 w-5 h-4 animate-float-up pointer-events-none"><PixelHeartSprite /></div>)}
+            {dogPets.length > 0 && <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-[8px] bg-white px-1 rounded border border-black font-bold whitespace-nowrap pointer-events-none">You can pet the dog!</div>}
+            <div key={dogPets.at(-1)?.id ?? 'still'} className={`w-full h-full ${dogPets.length ? 'animate-dog-pet' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
+          </div>
 
           {/* Running Rabbit */}
           {dreamStage !== 'NIGHTMARE_END' && (
@@ -1632,8 +1788,9 @@ export default function App() {
             ))}
           </div>
           
-          {/* Main content wrapper safely raised to z-40 so it stays over background fires */}
-          <div className="max-w-3xl w-full mt-8 relative z-40 pb-48">
+          {/* Main content wrapper safely raised to z-40 so it stays over background fires. Its empty space lets taps
+              through to the farm behind it; the field and dialog box opt back in. */}
+          <div className="max-w-3xl w-full mt-8 relative z-40 pb-48 pointer-events-none [&>*]:pointer-events-auto">
             <div className="flex justify-between items-center mb-3">
                <PixelBox className="py-2 px-4"><span className="text-amber-700">{currentDay}</span> | 9:00 AM</PixelBox>
                {PLAYABLE_STAGES.includes(dreamStage) && (
@@ -1650,10 +1807,10 @@ export default function App() {
             </div>
 
             {PLAYABLE_STAGES.includes(dreamStage) && (
-              <div className="text-center animate-fade-in relative flex flex-col items-center">
+              <div className="text-center animate-fade-in relative flex flex-col items-center pointer-events-none!">
 
 
-                 <div ref={gameFieldRef} style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
+                 <div ref={gameFieldRef} className="pointer-events-auto" style={{ width: 340 * gameScale, height: 300 * gameScale, position: 'relative', flexShrink: 0, overflow: 'hidden', touchAction: 'manipulation' }}>
                  <div className="w-[340px] h-[300px] bg-[#a1887f] border-4 border-[#5d4037] relative overflow-hidden rounded-xl shadow-inner garden-grid" style={{ ...FIELD_UNITS, transform: `scale(${gameScale})`, transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }} onClick={(e) => {
                    if (isFixModalOpen || isWorking || lives <= 0) return;
                    const rect = e.currentTarget.getBoundingClientRect();
@@ -1693,6 +1850,7 @@ export default function App() {
                             )}
                          </div>
                          {isStirring && <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] bg-black/40 flex items-center justify-center z-40"><div className="w-10 h-14 animate-stir"><PitchforkSprite/></div></div>}
+                         {holidayDecor('-right-5 bottom-0 w-7 h-6')}
                       </div>
                     )}
 
@@ -1726,10 +1884,11 @@ export default function App() {
 
                         <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 transition-all duration-700 flex items-center justify-center z-5 ${matchPhase >= 1 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
                            <ComposterSprite greens={combinedBins.includes('bin_n')} browns={combinedBins.includes('bin_c')} wet={isWatering || matchPhase >= 3} />
+                           {holidayDecor(DECOR_IN_PILE)}
                            {isWatering && <WateringPour />}
                            {isStirring && <div className="absolute left-[14.3%] top-[10.7%] w-[71.4%] h-[57.1%] bg-black/40 flex items-center justify-center z-20"><div className="w-10 h-14 animate-stir"><PitchforkSprite/></div></div>}
                         </div>
-                        {matchPhase >= 1 && <PeckingHens x={14} y={140} span={76} hearts={henHearts} onHenClick={handleHenClick} />}
+                        {matchPhase >= 1 && <PeckingHens x={14} y={140} span={76} hearts={henHearts} onHenClick={handleHenClick} flipping={henFlip} />}
                       </>
                     )}
 
@@ -1737,6 +1896,7 @@ export default function App() {
                       <>
                         <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(34px, 16px)' }}>
                           <ComposterSprite greens browns />
+                          {holidayDecor(DECOR_IN_PILE)}
                           <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Compost</span>
                         </div>
                         <div className="absolute z-10" style={{ width: 72, height: 84, transform: 'translate(230px, 20px)' }}>
@@ -1744,7 +1904,7 @@ export default function App() {
                           <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Trash</span>
                         </div>
                         <div className="absolute w-10 h-9 z-10" style={{ transform: 'translate(150px, 112px)' }}><ScrapBucketSprite /></div>
-                        <PeckingHens x={12} y={124} span={74} hearts={henHearts} onHenClick={handleHenClick} />
+                        <PeckingHens x={12} y={124} span={74} hearts={henHearts} onHenClick={handleHenClick} flipping={henFlip} />
                       </>
                     )}
 
@@ -1768,6 +1928,7 @@ export default function App() {
                           <>
                             <div className="absolute w-24 h-24 z-10" style={{ transform: 'translate(198px, 14px)' }}>
                               <ComposterSprite greens browns />
+                              {holidayDecor(DECOR_IN_PILE)}
                               <span className={`absolute left-1/2 -translate-x-1/2 -bottom-2 ${FIELD_LABEL}`}>Compost Pile</span>
                             </div>
                             <div className="absolute w-10 h-9 z-10" style={{ transform: 'translate(58px, 150px)' }}><ScrapBucketSprite /></div>
@@ -1785,6 +1946,7 @@ export default function App() {
                            return (
                              <div key={plot.id} className={`absolute w-16 h-16 flex items-center justify-center z-10 ${isFixed ? '' : 'animate-pulse'}`} style={{ transform: `translate(${plot.x}px, ${plot.y}px)` }}>
                                 <div className="absolute inset-0"><PlotSprite /></div>
+                                {dreamStage === 'COMPOST_DOCTOR' && holidayDecor('-right-2 -bottom-1 w-6 h-5')}
                                 {(!isFixed && !answeredPlots.includes(plot.id) && !isWorkingOnPlot && nearPlotId === plot.id) && (
                                     <div className="absolute -top-8 animate-bounce text-[8px] bg-white px-1 rounded border border-black font-bold min-w-max">Press Space</div>
                                 )}
@@ -1811,7 +1973,7 @@ export default function App() {
                         {isWatering && activePlot && (
                             <div className="absolute z-40 w-16 h-16" style={{ transform: `translate(${activePlot.x}px, ${activePlot.y}px)` }}><WateringPour /></div>
                         )}
-                        {dreamStage === 'COMPOST_DOCTOR' && <PeckingHens x={20} y={150} span={250} hearts={henHearts} onHenClick={handleHenClick} />}
+                        {dreamStage === 'COMPOST_DOCTOR' && <PeckingHens x={20} y={150} span={250} hearts={henHearts} onHenClick={handleHenClick} flipping={henFlip} />}
                       </>
                     )}
 
@@ -1836,6 +1998,9 @@ export default function App() {
                       })
                     )}
 
+                    {/* Touch Grass: stand here for 5 seconds */}
+                    <div className="absolute z-[5] pointer-events-none" style={{ width: 28, height: 21, transform: `translate(${GRASS_SPOT.x - 14}px, ${GRASS_SPOT.y - 11}px)` }}><GrassTuftSprite /></div>
+
                     {groundItems.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -1848,16 +2013,21 @@ export default function App() {
 
                     <MovingActor apiRef={wallaceApi} start={wallaceRenderPos} className="absolute w-8 h-10 z-[29]">
                       {(pos) => (
-                        <div className="w-full h-full animate-wallace-wobble">
-                          <div className="w-full h-full" style={{ transform: pos.dir === 'left' ? 'scaleX(-1)' : undefined }}><WallaceFollowerSprite /></div>
-                        </div>
+                        <>
+                          <div className={`w-full h-full ${wallaceDancing ? 'animate-worm-dance' : 'animate-wallace-wobble'}`}>
+                            <div className="w-full h-full" style={{ transform: pos.dir === 'left' ? 'scaleX(-1)' : undefined }}><WallaceFollowerSprite costume={holiday} /></div>
+                          </div>
+                          {wallaceDancing && ['#fdd835', '#f48fb1', '#81d4fa'].map((color, i) => (
+                            <div key={color} className="absolute -top-2 w-3 h-3 animate-note-float pointer-events-none" style={{ left: [0, 20, 10][i], animationDelay: `${-i * 0.47}s`, '--nx': `${i === 1 ? 8 : -8}px`, '--nr': `${i === 1 ? 20 : -20}deg` }}><MusicNoteIcon color={color} /></div>
+                          ))}
+                        </>
                       )}
                     </MovingActor>
 
                     <MovingActor apiRef={farmerApi} start={farmerRenderPos} className="absolute w-10 h-10 z-30">
                       {(pos) => (
                         <div className={pos.isWalking ? 'farmer-walking' : ''}>
-                          <FarmerSprite />
+                          <div className={pos.slipping ? 'animate-slip' : ''}><FarmerSprite /></div>
                           {heldBubble}
                         </div>
                       )}
@@ -1971,8 +2141,9 @@ export default function App() {
                              <PixelHeartSprite />
                            </div>
                          ))}
+                         {henFlip && <HenSparkles />}
                          <div className="w-14 h-14">
-                            <PolishHenSprite name="Riot" />
+                            <PolishHenSprite name="Riot" flipping={henFlip} />
                          </div>
                          <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm pointer-events-none">Riot</span>
                       </div>
@@ -1990,8 +2161,9 @@ export default function App() {
                              <PixelHeartSprite />
                            </div>
                          ))}
+                         {henFlip && <HenSparkles />}
                          <div className="w-14 h-14" style={{ transform: 'scaleX(-1)' }}>
-                            <PolishHenSprite name="Beyonce" />
+                            <PolishHenSprite name="Beyonce" flipping={henFlip} />
                          </div>
                          <span className="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-1 shadow-sm pointer-events-none">Beyonce</span>
                       </div>
@@ -2130,6 +2302,9 @@ export default function App() {
         <p>Please rotate your device to portrait mode to play.</p>
       </div>
       <div key="active-scene-wrapper">{renderCurrentScene()}</div>
+
+      {wormString && <WormOnAString key={wormString} costume={holiday} />}
+      {achievement && <AchievementToast key={achievement.id} icon={achievement.icon} title={achievement.title} subtitle={achievement.subtitle} />}
 
       {/* CROW STEALING LIFE ANIMATION OVERLAY */}
       {crows.map(crow => (

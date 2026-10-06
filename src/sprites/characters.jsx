@@ -42,7 +42,8 @@ export const WormSprite = React.memo(() => (
   </svg>
 ));
 
-export const WallaceFollowerSprite = React.memo(() => (
+// Wallace keeps his original 1x look; holiday costumes (see data/holidays.js) add half-unit detail on top
+export const WallaceFollowerSprite = React.memo(({ costume }) => (
   <svg viewBox="0 0 16 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M12,6 h4 v4 h-4 z" fill="#c8960c" />
     <path d="M12,9 h4 v1 h-4 z" fill="#5d4037" />
@@ -52,6 +53,49 @@ export const WallaceFollowerSprite = React.memo(() => (
     <path d="M12,11 h1 v1 h-1 z M14,11 h1 v1 h-1 z" fill="#3e2723" />
     <path d="M2,15 h3 v-3 h3 v3 h3 v-4 h3 v5 h-14 z" fill="#f48fb1" />
     <path d="M4,13 h1 v2 h-1 z M7,15 h1 v1 h-1 z M10,12 h1 v3 h-1 z M13,13 h1 v1 h-1 z" fill="#d81b60" />
+    {costume === 'halloween' && <>
+      {/* Ghost sheet over his head, with the hat perched on top */}
+      <path d="M11.5,11 h4.5 v4.5 h-4.5 z M11.5,15.5 h1 v1 h-1 z M13.5,15.5 h1 v1 h-1 z M15,15.5 h1 v1 h-1 z" fill="#f5f5f5" />
+      <path d="M11.5,11 h0.5 v5.5 h-0.5 z M12,15 h4 v0.5 h-4 z" fill="#cfd8dc" />
+      <path d="M15.5,11 h0.5 v3 h-0.5 z" fill="#ffffff" />
+      <path d="M12.5,11.5 h1 v1.5 h-1 z M14.5,11.5 h1 v1.5 h-1 z M13.5,13.5 h1 v1 h-1 z" fill="#3e2723" />
+      <path d="M12,6 h4 v4 h-4 z" fill="#c8960c" />
+      <path d="M12,9 h4 v1 h-4 z" fill="#5d4037" />
+      <path d="M10,10 h6 v1 h-6 z" fill="#e8c44a" />
+    </>}
+    {costume === 'earthday' && <>
+      {/* A sprout tucked in his hat band */}
+      <path d="M11.5,4.5 h0.5 v5 h-0.5 z" fill="#558b2f" />
+      <path d="M9.5,4 h2 v1 h-2 z M10,5 h1.5 v0.5 h-1.5 z M12,3 h2 v1 h-2 z M12,4 h1.5 v0.5 h-1.5 z" fill="#66bb6a" />
+      <path d="M10,5 h1.5 v0.5 h-1.5 z M12,4 h1.5 v0.5 h-1.5 z" fill="#43a047" />
+      <path d="M9.5,4 h1 v0.5 h-1 z M13,3 h1 v0.5 h-1 z" fill="#a5d6a7" />
+    </>}
+    {costume === 'muertos' && <>
+      {/* Calavera face paint and marigolds in his hat band */}
+      <path d="M12,11 h4 v3 h-4 z" fill="#fafafa" />
+      <path d="M12,13.5 h4 v0.5 h-4 z" fill="#e0e0e0" />
+      <path d="M12,11 h2 v2 h-2 z" fill="#f06292" />
+      <path d="M14,11 h2 v2 h-2 z" fill="#4dd0e1" />
+      <path d="M12.5,11.5 h1 v1 h-1 z M14.5,11.5 h1 v1 h-1 z M13.5,13 h1 v0.5 h-1 z M12.5,13.5 h0.5 v0.5 h-0.5 z M13.5,13.5 h0.5 v0.5 h-0.5 z M14.5,13.5 h0.5 v0.5 h-0.5 z M15.5,13.5 h0.5 v0.5 h-0.5 z" fill="#212121" />
+      <path d="M10.5,8 h1.5 v1.5 h-1.5 z M14.5,8.5 h1.5 v1.5 h-1.5 z" fill="#ff9800" />
+      <path d="M11,8.5 h0.5 v0.5 h-0.5 z M15,9 h0.5 v0.5 h-0.5 z" fill="#e65100" />
+      <path d="M10.5,8 h0.5 v0.5 h-0.5 z M14.5,8.5 h0.5 v0.5 h-0.5 z" fill="#ffcc80" />
+    </>}
+    {costume === 'christmas' && <>
+      {/* Santa hat on top of the cowboy hat, its tip flopping over */}
+      <path d="M12,4 h4 v2 h-4 z M12.5,3 h3 v1 h-3 z M13,2 h2 v1 h-2 z M11.5,2 h1.5 v1 h-1.5 z" fill="#e53935" />
+      <path d="M12,4 h0.5 v2 h-0.5 z M12.5,3 h0.5 v1 h-0.5 z M11.5,2.5 h1.5 v0.5 h-1.5 z" fill="#c62828" />
+      <path d="M11.5,5.5 h4.5 v1 h-4.5 z M10.5,1.5 h1 v1 h-1 z" fill="#fafafa" />
+      <path d="M11.5,6 h4.5 v0.5 h-4.5 z M10.5,2 h1 v0.5 h-1 z" fill="#e0e0e0" />
+    </>}
+    {costume === 'compostweek' && <>
+      {/* Party hat on top of the cowboy hat */}
+      <path d="M13.5,2.5 h1 v1 h-1 z M13,3.5 h2 v1 h-2 z M12.5,4.5 h3 v1.5 h-3 z" fill="#ab47bc" />
+      <path d="M13,3.5 h0.5 v1 h-0.5 z M12.5,4.5 h0.5 v1.5 h-0.5 z" fill="#8e24aa" />
+      <path d="M13.5,3 h1 v0.5 h-1 z M12.5,5 h3 v0.5 h-3 z" fill="#4fc3f7" />
+      <path d="M13.5,1.5 h1 v1 h-1 z" fill="#fdd835" />
+      <path d="M14,1.5 h0.5 v0.5 h-0.5 z" fill="#fff59d" />
+    </>}
   </svg>
 ));
 

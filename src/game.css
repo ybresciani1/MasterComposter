@@ -386,3 +386,84 @@
   95% { transform: translateX(0) scaleX(-1); }
 }
 .animate-wiggler { animation: wiggler 3.2s ease-in-out infinite; }
+
+/* EASTER EGGS */
+/* Konami code: Wallace lowers on a string, sways, then is pulled back up */
+@keyframes worm-string-drop {
+  0% { transform: translateY(-110%); }
+  12%, 86% { transform: translateY(0); }
+  100% { transform: translateY(-110%); }
+}
+.worm-string-drop { animation: worm-string-drop 6s ease-in-out forwards; }
+@keyframes worm-string-sway { 0% { transform: rotate(-9deg); } 100% { transform: rotate(9deg); } }
+.worm-string-sway { animation: worm-string-sway 1.1s ease-in-out infinite alternate; }
+
+/* "Achievement Get!" card */
+@keyframes achievement-slide {
+  0% { transform: translateX(130%); }
+  8%, 88% { transform: translateX(0); }
+  100% { transform: translateX(130%); }
+}
+.animate-achievement { animation: achievement-slide 4.5s ease-in-out forwards; }
+
+/* Riot & Beyonce hair flip: the crest tosses back, then settles */
+@keyframes hen-crest-flip {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-38deg) translateY(-1px); }
+  50% { transform: rotate(14deg); }
+  70% { transform: rotate(-8deg); }
+}
+.hen-crest-flip { transform-box: fill-box; transform-origin: 30% 100%; animation: hen-crest-flip 0.8s ease-in-out 2; }
+
+/* Wallace does The Worm when you've been idle */
+@keyframes worm-dance {
+  0% { transform: translateY(0) rotate(0deg) scale(1, 1); }
+  12% { transform: translateY(-5px) rotate(-14deg) scale(1.1, 0.9); }
+  24% { transform: translateY(0) rotate(0deg) scale(0.9, 1.1); }
+  36% { transform: translateY(-5px) rotate(14deg) scale(1.1, 0.9); }
+  48% { transform: translateY(0) rotate(0deg) scale(0.9, 1.1); }
+  60% { transform: translateY(0) rotate(0deg) scale(1, 1); }
+  76% { transform: translateY(-12px) rotate(-180deg); }
+  90%, 100% { transform: translateY(0) rotate(-360deg); }
+}
+.animate-worm-dance { animation: worm-dance 1.6s ease-in-out infinite; }
+@keyframes note-float {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(var(--nx), -22px) rotate(var(--nr)); opacity: 0; }
+}
+.animate-note-float { animation: note-float 1.4s ease-out infinite; }
+
+/* Petting the dog: a happy wiggle */
+@keyframes dog-pet {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-6deg) scale(1.08, 0.94); }
+  40% { transform: rotate(5deg) scale(1.08, 0.94); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(3deg); }
+}
+.animate-dog-pet { animation: dog-pet 0.6s ease-in-out; transform-origin: 50% 100%; }
+
+/* Goat scream: the goat and its speech bubble shake */
+@keyframes goat-scream {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+}
+.animate-goat-scream { animation: goat-scream 0.08s linear infinite; }
+@keyframes scream-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  12% { transform: scale(1.15); opacity: 1; }
+  20%, 85% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+.animate-scream-pop { animation: scream-pop 1.2s ease-out forwards; transform-origin: 20% 100%; }
+
+/* Banana peel spin-out */
+@keyframes slip-spin {
+  0% { transform: rotate(0deg); }
+  80% { transform: rotate(720deg) translateY(-4px); }
+  100% { transform: rotate(720deg); }
+}
+.animate-slip { animation: slip-spin 0.9s ease-out; }
