@@ -1,8 +1,9 @@
 import React from 'react';
 
-// `costume` swaps her sun hat for a holiday one (a witch hat at Halloween, a Santa hat at Christmas)
+// `costume` swaps her sun hat for a holiday one (a witch hat at Halloween, a Catrina crown of roses and
+// gold spikes at Día de los Muertos, a Santa hat at Christmas)
 export const FarmerSprite = React.memo(({ costume }) => (
-  // overflow visible lets the tall witch hat rise above the sprite's box
+  // overflow visible lets the tall witch hat and the Catrina crown's halo rise above the sprite's box
   <svg viewBox="0 0 24 27" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges" overflow="visible">
     {costume === 'halloween' ? <>
       {/* Tall witch hat with a bent tip */}
@@ -11,6 +12,20 @@ export const FarmerSprite = React.memo(({ costume }) => (
       <path d="M13,-4 h1 v1 h-1 z M12,-3 h1 v1 h-1 z M11,-2 h1 v2 h-1 z M10,0 h1 v2 h-1 z M9,2 h1 v1 h-1 z M3,5 h2 v1 h-2 z" fill="#311b92" />
       <path d="M8,3 h8 v1 h-8 z" fill="#ff9800" />
       <path d="M11,3 h2 v1 h-2 z" fill="#fdd835" />
+    </> : costume === 'muertos' ? <>
+      {/* Catrina crown: a halo of red-tipped gold spikes behind a ring of red roses */}
+      <path d="M6,5 h1 v1 h-1 z M5,5 h1 v1 h-1 z M4,5 h1 v1 h-1 z M7,4 h1 v1 h-1 z M6,3 h1 v1 h-1 z M5,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z M7,2 h1 v1 h-1 z M9,2 h1 v1 h-1 z M8,1 h1 v1 h-1 z M8,0 h1 v1 h-1 z M10,1 h1 v1 h-1 z M10,0 h1 v1 h-1 z M10,-1 h1 v1 h-1 z M12,1 h1 v1 h-1 z M12,0 h1 v1 h-1 z M12,-1 h1 v1 h-1 z M14,1 h1 v1 h-1 z M14,0 h1 v1 h-1 z M14,-1 h1 v1 h-1 z M15,2 h1 v1 h-1 z M16,1 h1 v1 h-1 z M16,0 h1 v1 h-1 z M16,3 h1 v1 h-1 z M17,2 h1 v1 h-1 z M17,4 h1 v1 h-1 z M18,3 h1 v1 h-1 z M19,3 h1 v1 h-1 z M18,5 h1 v1 h-1 z M19,5 h1 v1 h-1 z M20,5 h1 v1 h-1 z" fill="#c8962c" />
+      <path d="M2,4 h1 v1 h-1 z M1,4 h1 v1 h-1 z M0,4 h1 v1 h-1 z M4,2 h1 v1 h-1 z M3,1 h1 v1 h-1 z M2,1 h1 v1 h-1 z M5,0 h1 v1 h-1 z M4,-1 h1 v1 h-1 z M7,-1 h1 v1 h-1 z M6,-2 h1 v1 h-1 z M6,-3 h1 v1 h-1 z M9,-3 h1 v1 h-1 z M9,-4 h1 v1 h-1 z M9,-5 h1 v1 h-1 z M12,-2 h1 v1 h-1 z M12,-3 h1 v1 h-1 z M12,-4 h1 v1 h-1 z M12,-5 h1 v1 h-1 z M15,-3 h1 v1 h-1 z M15,-4 h1 v1 h-1 z M15,-5 h1 v1 h-1 z M17,-1 h1 v1 h-1 z M18,-2 h1 v1 h-1 z M18,-3 h1 v1 h-1 z M19,0 h1 v1 h-1 z M20,-1 h1 v1 h-1 z M20,2 h1 v1 h-1 z M21,1 h1 v1 h-1 z M22,1 h1 v1 h-1 z M22,4 h1 v1 h-1 z M23,4 h1 v1 h-1 z M24,4 h1 v1 h-1 z" fill="#f2c94c" />
+      <path d="M3,5 h1 v1 h-1 z M6,1 h1 v1 h-1 z M10,-2 h1 v1 h-1 z M14,-2 h1 v1 h-1 z M18,1 h1 v1 h-1 z M21,5 h1 v1 h-1 z" fill="#ff7043" />
+      <path d="M-1,4 h1 v1 h-1 z M1,0 h1 v1 h-1 z M3,-2 h1 v1 h-1 z M5,-4 h1 v1 h-1 z M9,-6 h1 v1 h-1 z M12,-6 h1 v1 h-1 z M15,-6 h1 v1 h-1 z M19,-4 h1 v1 h-1 z M21,-2 h1 v1 h-1 z M23,0 h1 v1 h-1 z M25,4 h1 v1 h-1 z" fill="#e53935" />
+      <path d="M8,2 h8 v1 h-8 z M7,3 h10 v1 h-10 z M6,4 h12 v2 h-12 z" fill="#8d2a0e" />
+      <path d="M4,5 h2 v1 h-2 z M3,6 h4 v2 h-4 z M4,8 h2 v1 h-2 z M6,2 h2 v1 h-2 z M5,3 h4 v2 h-4 z M6,5 h2 v1 h-2 z M9,0 h2 v1 h-2 z M8,1 h4 v2 h-4 z M9,3 h2 v1 h-2 z M13,0 h2 v1 h-2 z M12,1 h4 v2 h-4 z M13,3 h2 v1 h-2 z M16,2 h2 v1 h-2 z M15,3 h4 v2 h-4 z M16,5 h2 v1 h-2 z M18,5 h2 v1 h-2 z M17,6 h4 v2 h-4 z M18,8 h2 v1 h-2 z" fill="#c62828" />
+      <path d="M4,5 h1 v1 h-1 z M3,6 h1 v1 h-1 z M6,2 h1 v1 h-1 z M5,3 h1 v1 h-1 z M9,0 h1 v1 h-1 z M8,1 h1 v1 h-1 z M13,0 h1 v1 h-1 z M12,1 h1 v1 h-1 z M16,2 h1 v1 h-1 z M15,3 h1 v1 h-1 z M18,5 h1 v1 h-1 z M17,6 h1 v1 h-1 z" fill="#ff5252" />
+      <path d="M6,7 h1 v1 h-1 z M5,8 h1 v1 h-1 z M8,4 h1 v1 h-1 z M7,5 h1 v1 h-1 z M11,2 h1 v1 h-1 z M10,3 h1 v1 h-1 z M15,2 h1 v1 h-1 z M14,3 h1 v1 h-1 z M18,4 h1 v1 h-1 z M17,5 h1 v1 h-1 z M20,7 h1 v1 h-1 z M19,8 h1 v1 h-1 z" fill="#5d0a0a" />
+      <path d="M5,6 h1 v1 h-1 z M4,7 h1 v1 h-1 z M7,3 h1 v1 h-1 z M6,4 h1 v1 h-1 z M10,1 h1 v1 h-1 z M9,2 h1 v1 h-1 z M14,1 h1 v1 h-1 z M13,2 h1 v1 h-1 z M17,3 h1 v1 h-1 z M16,4 h1 v1 h-1 z M19,6 h1 v1 h-1 z M18,7 h1 v1 h-1 z" fill="#7f0000" />
+      <path d="M6,6 h1 v1 h-1 z M11,1 h1 v1 h-1 z M18,3 h1 v1 h-1 z M5,4 h1 v1 h-1 z M12,2 h1 v1 h-1 z M17,7 h1 v1 h-1 z" fill="#ffffff" />
+      <path d="M8,4 h1 v1 h-1 z M7,5 h3 v1 h-3 z M8,6 h1 v1 h-1 z M12,3 h1 v1 h-1 z M11,4 h3 v1 h-3 z M12,5 h1 v1 h-1 z M16,4 h1 v1 h-1 z M15,5 h3 v1 h-3 z M16,6 h1 v1 h-1 z" fill="#e53935" />
+      <path d="M8,5 h1 v1 h-1 z M12,4 h1 v1 h-1 z M16,5 h1 v1 h-1 z" fill="#7f0000" />
     </> : costume === 'christmas' ? <>
       {/* Santa hat flopping to one side, with a fur brim and pompom */}
       <path d="M12,0 h5 v1 h-5 z M9,1 h10 v1 h-10 z M7,2 h10 v2 h-10 z" fill="#e53935" />

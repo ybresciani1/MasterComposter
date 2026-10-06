@@ -17,9 +17,9 @@ import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
 import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
-import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite } from './sprites/props.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite, CandleSprite, SugarSkullSprite, AlebrijeSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
-import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite } from './sprites/plants.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite, MarigoldPetalSprite } from './sprites/plants.jsx';
 import { PondSprite, BarnSprite, SiloSprite, CobwebSprite, SnowflakeSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
@@ -75,15 +75,47 @@ const TITLE_FLOWERS = [
   ['top-1/2 left-2 md:left-8 -translate-y-1/2', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-3'],
   ['top-1/3 right-4 md:right-10', 'w-8 h-16 md:w-10 md:h-20', LavenderSprite, 'hover:-rotate-3'],
 ];
-// Holidays whose title flowers become things you tap to light up (tap again to put them out).
-// Every third one also lets out a burst: spiders from a jack-o'-lantern, a puff of snow from a Christmas tree.
+// Holidays whose title flowers become things you tap to light up (tap again to put them out). Every third one also
+// lets out a burst: spiders from a jack-o'-lantern, snow from a tree. With `Alt`, every other slot shows that instead
+// (marigolds between the ofrenda candles); tapping one releases the burst (monarch butterflies) and nothing lights.
+// burstClass/burstStyle animate each burst critter (spiders skitter, monarchs flap).
 const TITLE_LIGHT_UPS = {
-  halloween: { Sprite: PumpkinSprite, aspect: 'aspect-[16/14]', glow: 'animate-pumpkin-glow', sound: playIgnite, Burst: SpiderSprite, skitter: true },
-  christmas: { Sprite: ChristmasTreeSprite, aspect: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, skitter: false },
+  halloween: { Sprite: PumpkinSprite, aspect: 'aspect-[16/14]', glow: 'animate-pumpkin-glow', sound: playIgnite, Burst: SpiderSprite, burstClass: 'animate-spider-skitter' },
+  muertos: { Sprite: CandleSprite, aspect: 'aspect-[10/20] w-[70%]! mx-auto', glow: 'animate-candle-glow', sound: playIgnite, Burst: MonarchSprite, burstClass: 'animate-butterfly-flap', burstStyle: { animationDuration: '0.12s' }, Alt: MarigoldSprite },
+  christmas: { Sprite: ChristmasTreeSprite, aspect: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, burstClass: '' },
 };
 const BURST_EVERY = 3;
-// Snow drifting down the Christmas title: [left %, size px, fall seconds, delay seconds, sideways drift px]
-const SNOWFLAKES = [...Array(36)].map(() => [Math.random() * 100, 6 + Math.round(Math.random() * 5), 7 + Math.random() * 7, -Math.random() * 14, (Math.random() - 0.5) * 80]);
+// Things drifting down the title: snow at Christmas, marigold petals at Día de los Muertos
+const TITLE_FALLING = {
+  christmas: { Sprite: SnowflakeSprite, anim: 'animate-snow-fall' },
+  muertos: { Sprite: MarigoldPetalSprite, anim: 'animate-petal-fall' },
+};
+// Sugar skulls and alebrijes dotted around the Día de los Muertos title, in the open space either side of the title
+// card (which is 32rem wide): [kind, side, top %, how far across that side's space, size, colours, face left].
+// Tap a skull to wiggle it, an alebrije to make it hop.
+const ALEBRIJE_PALETTES = [
+  ['#ec407a', '#ad1457', '#26c6da', '#fdd835', '#7e57c2'],
+  ['#7e57c2', '#4527a0', '#66bb6a', '#fdd835', '#ff7043'],
+  ['#26a69a', '#00695c', '#ff7043', '#fdd835', '#ec407a'],
+];
+const SKULL_COLORS = [['#ec407a', '#26c6da'], ['#ab47bc', '#ff9800'], ['#26c6da', '#e53935'], ['#ff9800', '#66bb6a']];
+const SKULL_SIZE = 'w-8 h-8 md:w-11 md:h-11', ALEBRIJE_SIZE = 'w-14 h-10 md:w-20 md:h-14';
+const MUERTOS_EXTRAS = [
+  ['skull', 'left', 16, 0.7, SKULL_SIZE, SKULL_COLORS[0]],
+  ['dog', 'left', 33, 0.45, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[2]],
+  ['cat', 'left', 52, 0.6, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[0]],
+  ['skull', 'left', 68, 0.8, SKULL_SIZE, SKULL_COLORS[1]],
+  ['skull', 'right', 19, 0.8, SKULL_SIZE, SKULL_COLORS[2]],
+  ['cat', 'right', 34, 0.6, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[2], true],
+  ['dog', 'right', 56, 0.5, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[1], true],
+  ['skull', 'right', 76, 0.7, SKULL_SIZE, SKULL_COLORS[3]],
+];
+
+// Marigold petals strewn on the ground at Día de los Muertos: [left %, top %, size px, quarter turns].
+// Half are scattered everywhere, half carpet the bottom of the screen.
+const FLOOR_PETALS = [...Array(90)].map((_, i) => [Math.random() * 100, i % 2 ? 78 + Math.random() * 22 : Math.random() * 100, 6 + Math.round(Math.random() * 4), Math.floor(Math.random() * 4)]);
+// [left %, size px, fall seconds, delay seconds, sideways drift px]
+const FALLING_BITS = [...Array(36)].map(() => [Math.random() * 100, 6 + Math.round(Math.random() * 5), 7 + Math.random() * 7, -Math.random() * 14, (Math.random() - 0.5) * 80]);
 
 const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
@@ -167,8 +199,9 @@ export default function App() {
   const HolidayDecor = HOLIDAYS[holiday]?.decor;
   const holidayDecor = (className) => HolidayDecor && <div className={`absolute z-[15] pointer-events-none ${className}`}><HolidayDecor /></div>;
 
-  // Halloween / Christmas title: tap a jack-o'-lantern or tree to light it (or put it out); see TITLE_LIGHT_UPS
+  // Holiday title: tap a jack-o'-lantern, candle or tree to light it (or put it out); see TITLE_LIGHT_UPS
   const titleLightUp = TITLE_LIGHT_UPS[holiday];
+  const titleFalling = TITLE_FALLING[holiday];
   const [litTitleDecor, setLitTitleDecor] = useState([]);
   const [titleBursts, setTitleBursts] = useState([]);
   const handleTitleDecorTap = (e, i) => {
@@ -176,7 +209,15 @@ export default function App() {
     setLitTitleDecor(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
     if (!lighting) return;
     titleLightUp.sound(volumeRef.current);
-    if (i % BURST_EVERY !== 0) return;
+    if (!titleLightUp.Alt && i % BURST_EVERY === 0) releaseTitleBurst(e);
+  };
+  const [extraTaps, setExtraTaps] = useState({}); // replays a sugar skull's wiggle or an alebrije's hop
+  const handleExtraTap = (i) => setExtraTaps(t => ({ ...t, [i]: (t[i] ?? 0) + 1 }));
+  const handleTitleAltTap = (e) => {
+    playSfx(butterflyTapSound);
+    releaseTitleBurst(e);
+  };
+  const releaseTitleBurst = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     const id = ++eggIdRef.current;
     const critters = [...Array(5)].map(() => {
@@ -1450,11 +1491,22 @@ export default function App() {
         <span className="text-[10px] font-bold w-8 text-right tabular-nums select-none">{Math.round(volume * 100)}%</span>
       </PixelBox>
 
+      {holiday === 'muertos' && (
+        <div className="absolute inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
+          {FLOOR_PETALS.map(([left, top, size, turns], i) => (
+            <div key={i} className="absolute" style={{ left: `${left}%`, top: `${top}%`, width: size, height: size, transform: `rotate(${turns * 90}deg)` }}><MarigoldPetalSprite /></div>
+          ))}
+        </div>
+      )}
+
       {/* Flower Decorations */}
       <div className="absolute inset-0 pointer-events-none z-[6] overflow-hidden">
         {TITLE_FLOWERS.map((flower, i) => {
           const [position, size, Flower, tilt] = flower;
-          // Halloween and Christmas swap the flowers for jack-o'-lanterns / trees that light up when tapped
+          // Halloween, Día de los Muertos and Christmas swap the flowers for jack-o'-lanterns / candles / trees that light up when tapped
+          if (titleLightUp?.Alt && i % 2 === 1) return (
+            <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={handleTitleAltTap}><titleLightUp.Alt /></div>
+          );
           return titleLightUp ? (
             <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleTitleDecorTap(e, i)}>
               <div className={`w-full ${titleLightUp.aspect} ${litTitleDecor.includes(i) ? titleLightUp.glow : ''}`}><titleLightUp.Sprite lit={litTitleDecor.includes(i)} /></div>
@@ -1463,6 +1515,17 @@ export default function App() {
             <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}><Flower /></div>
           );
         })}
+        {holiday === 'muertos' && MUERTOS_EXTRAS.map(([kind, side, top, across, size, colors, faceLeft], i) => (
+          <div key={`extra-${i}`} className={`absolute ${size} ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleExtraTap(i)}>
+            <div className={`w-full h-full ${kind === 'skull' ? '' : 'animate-alebrije-bob'}`}>
+              <div key={extraTaps[i] ?? 0} className={`w-full h-full ${extraTaps[i] ? (kind === 'skull' ? 'animate-skull-wiggle' : 'animate-alebrije-hop') : ''}`}>
+                <div className="w-full h-full" style={{ transform: faceLeft ? 'scaleX(-1)' : undefined }}>
+                  {kind === 'skull' ? <SugarSkullSprite rim={colors[0]} accent={colors[1]} /> : <AlebrijeSprite kind={kind} palette={colors} />}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Fluttering Butterflies Overlay */}
@@ -1502,17 +1565,17 @@ export default function App() {
         <div key={`tb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
           {burst.critters.map((c, i) => (
             <div key={i} className="absolute -left-2.5 -top-2.5 animate-spider-scurry" style={{ '--tx': `${c.tx}px`, '--ty': `${c.ty}px`, animationDuration: `${c.duration}s` }}>
-              <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`w-5 h-5 ${titleLightUp?.skitter ? 'animate-spider-skitter' : ''}`}>{titleLightUp && <titleLightUp.Burst />}</div></div>
+              <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`w-5 h-5 ${titleLightUp?.burstClass ?? ''}`} style={titleLightUp?.burstStyle}>{titleLightUp && <titleLightUp.Burst />}</div></div>
             </div>
           ))}
         </div>
       ))}
 
-      {/* Christmas: snow drifting down over everything but the controls */}
-      {holiday === 'christmas' && (
+      {/* Snow (Christmas) or marigold petals (Día de los Muertos) drifting down over everything but the controls */}
+      {titleFalling && (
         <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden" aria-hidden="true">
-          {SNOWFLAKES.map(([left, size, duration, delay, drift], i) => (
-            <div key={i} className="absolute -top-4 animate-snow-fall" style={{ left: `${left}%`, width: size, height: size, animationDuration: `${duration}s`, animationDelay: `${delay}s`, '--tx': `${drift}px` }}><SnowflakeSprite /></div>
+          {FALLING_BITS.map(([left, size, duration, delay, drift], i) => (
+            <div key={i} className={`absolute -top-4 ${titleFalling.anim}`} style={{ left: `${left}%`, width: size, height: size, animationDuration: `${duration}s`, animationDelay: `${delay}s`, '--tx': `${drift}px` }}><titleFalling.Sprite /></div>
           ))}
         </div>
       )}

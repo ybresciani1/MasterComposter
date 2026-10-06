@@ -173,3 +173,87 @@ export const ChristmasLightsSprite = React.memo(() => (
     })}
   </svg>
 ));
+
+// Ofrenda candle for the Día de los Muertos title. Lit, its flame flickers (see .candle-flame)
+export const CandleSprite = React.memo(({ lit = false }) => (
+  <svg viewBox="0 0 10 20" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {lit && (
+      <g className="candle-flame">
+        <path d="M5,0 h1 v1 h-1 z M4,1 h2 v1 h-2 z M3,2 h4 v3 h-4 z M4,5 h2 v1 h-2 z" fill="#ff9800" />
+        <path d="M4,3 h2 v2 h-2 z" fill="#ffeb3b" />
+        <path d="M4,4 h1 v1 h-1 z" fill="#fffde7" />
+      </g>
+    )}
+    <path d="M5,6 h1 v1 h-1 z" fill={lit ? '#4e342e' : '#3e2723'} />
+    {/* Pillar with a melted top, a drip and painted bands */}
+    <path d="M2,7 h6 v13 h-6 z" fill="#fff3e0" />
+    <path d="M2,7 h6 v1 h-6 z M2,8 h1 v12 h-1 z M2,19 h6 v1 h-6 z" fill="#ffe0b2" />
+    <path d="M7,9 h1 v6 h-1 z M3,8 h1 v3 h-1 z" fill="#fffde7" />
+    <path d="M2,14 h6 v1 h-6 z" fill="#ff9800" />
+    <path d="M2,16 h6 v1 h-6 z" fill="#ec407a" />
+    <path d="M2,14 h1 v1 h-1 z" fill="#ef6c00" />
+    <path d="M2,16 h1 v1 h-1 z" fill="#c2185b" />
+  </svg>
+));
+
+// Calavera (sugar skull) for the Día de los Muertos title; rim and accent recolour its eye rims and forehead flower
+export const SugarSkullSprite = React.memo(({ rim = '#ec407a', accent = '#26c6da' }) => (
+  <svg viewBox="0 0 14 13" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    <path d="M4,0 h6 v1 h-6 z M2,1 h10 v1 h-10 z M1,2 h12 v6 h-12 z M2,8 h10 v1 h-10 z M3,9 h8 v1 h-8 z M4,10 h6 v2 h-6 z" fill="#fafafa" />
+    <path d="M1,3 h1 v5 h-1 z M2,8 h1 v1 h-1 z M3,9 h1 v1 h-1 z M4,11 h6 v1 h-6 z" fill="#e0e0e0" />
+    {/* Flowered eye rims and dark sockets */}
+    <path d="M2,3 h4 v4 h-4 z M8,3 h4 v4 h-4 z" fill={rim} />
+    <path d="M3,4 h2 v2 h-2 z M9,4 h2 v2 h-2 z M6,7 h2 v1 h-2 z M4,10 h6 v1 h-6 z M5,11 h1 v1 h-1 z M8,11 h1 v1 h-1 z" fill="#212121" />
+    <path d="M3,4 h1 v1 h-1 z M9,4 h1 v1 h-1 z" fill="#616161" />
+    {/* Forehead flower and cheek dots */}
+    <path d="M6,0 h2 v1 h-2 z M5,1 h4 v1 h-4 z M6,2 h2 v1 h-2 z M2,8 h1 v1 h-1 z M11,8 h1 v1 h-1 z" fill={accent} />
+    <path d="M6,1 h2 v1 h-2 z" fill="#fdd835" />
+  </svg>
+));
+
+// Alebrije: a folk-art fantasy creature covered in dots and a flower, as a winged cat or a long-eared dog.
+// palette = [body, shade, accent, dot, flower]
+export const AlebrijeSprite = React.memo(({ kind = 'cat', palette = ['#ec407a', '#ad1457', '#26c6da', '#fdd835', '#7e57c2'] }) => {
+  const [body, shade, accent, dot, flower] = palette;
+  return (
+    <svg viewBox="0 0 24 17" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+      {kind === 'cat' ? <>
+        {/* Feathered wing, curly tail */}
+        <path d="M8,5 h5 v2 h-5 z M9,4 h5 v1 h-5 z M11,3 h4 v1 h-4 z M13,2 h3 v1 h-3 z" fill={accent} />
+        <path d="M15,2 h1 v1 h-1 z M14,3 h1 v1 h-1 z M13,4 h1 v1 h-1 z M12,5 h1 v1 h-1 z" fill={dot} />
+        <path d="M4,7 h1 v2 h-1 z M3,5 h1 v2 h-1 z M2,3 h1 v2 h-1 z M3,2 h2 v1 h-2 z" fill={body} />
+        <path d="M3,5 h1 v1 h-1 z M2,3 h1 v1 h-1 z M4,2 h1 v1 h-1 z" fill={accent} />
+      </> : <>
+        {/* Wavy tail standing up */}
+        <path d="M4,7 h1 v2 h-1 z M3,5 h1 v2 h-1 z M4,3 h1 v2 h-1 z M3,1 h1 v2 h-1 z" fill={body} />
+        <path d="M3,6 h1 v1 h-1 z M4,4 h1 v1 h-1 z M3,2 h1 v1 h-1 z" fill={dot} />
+      </>}
+      {/* Body and legs */}
+      <path d="M6,7 h10 v1 h-10 z M5,8 h12 v3 h-12 z M5,12 h2 v4 h-2 z M8,12 h2 v4 h-2 z M12,12 h2 v4 h-2 z M15,12 h2 v4 h-2 z" fill={body} />
+      <path d="M5,11 h12 v1 h-12 z M5,16 h2 v1 h-2 z M8,16 h2 v1 h-2 z M12,16 h2 v1 h-2 z M15,16 h2 v1 h-2 z" fill={shade} />
+      <path d="M5,13 h2 v1 h-2 z M8,14 h2 v1 h-2 z M12,13 h2 v1 h-2 z M15,14 h2 v1 h-2 z" fill={accent} />
+      {/* Flower on the haunch and dots along the back */}
+      <path d="M8,8 h1 v1 h-1 z M7,9 h3 v1 h-3 z M8,10 h1 v1 h-1 z" fill={flower} />
+      <path d="M8,9 h1 v1 h-1 z M12,8 h1 v1 h-1 z M14,9 h1 v1 h-1 z M11,10 h1 v1 h-1 z M15,7 h1 v1 h-1 z M6,10 h1 v1 h-1 z" fill={dot} />
+      <path d="M13,10 h1 v1 h-1 z M10,8 h1 v1 h-1 z M16,10 h1 v1 h-1 z" fill={flower} />
+      {kind === 'cat' ? <>
+        {/* Cat head with pointed ears */}
+        <path d="M16,4 h5 v5 h-5 z M21,6 h2 v2 h-2 z" fill={body} />
+        <path d="M16,2 h1 v2 h-1 z M20,2 h1 v2 h-1 z M18,4 h2 v1 h-2 z" fill={accent} />
+        <path d="M16,8 h5 v1 h-5 z" fill={shade} />
+        <path d="M18,5 h2 v2 h-2 z" fill="#ffffff" />
+        <path d="M19,5 h1 v1 h-1 z M22,6 h1 v1 h-1 z" fill="#212121" />
+        <path d="M17,7 h1 v1 h-1 z" fill={dot} />
+      </> : <>
+        {/* Dog head with a long muzzle and a floppy ear */}
+        <path d="M16,4 h4 v4 h-4 z M20,5 h3 v2 h-3 z" fill={body} />
+        <path d="M16,7 h4 v1 h-4 z M20,6 h3 v1 h-3 z" fill={shade} />
+        <path d="M18,5 h2 v1 h-2 z" fill="#ffffff" />
+        <path d="M19,5 h1 v1 h-1 z M22,5 h1 v1 h-1 z" fill="#212121" />
+        <path d="M15,4 h2 v5 h-2 z" fill={accent} />
+        <path d="M15,6 h1 v1 h-1 z M16,8 h1 v1 h-1 z" fill={dot} />
+        <path d="M18,3 h2 v1 h-2 z" fill={flower} />
+      </>}
+    </svg>
+  );
+});

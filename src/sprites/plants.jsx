@@ -163,3 +163,12 @@ export const ChristmasTreeSprite = React.memo(({ lit = false }) => (
     <path d="M7,1 h1 v1 h-1 z" fill={lit ? '#fffde7' : '#d4b24a'} />
   </svg>
 ));
+
+// A single cempasúchil (marigold) petal drifting down the Día de los Muertos title
+export const MarigoldPetalSprite = React.memo(() => (
+  <svg viewBox="0 0 4 4" className="w-full h-full" shapeRendering="crispEdges">
+    <path d="M1,0 h2 v1 h-2 z M0,1 h4 v2 h-4 z M1,3 h2 v1 h-2 z" fill="#ff9800" />
+    <path d="M2,2 h2 v1 h-2 z M1,3 h2 v1 h-2 z" fill="#ef6c00" />
+    <path d="M1,1 h1 v1 h-1 z" fill="#ffb74d" />
+  </svg>
+));
