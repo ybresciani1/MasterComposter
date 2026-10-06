@@ -229,3 +229,37 @@ export const SiloSprite = React.memo(() => (
     <path d="M7,31 h2 v9 h-2 z" fill="#a1887f" />
   </svg>
 ));
+
+// Corner cobweb, anchored top-left (mirror it for the other corners): five threads fanning out from the corner,
+// joined by four rings that sag towards it. Rasterised to 1-unit pixels once, when the module loads.
+const pixelLine = (x0, y0, x1, y1) => {
+  const pts = [];
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  for (;;) {
+    pts.push([x0, y0]);
+    if (x0 === x1 && y0 === y1) return pts;
+    const e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x0 += sx; }
+    if (e2 <= dx) { err += dx; y0 += sy; }
+  }
+};
+const COBWEB = (() => {
+  const angles = [0, 22.5, 45, 67.5, 90].map(a => a * Math.PI / 180);
+  const at = (r, a) => [Math.round(r * Math.cos(a)), Math.round(r * Math.sin(a))];
+  const threads = new Set(), rings = new Set();
+  angles.forEach(a => pixelLine(0, 0, ...at(31, a)).forEach(p => threads.add(p.join())));
+  [8, 15, 22, 29].forEach(r => angles.slice(1).forEach((a, i) => {
+    const mid = at(r * 0.84, (a + angles[i]) / 2);
+    [...pixelLine(...at(r, angles[i]), ...mid), ...pixelLine(...mid, ...at(r, a))].forEach(p => rings.add(p.join()));
+  }));
+  const toPath = (set) => [...set].map(p => p.split(',').map(Number)).filter(([x, y]) => x >= 0 && y >= 0 && x < 32 && y < 32).map(([x, y]) => `M${x},${y} h1 v1 h-1 z`).join(' ');
+  return { threads: toPath(threads), rings: toPath([...rings].filter(p => !threads.has(p))) };
+})();
+
+export const CobwebSprite = React.memo(() => (
+  <svg viewBox="0 0 32 32" className="w-full h-full" shapeRendering="crispEdges" opacity="0.8">
+    <path d={COBWEB.rings} fill="#cfd8dc" />
+    <path d={COBWEB.threads} fill="#fafafa" />
+  </svg>
+));

@@ -467,3 +467,28 @@
   100% { transform: rotate(720deg); }
 }
 .animate-slip { animation: slip-spin 0.9s ease-out; }
+
+/* Halloween title: lit jack-o'-lanterns flicker, spiders scurry out and one bobs on its thread */
+@keyframes pumpkin-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px #ffca28) drop-shadow(0 0 12px #ff8f00); }
+  30% { filter: drop-shadow(0 0 6px #ffd54f) drop-shadow(0 0 18px #ff9800); }
+  55% { filter: drop-shadow(0 0 3px #ffca28) drop-shadow(0 0 9px #ff6f00); }
+  80% { filter: drop-shadow(0 0 5px #ffe082) drop-shadow(0 0 15px #ff8f00); }
+}
+.animate-pumpkin-glow { animation: pumpkin-glow 1.4s ease-in-out infinite; }
+@keyframes spider-scurry {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
+  15% { transform: translate(calc(var(--tx) * 0.1), calc(var(--ty) * 0.1)) scale(1); }
+  80% { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+}
+.animate-spider-scurry { animation: spider-scurry ease-out forwards; }
+@keyframes spider-skitter { 0% { transform: rotate(-8deg); } 100% { transform: rotate(8deg); } }
+.animate-spider-skitter { animation: spider-skitter 0.1s linear infinite alternate; }
+@keyframes spider-dangle {
+  0%, 100% { transform: translateY(70px); }
+  45%, 60% { transform: translateY(200px); }
+}
+.animate-spider-dangle { animation: spider-dangle 7s ease-in-out infinite; }
+@keyframes spider-sway { 0% { rotate: -6deg; } 100% { rotate: 6deg; } }
+.animate-spider-sway { animation: spider-sway 1.3s ease-in-out infinite alternate; }

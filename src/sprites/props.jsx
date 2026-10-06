@@ -101,8 +101,8 @@ export const WormBinSprite = React.memo(({ state = "empty" }) => (
   </svg>
 ));
 
-// Jack-o'-lantern that sits on the compost at Halloween
-export const PumpkinSprite = React.memo(() => (
+// Jack-o'-lantern that sits on the compost at Halloween; `lit={false}` leaves its face dark (the title lights them on tap)
+export const PumpkinSprite = React.memo(({ lit = true }) => (
   <svg viewBox="0 0 16 14" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
     <path d="M7,0 h2 v3 h-2 z" fill="#6d4c41" />
     <path d="M8,0 h1 v2 h-1 z" fill="#8d6e63" />
@@ -111,9 +111,9 @@ export const PumpkinSprite = React.memo(() => (
     <path d="M5,4 h1 v8 h-1 z M10,4 h1 v8 h-1 z" fill="#ef6c00" />
     <path d="M1,5 h1 v6 h-1 z M2,11 h2 v1 h-2 z M4,12 h8 v1 h-8 z" fill="#e65100" />
     <path d="M11,4 h2 v1 h-2 z M12,5 h1 v3 h-1 z" fill="#ffb74d" />
-    {/* Glowing face */}
-    <path d="M4,6 h1 v1 h-1 z M3,7 h2 v1 h-2 z M11,6 h1 v1 h-1 z M11,7 h2 v1 h-2 z M7,8 h2 v1 h-2 z M3,9 h10 v1 h-10 z M4,10 h8 v1 h-8 z" fill="#ffd54f" />
-    <path d="M4,10 h8 v1 h-8 z" fill="#ffb300" />
+    {/* Face: glowing when lit, dark hollows when not */}
+    <path d="M4,6 h1 v1 h-1 z M3,7 h2 v1 h-2 z M11,6 h1 v1 h-1 z M11,7 h2 v1 h-2 z M7,8 h2 v1 h-2 z M3,9 h10 v1 h-10 z M4,10 h8 v1 h-8 z" fill={lit ? '#ffd54f' : '#4e342e'} />
+    <path d="M4,10 h8 v1 h-8 z" fill={lit ? '#ffb300' : '#3e2723'} />
     <path d="M6,9 h1 v1 h-1 z M9,10 h1 v1 h-1 z" fill="#fb8c00" />
   </svg>
 ));

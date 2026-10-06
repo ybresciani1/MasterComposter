@@ -6,7 +6,7 @@ import { MovingActor } from './components/MovingActor.jsx';
 import { useSpaceKey } from './hooks/useSpaceKey.js';
 import { PeckingHens, HenSparkles } from './components/PeckingHens.jsx';
 import { WormOnAString, AchievementToast } from './components/EasterEggs.jsx';
-import { unlockSynth, playGoatScream, playSlip, playAchievement } from './audio/synth.js';
+import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite } from './audio/synth.js';
 import { getHoliday, HOLIDAYS } from './data/holidays.js';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
@@ -14,13 +14,13 @@ import { backgroundMusic, wowSound, endCreditsVideo, pitchforkSound, hammerSound
 import { DREAM_LEVELS, SOIL_COMPONENTS, FALSE_COMPONENTS, INGREDIENT_ICONS, EXAMPLE_ITEMS, EXAMPLE_BINS, NO_COMPOST_ITEMS, SOIL_PROBLEMS, COMPOST_PROBLEMS, WORM_BEDDING_ITEMS, WORM_FOODS, PLANTS, BED_SPOTS } from './data/gameData.js';
 import { PolishHenSprite, CowSprite, PigSprite, ChickenSprite, RoosterSprite, ChickSprite, SheepSprite, GoatSprite, FrogSprite, RabbitSprite, CatSprite, DogSprite } from './sprites/animals.jsx';
 import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
-import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite } from './sprites/critters.jsx';
+import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
-import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite } from './sprites/props.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
 import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite } from './sprites/plants.jsx';
-import { PondSprite, BarnSprite, SiloSprite } from './sprites/scenery.jsx';
+import { PondSprite, BarnSprite, SiloSprite, CobwebSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
 const PLAYABLE_STAGES = DREAM_LEVELS.map(l => l.stage);
@@ -55,6 +55,27 @@ const GRASS_SECONDS = 5;
 const IDLE_DANCE_MS = 30000;
 const HEN_CLUCKS_TO_FLIP = 10;
 const DECOR_IN_PILE = 'left-[50%] top-[22%] w-[32%] h-[30%]'; // inside a ComposterSprite's soil
+
+// Title screen flowers: [position, size, sprite, hover tilt]
+const TITLE_FLOWERS = [
+  ['bottom-4 left-4 md:left-12', 'w-10 h-20 md:w-16 md:h-32', SunflowerSprite, 'hover:-rotate-3'],
+  ['bottom-2 left-16 md:left-32', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-3'],
+  ['bottom-12 left-24 md:left-48', 'w-6 h-10 md:w-10 md:h-14', ZinniaSprite, 'hover:-rotate-6'],
+  ['bottom-32 left-12 md:left-24', 'w-8 h-16 md:w-12 md:h-24', LavenderSprite, 'hover:-rotate-3'],
+  ['bottom-8 right-4 md:right-10', 'w-12 h-24 md:w-16 md:h-32', SunflowerSprite, 'hover:rotate-3'],
+  ['bottom-4 right-24 md:right-36', 'w-8 h-16 md:w-12 md:h-24', LavenderSprite, 'hover:-rotate-3'],
+  ['bottom-16 right-36 md:right-56', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-6'],
+  ['bottom-2 right-12 md:right-24', 'w-6 h-10 md:w-10 md:h-14', ZinniaSprite, 'hover:rotate-3'],
+  ['top-12 left-8 md:left-16', 'w-8 h-16 md:w-10 md:h-20', LavenderSprite, 'hover:-rotate-3'],
+  ['top-24 left-2 md:left-6', 'w-8 h-12 md:w-12 md:h-16', ZinniaSprite, 'hover:-rotate-6'],
+  ['top-8 left-24 md:left-36', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-3'],
+  ['top-16 right-10 md:right-20', 'w-10 h-20 md:w-14 md:h-28', SunflowerSprite, 'hover:rotate-3'],
+  ['top-8 right-24 md:right-40', 'w-6 h-10 md:w-10 md:h-14', ZinniaSprite, 'hover:-rotate-6'],
+  ['top-32 right-4 md:right-12', 'w-8 h-16 md:w-10 md:h-20', LavenderSprite, 'hover:rotate-3'],
+  ['top-1/2 left-2 md:left-8 -translate-y-1/2', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-3'],
+  ['top-1/3 right-4 md:right-10', 'w-8 h-16 md:w-10 md:h-20', LavenderSprite, 'hover:-rotate-3'],
+];
+const SPIDER_PUMPKIN_EVERY = 3;
 
 const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
@@ -137,6 +158,26 @@ export default function App() {
   // Holiday decor (a jack-o'-lantern, marigolds, a present) sits on each compost pile
   const HolidayDecor = HOLIDAYS[holiday]?.decor;
   const holidayDecor = (className) => HolidayDecor && <div className={`absolute z-[15] pointer-events-none ${className}`}><HolidayDecor /></div>;
+
+  // Halloween title: tapping a jack-o'-lantern lights it (or blows it out); every third one lets spiders out
+  const [litPumpkins, setLitPumpkins] = useState([]);
+  const [spiderBursts, setSpiderBursts] = useState([]);
+  const handlePumpkinTap = (e, i) => {
+    const lighting = !litPumpkins.includes(i);
+    setLitPumpkins(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
+    if (!lighting) return;
+    playIgnite(volumeRef.current);
+    if (i % SPIDER_PUMPKIN_EVERY !== 0) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const id = ++eggIdRef.current;
+    const spiders = [...Array(5)].map(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 70 + Math.random() * 110;
+      return { tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist, rot: angle + Math.PI / 2, duration: 1.2 + Math.random() * 0.7 };
+    });
+    setSpiderBursts(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top + r.height * 0.7, spiders }]);
+    setTimeout(() => setSpiderBursts(prev => prev.filter(b => b.id !== id)), 2000);
+  };
 
   const showAchievement = (title, subtitle, icon) => {
     const id = ++eggIdRef.current;
@@ -1401,34 +1442,18 @@ export default function App() {
       </PixelBox>
 
       {/* Flower Decorations */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Bottom Left - Adjusted Spacing Here! */}
-        <div className="absolute bottom-4 left-4 md:left-12 w-10 h-20 md:w-16 md:h-32 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
-        <div className="absolute bottom-2 left-16 md:left-32 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
-        <div className="absolute bottom-12 left-24 md:left-48 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
-        
-        {/* Adjusted Lavender on the Bottom Left: Moved higher and to the right */}
-        <div className="absolute bottom-32 left-12 md:left-24 w-8 h-16 md:w-12 md:h-24 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
-
-        {/* Bottom Right */}
-        <div className="absolute bottom-8 right-4 md:right-10 w-12 h-24 md:w-16 md:h-32 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
-        <div className="absolute bottom-4 right-24 md:right-36 w-8 h-16 md:w-12 md:h-24 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
-        <div className="absolute bottom-16 right-36 md:right-56 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-6 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
-        <div className="absolute bottom-2 right-12 md:right-24 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
-
-        {/* Top Left */}
-        <div className="absolute top-12 left-8 md:left-16 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
-        <div className="absolute top-24 left-2 md:left-6 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
-        <div className="absolute top-8 left-24 md:left-36 w-8 h-12 md:w-12 md:h-16 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
-
-        {/* Top Right */}
-        <div className="absolute top-16 right-10 md:right-20 w-10 h-20 md:w-14 md:h-28 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><SunflowerSprite /></div>
-        <div className="absolute top-8 right-24 md:right-40 w-6 h-10 md:w-10 md:h-14 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform" onClick={triggerButterflies}><ZinniaSprite /></div>
-        <div className="absolute top-32 right-4 md:right-12 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
-
-        {/* Middle Edges */}
-        <div className="absolute top-1/2 left-2 md:left-8 w-8 h-12 md:w-12 md:h-16 -translate-y-1/2 pointer-events-auto cursor-pointer hover:scale-110 hover:rotate-3 transition-transform" onClick={triggerButterflies}><MarigoldSprite /></div>
-        <div className="absolute top-1/3 right-4 md:right-10 w-8 h-16 md:w-10 md:h-20 pointer-events-auto cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform" onClick={triggerButterflies}><LavenderSprite /></div>
+      <div className="absolute inset-0 pointer-events-none z-[6] overflow-hidden">
+        {TITLE_FLOWERS.map((flower, i) => {
+          const [position, size, Flower, tilt] = flower;
+          // Halloween swaps the flowers for jack-o'-lanterns that light up when tapped (every third lets out spiders)
+          return holiday === 'halloween' ? (
+            <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handlePumpkinTap(e, i)}>
+              <div className={`w-full aspect-[16/14] ${litPumpkins.includes(i) ? 'animate-pumpkin-glow' : ''}`}><PumpkinSprite lit={litPumpkins.includes(i)} /></div>
+            </div>
+          ) : (
+            <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}><Flower /></div>
+          );
+        })}
       </div>
 
       {/* Fluttering Butterflies Overlay */}
@@ -1446,6 +1471,31 @@ export default function App() {
               </div>
             );
           })}
+        </div>
+      ))}
+
+      {/* Halloween: cobwebs in every corner, a spider bobbing on a thread from the top-right one, and spiders let out of jack-o'-lanterns */}
+      {holiday === 'halloween' && (
+        <div className="fixed inset-0 pointer-events-none z-[5]" aria-hidden="true">
+          {[['top-0 left-0', ''], ['top-0 right-0', 'scaleX(-1)'], ['bottom-0 left-0', 'scaleY(-1)'], ['bottom-0 right-0', 'scale(-1, -1)']].map(([corner, flip]) => (
+            <div key={corner} className={`absolute ${corner} w-28 h-28 md:w-40 md:h-40`} style={{ transform: flip || undefined }}><CobwebSprite /></div>
+          ))}
+        </div>
+      )}
+      {holiday === 'halloween' && (
+        // Above the title card (so phones see it too) but under the volume control
+        <div className="fixed top-0 right-12 md:right-16 z-20 pointer-events-none animate-spider-dangle" aria-hidden="true">
+          <div className="absolute bottom-full left-1/2 w-px h-[600px] bg-[#9e9e9e]" />
+          <div className="w-6 h-6 md:w-7 md:h-7 animate-spider-sway" style={{ transform: 'rotate(180deg)' }}><SpiderSprite /></div>
+        </div>
+      )}
+      {spiderBursts.map(burst => (
+        <div key={`sb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
+          {burst.spiders.map((sp, i) => (
+            <div key={i} className="absolute -left-2.5 -top-2.5 animate-spider-scurry" style={{ '--tx': `${sp.tx}px`, '--ty': `${sp.ty}px`, animationDuration: `${sp.duration}s` }}>
+              <div style={{ transform: `rotate(${sp.rot}rad)` }}><div className="w-5 h-5 animate-spider-skitter"><SpiderSprite /></div></div>
+            </div>
+          ))}
         </div>
       ))}
 

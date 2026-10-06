@@ -80,3 +80,25 @@ export const playAchievement = (volume) => play(volume, (ac, t, out) => {
     note.stop(start + 0.55);
   });
 });
+
+// A soft "fwoomp" as a candle catches inside a jack-o'-lantern
+export const playIgnite = (volume) => play(volume, (ac, t, out) => {
+  const length = 0.5;
+  const noise = ac.createBuffer(1, Math.ceil(ac.sampleRate * length), ac.sampleRate);
+  const samples = noise.getChannelData(0);
+  for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+  const flame = ac.createBufferSource();
+  flame.buffer = noise;
+  const tone = ac.createBiquadFilter();
+  tone.type = 'lowpass';
+  tone.frequency.setValueAtTime(250, t);
+  tone.frequency.exponentialRampToValueAtTime(1800, t + 0.12);
+  tone.frequency.exponentialRampToValueAtTime(500, t + length);
+  const env = ac.createGain();
+  env.gain.setValueAtTime(0.0001, t);
+  env.gain.exponentialRampToValueAtTime(0.6, t + 0.06);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + length);
+  flame.connect(tone).connect(env).connect(out);
+  flame.start(t);
+  flame.stop(t + length);
+});

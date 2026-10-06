@@ -72,3 +72,16 @@ export const BeeSprite = React.memo(() => (
     <path d="M3,2 h2 v2 h-2 z" fill="#ffffff" opacity="0.8"/> 
   </svg>
 ));
+
+// Little spider seen from above, head up (Halloween title)
+export const SpiderSprite = React.memo(() => (
+  <svg viewBox="0 0 14 14" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    {/* Legs */}
+    <path d="M2,1 h1 v2 h-1 z M11,1 h1 v2 h-1 z M3,3 h1 v1 h-1 z M10,3 h1 v1 h-1 z M1,4 h1 v1 h-1 z M4,4 h1 v1 h-1 z M9,4 h1 v1 h-1 z M12,4 h1 v1 h-1 z M2,5 h2 v1 h-2 z M10,5 h2 v1 h-2 z M4,6 h1 v1 h-1 z M9,6 h1 v1 h-1 z M3,8 h2 v1 h-2 z M9,8 h2 v1 h-2 z M2,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M1,10 h1 v1 h-1 z M4,10 h1 v1 h-1 z M9,10 h1 v1 h-1 z M12,10 h1 v1 h-1 z M3,11 h1 v2 h-1 z M10,11 h1 v2 h-1 z M2,13 h1 v1 h-1 z M11,13 h1 v1 h-1 z" fill="#212121" />
+    {/* Head and body */}
+    <path d="M5,3 h4 v3 h-4 z M5,6 h4 v1 h-4 z M4,7 h6 v4 h-6 z M5,11 h4 v1 h-4 z" fill="#212121" />
+    <path d="M9,8 h1 v3 h-1 z M8,11 h1 v1 h-1 z M5,6 h4 v1 h-4 z" fill="#000000" />
+    <path d="M5,7 h1 v2 h-1 z M6,4 h1 v1 h-1 z" fill="#5c5c5c" />
+    <path d="M5,3 h1 v1 h-1 z M8,3 h1 v1 h-1 z" fill="#e53935" />
+  </svg>
+));
