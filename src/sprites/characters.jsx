@@ -1,14 +1,32 @@
 import React from 'react';
 
-export const FarmerSprite = React.memo(() => (
-  <svg viewBox="0 0 24 27" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
-    {/* Hat & flower */}
-    <path d="M9,0 h6 v1 h-6 z M8,1 h1 v1 h-1 z M11,1 h5 v1 h-5 z M10,2 h6 v1 h-6 z M4,4 h16 v1 h-16 z" fill="#f48fb1" />
-    <path d="M9,1 h2 v1 h-2 z M9,2 h1 v1 h-1 z" fill="#f8bbd0" />
-    <path d="M4,5 h16 v1 h-16 z" fill="#ec407a" />
-    <path d="M8,3 h8 v1 h-8 z" fill="#d81b60" />
-    <path d="M7,1 h1 v1 h-1 z M6,2 h1 v1 h-1 z M8,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#ff4081" />
-    <path d="M7,2 h1 v1 h-1 z" fill="#fdd835" />
+// `costume` swaps her sun hat for a holiday one (a witch hat at Halloween, a Santa hat at Christmas)
+export const FarmerSprite = React.memo(({ costume }) => (
+  // overflow visible lets the tall witch hat rise above the sprite's box
+  <svg viewBox="0 0 24 27" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges" overflow="visible">
+    {costume === 'halloween' ? <>
+      {/* Tall witch hat with a bent tip */}
+      <path d="M15,-5 h1 v1 h-1 z M13,-4 h3 v1 h-3 z M12,-3 h3 v1 h-3 z M11,-2 h4 v2 h-4 z M10,0 h5 v1 h-5 z M10,1 h6 v1 h-6 z M9,2 h7 v1 h-7 z M3,5 h18 v1 h-18 z" fill="#4a148c" />
+      <path d="M16,-5 h1 v1 h-1 z M14,-2 h1 v3 h-1 z M15,1 h1 v2 h-1 z M2,4 h20 v1 h-20 z" fill="#7b1fa2" />
+      <path d="M13,-4 h1 v1 h-1 z M12,-3 h1 v1 h-1 z M11,-2 h1 v2 h-1 z M10,0 h1 v2 h-1 z M9,2 h1 v1 h-1 z M3,5 h2 v1 h-2 z" fill="#311b92" />
+      <path d="M8,3 h8 v1 h-8 z" fill="#ff9800" />
+      <path d="M11,3 h2 v1 h-2 z" fill="#fdd835" />
+    </> : costume === 'christmas' ? <>
+      {/* Santa hat flopping to one side, with a fur brim and pompom */}
+      <path d="M12,0 h5 v1 h-5 z M9,1 h10 v1 h-10 z M7,2 h10 v2 h-10 z" fill="#e53935" />
+      <path d="M7,2 h2 v2 h-2 z M9,1 h1 v1 h-1 z" fill="#c62828" />
+      <path d="M13,2 h3 v1 h-3 z M14,0 h2 v1 h-2 z" fill="#ef5350" />
+      <path d="M4,4 h16 v2 h-16 z M19,0 h2 v3 h-2 z" fill="#fafafa" />
+      <path d="M4,5 h16 v1 h-16 z M19,2 h2 v1 h-2 z" fill="#e0e0e0" />
+    </> : <>
+      {/* Hat & flower */}
+      <path d="M9,0 h6 v1 h-6 z M8,1 h1 v1 h-1 z M11,1 h5 v1 h-5 z M10,2 h6 v1 h-6 z M4,4 h16 v1 h-16 z" fill="#f48fb1" />
+      <path d="M9,1 h2 v1 h-2 z M9,2 h1 v1 h-1 z" fill="#f8bbd0" />
+      <path d="M4,5 h16 v1 h-16 z" fill="#ec407a" />
+      <path d="M8,3 h8 v1 h-8 z" fill="#d81b60" />
+      <path d="M7,1 h1 v1 h-1 z M6,2 h1 v1 h-1 z M8,2 h1 v1 h-1 z M7,3 h1 v1 h-1 z" fill="#ff4081" />
+      <path d="M7,2 h1 v1 h-1 z" fill="#fdd835" />
+    </>}
     {/* Hair & braids */}
     <path d="M7,6 h10 v1 h-10 z M6,7 h1 v1 h-1 z M17,7 h1 v1 h-1 z M7,8 h1 v1 h-1 z M16,8 h1 v1 h-1 z M6,9 h1 v1 h-1 z M17,9 h1 v1 h-1 z M7,10 h1 v1 h-1 z M16,10 h1 v1 h-1 z M6,11 h1 v1 h-1 z M17,11 h1 v1 h-1 z M7,12 h1 v1 h-1 z M16,12 h1 v1 h-1 z M6,13 h1 v1 h-1 z M17,13 h1 v1 h-1 z M7,14 h1 v1 h-1 z M16,14 h1 v1 h-1 z M6,15 h1 v1 h-1 z M17,15 h1 v1 h-1 z M7,16 h1 v1 h-1 z M16,16 h1 v1 h-1 z M7,18 h1 v2 h-1 z M16,18 h1 v2 h-1 z" fill="#d84315" />
     <path d="M6,6 h1 v1 h-1 z M17,6 h1 v1 h-1 z M7,7 h1 v1 h-1 z M16,7 h1 v1 h-1 z M6,8 h1 v1 h-1 z M17,8 h1 v1 h-1 z M7,9 h1 v1 h-1 z M16,9 h1 v1 h-1 z M6,10 h1 v1 h-1 z M17,10 h1 v1 h-1 z M7,11 h1 v1 h-1 z M16,11 h1 v1 h-1 z M6,12 h1 v1 h-1 z M17,12 h1 v1 h-1 z M7,13 h1 v1 h-1 z M16,13 h1 v1 h-1 z M6,14 h1 v1 h-1 z M17,14 h1 v1 h-1 z M7,15 h1 v1 h-1 z M16,15 h1 v1 h-1 z M6,16 h1 v1 h-1 z M17,16 h1 v1 h-1 z M6,18 h1 v1 h-1 z M17,18 h1 v1 h-1 z" fill="#bf360c" />

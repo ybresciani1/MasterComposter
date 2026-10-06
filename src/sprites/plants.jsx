@@ -137,3 +137,29 @@ export const GrassTuftSprite = React.memo(() => (
     <path d="M1,11 h14 v1 h-14 z" fill="#2e7d32" />
   </svg>
 ));
+
+// Little decorated Christmas tree for the Christmas title. Lit, its star shines and its bulbs twinkle in two sets
+const TREE_BULBS = [[8, 5, 0], [6, 9, 1], [10, 10, 2], [4, 11, 3], [8, 13, 0], [11, 14, 1], [5, 15, 2], [13, 16, 3], [2, 17, 1], [9, 17, 2]];
+const BULB_COLORS = [['#ff5252', '#8e2a2a'], ['#ffeb3b', '#8a7d2a'], ['#40c4ff', '#2a5f7a'], ['#ff80ab', '#8a4a5e']];
+export const ChristmasTreeSprite = React.memo(({ lit = false }) => (
+  <svg viewBox="0 0 16 21" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Trunk */}
+    <path d="M6,18 h4 v3 h-4 z" fill="#6d4c41" />
+    <path d="M6,18 h1 v3 h-1 z" fill="#4e342e" />
+    {/* Three tiers of branches */}
+    <path d="M7,3 h2 v1 h-2 z M6,4 h4 v1 h-4 z M5,5 h6 v1 h-6 z M4,6 h8 v1 h-8 z M6,7 h4 v1 h-4 z M5,8 h6 v1 h-6 z M4,9 h8 v1 h-8 z M3,10 h10 v1 h-10 z M2,11 h12 v1 h-12 z M5,12 h6 v1 h-6 z M4,13 h8 v1 h-8 z M3,14 h10 v1 h-10 z M2,15 h12 v1 h-12 z M1,16 h14 v1 h-14 z M0,17 h16 v1 h-16 z" fill="#2e7d32" />
+    <path d="M7,3 h1 v1 h-1 z M6,4 h1 v1 h-1 z M5,5 h1 v1 h-1 z M4,6 h2 v1 h-2 z M6,7 h1 v1 h-1 z M5,8 h1 v1 h-1 z M4,9 h1 v1 h-1 z M3,10 h1 v1 h-1 z M2,11 h3 v1 h-3 z M5,12 h1 v1 h-1 z M4,13 h1 v1 h-1 z M3,14 h1 v1 h-1 z M2,15 h1 v1 h-1 z M1,16 h1 v1 h-1 z M0,17 h4 v1 h-4 z" fill="#1b5e20" />
+    <path d="M9,4 h1 v1 h-1 z M10,5 h1 v1 h-1 z M9,8 h2 v1 h-2 z M11,9 h1 v1 h-1 z M12,10 h1 v1 h-1 z M10,13 h2 v1 h-2 z M12,14 h1 v1 h-1 z M13,15 h1 v1 h-1 z M14,16 h1 v1 h-1 z" fill="#43a047" />
+    {/* Bulbs, in two sets that blink in turn when lit */}
+    {[0, 1].map(set => (
+      <g key={set} className={lit ? `tree-twinkle-${set}` : undefined}>
+        {TREE_BULBS.filter((_, i) => i % 2 === set).map(([x, y, c]) => (
+          <path key={`${x},${y}`} d={`M${x},${y} h1 v1 h-1 z`} fill={BULB_COLORS[c][lit ? 0 : 1]} />
+        ))}
+      </g>
+    ))}
+    {/* Star */}
+    <path d="M7,0 h2 v1 h-2 z M6,1 h4 v1 h-4 z M7,2 h2 v1 h-2 z" fill={lit ? '#ffee58' : '#b8962e'} />
+    <path d="M7,1 h1 v1 h-1 z" fill={lit ? '#fffde7' : '#d4b24a'} />
+  </svg>
+));

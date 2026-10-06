@@ -102,3 +102,23 @@ export const playIgnite = (volume) => play(volume, (ac, t, out) => {
   flame.start(t);
   flame.stop(t + length);
 });
+
+// Sleigh-bell jingle as a Christmas tree's lights come on
+export const playJingle = (volume) => play(volume, (ac, t, out) => {
+  [1568, 2093, 1760, 2349, 2093].forEach((freq, i) => {
+    const start = t + i * 0.06;
+    const bell = ac.createOscillator();
+    bell.type = 'triangle';
+    bell.frequency.value = freq;
+    const shimmer = ac.createOscillator();
+    shimmer.type = 'sine';
+    shimmer.frequency.value = freq * 2.76; // a bell's inharmonic overtone
+    const env = ac.createGain();
+    env.gain.setValueAtTime(0.0001, start);
+    env.gain.exponentialRampToValueAtTime(0.2, start + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
+    bell.connect(env); shimmer.connect(env); env.connect(out);
+    bell.start(start); shimmer.start(start);
+    bell.stop(start + 0.4); shimmer.stop(start + 0.4);
+  });
+});

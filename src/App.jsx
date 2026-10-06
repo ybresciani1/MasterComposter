@@ -6,7 +6,7 @@ import { MovingActor } from './components/MovingActor.jsx';
 import { useSpaceKey } from './hooks/useSpaceKey.js';
 import { PeckingHens, HenSparkles } from './components/PeckingHens.jsx';
 import { WormOnAString, AchievementToast } from './components/EasterEggs.jsx';
-import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite } from './audio/synth.js';
+import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite, playJingle } from './audio/synth.js';
 import { getHoliday, HOLIDAYS } from './data/holidays.js';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
@@ -17,10 +17,10 @@ import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
 import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
-import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite } from './sprites/props.jsx';
+import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
-import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite } from './sprites/plants.jsx';
-import { PondSprite, BarnSprite, SiloSprite, CobwebSprite } from './sprites/scenery.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite } from './sprites/plants.jsx';
+import { PondSprite, BarnSprite, SiloSprite, CobwebSprite, SnowflakeSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
 const PLAYABLE_STAGES = DREAM_LEVELS.map(l => l.stage);
@@ -75,7 +75,15 @@ const TITLE_FLOWERS = [
   ['top-1/2 left-2 md:left-8 -translate-y-1/2', 'w-8 h-12 md:w-12 md:h-16', MarigoldSprite, 'hover:rotate-3'],
   ['top-1/3 right-4 md:right-10', 'w-8 h-16 md:w-10 md:h-20', LavenderSprite, 'hover:-rotate-3'],
 ];
-const SPIDER_PUMPKIN_EVERY = 3;
+// Holidays whose title flowers become things you tap to light up (tap again to put them out).
+// Every third one also lets out a burst: spiders from a jack-o'-lantern, a puff of snow from a Christmas tree.
+const TITLE_LIGHT_UPS = {
+  halloween: { Sprite: PumpkinSprite, aspect: 'aspect-[16/14]', glow: 'animate-pumpkin-glow', sound: playIgnite, Burst: SpiderSprite, skitter: true },
+  christmas: { Sprite: ChristmasTreeSprite, aspect: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, skitter: false },
+};
+const BURST_EVERY = 3;
+// Snow drifting down the Christmas title: [left %, size px, fall seconds, delay seconds, sideways drift px]
+const SNOWFLAKES = [...Array(36)].map(() => [Math.random() * 100, 6 + Math.round(Math.random() * 5), 7 + Math.random() * 7, -Math.random() * 14, (Math.random() - 0.5) * 80]);
 
 const FIELD_LABEL = 'text-white text-[7px] font-bold text-center leading-none bg-black/50 px-1 py-0.5 rounded shadow-sm whitespace-nowrap z-10';
 
@@ -159,24 +167,25 @@ export default function App() {
   const HolidayDecor = HOLIDAYS[holiday]?.decor;
   const holidayDecor = (className) => HolidayDecor && <div className={`absolute z-[15] pointer-events-none ${className}`}><HolidayDecor /></div>;
 
-  // Halloween title: tapping a jack-o'-lantern lights it (or blows it out); every third one lets spiders out
-  const [litPumpkins, setLitPumpkins] = useState([]);
-  const [spiderBursts, setSpiderBursts] = useState([]);
-  const handlePumpkinTap = (e, i) => {
-    const lighting = !litPumpkins.includes(i);
-    setLitPumpkins(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
+  // Halloween / Christmas title: tap a jack-o'-lantern or tree to light it (or put it out); see TITLE_LIGHT_UPS
+  const titleLightUp = TITLE_LIGHT_UPS[holiday];
+  const [litTitleDecor, setLitTitleDecor] = useState([]);
+  const [titleBursts, setTitleBursts] = useState([]);
+  const handleTitleDecorTap = (e, i) => {
+    const lighting = !litTitleDecor.includes(i);
+    setLitTitleDecor(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
     if (!lighting) return;
-    playIgnite(volumeRef.current);
-    if (i % SPIDER_PUMPKIN_EVERY !== 0) return;
+    titleLightUp.sound(volumeRef.current);
+    if (i % BURST_EVERY !== 0) return;
     const r = e.currentTarget.getBoundingClientRect();
     const id = ++eggIdRef.current;
-    const spiders = [...Array(5)].map(() => {
+    const critters = [...Array(5)].map(() => {
       const angle = Math.random() * Math.PI * 2;
       const dist = 70 + Math.random() * 110;
       return { tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist, rot: angle + Math.PI / 2, duration: 1.2 + Math.random() * 0.7 };
     });
-    setSpiderBursts(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top + r.height * 0.7, spiders }]);
-    setTimeout(() => setSpiderBursts(prev => prev.filter(b => b.id !== id)), 2000);
+    setTitleBursts(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top + r.height * 0.7, critters }]);
+    setTimeout(() => setTitleBursts(prev => prev.filter(b => b.id !== id)), 2000);
   };
 
   const showAchievement = (title, subtitle, icon) => {
@@ -1445,10 +1454,10 @@ export default function App() {
       <div className="absolute inset-0 pointer-events-none z-[6] overflow-hidden">
         {TITLE_FLOWERS.map((flower, i) => {
           const [position, size, Flower, tilt] = flower;
-          // Halloween swaps the flowers for jack-o'-lanterns that light up when tapped (every third lets out spiders)
-          return holiday === 'halloween' ? (
-            <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handlePumpkinTap(e, i)}>
-              <div className={`w-full aspect-[16/14] ${litPumpkins.includes(i) ? 'animate-pumpkin-glow' : ''}`}><PumpkinSprite lit={litPumpkins.includes(i)} /></div>
+          // Halloween and Christmas swap the flowers for jack-o'-lanterns / trees that light up when tapped
+          return titleLightUp ? (
+            <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleTitleDecorTap(e, i)}>
+              <div className={`w-full ${titleLightUp.aspect} ${litTitleDecor.includes(i) ? titleLightUp.glow : ''}`}><titleLightUp.Sprite lit={litTitleDecor.includes(i)} /></div>
             </div>
           ) : (
             <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}><Flower /></div>
@@ -1489,15 +1498,24 @@ export default function App() {
           <div className="w-6 h-6 md:w-7 md:h-7 animate-spider-sway" style={{ transform: 'rotate(180deg)' }}><SpiderSprite /></div>
         </div>
       )}
-      {spiderBursts.map(burst => (
-        <div key={`sb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
-          {burst.spiders.map((sp, i) => (
-            <div key={i} className="absolute -left-2.5 -top-2.5 animate-spider-scurry" style={{ '--tx': `${sp.tx}px`, '--ty': `${sp.ty}px`, animationDuration: `${sp.duration}s` }}>
-              <div style={{ transform: `rotate(${sp.rot}rad)` }}><div className="w-5 h-5 animate-spider-skitter"><SpiderSprite /></div></div>
+      {titleBursts.map(burst => (
+        <div key={`tb-${burst.id}`} className="fixed pointer-events-none z-[160]" style={{ left: burst.x, top: burst.y }}>
+          {burst.critters.map((c, i) => (
+            <div key={i} className="absolute -left-2.5 -top-2.5 animate-spider-scurry" style={{ '--tx': `${c.tx}px`, '--ty': `${c.ty}px`, animationDuration: `${c.duration}s` }}>
+              <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`w-5 h-5 ${titleLightUp?.skitter ? 'animate-spider-skitter' : ''}`}>{titleLightUp && <titleLightUp.Burst />}</div></div>
             </div>
           ))}
         </div>
       ))}
+
+      {/* Christmas: snow drifting down over everything but the controls */}
+      {holiday === 'christmas' && (
+        <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden" aria-hidden="true">
+          {SNOWFLAKES.map(([left, size, duration, delay, drift], i) => (
+            <div key={i} className="absolute -top-4 animate-snow-fall" style={{ left: `${left}%`, width: size, height: size, animationDuration: `${duration}s`, animationDelay: `${delay}s`, '--tx': `${drift}px` }}><SnowflakeSprite /></div>
+          ))}
+        </div>
+      )}
 
       {/* Lingering Bugs Overlay */}
       <div className="fixed inset-0 pointer-events-none z-[140] overflow-hidden">
@@ -1566,6 +1584,7 @@ export default function App() {
       <PixelBox className="text-center max-w-lg w-full relative z-10">
         <div className="mb-8 mt-4 leading-tight">
           {holiday === 'muertos' && <div className="w-56 max-w-full h-12 mx-auto -mt-2 mb-1"><PapelPicadoSprite /></div>}
+          {holiday === 'christmas' && <div className="w-64 max-w-full h-8 mx-auto -mt-2 mb-2"><ChristmasLightsSprite /></div>}
           {holiday && <div className="stardew-credit text-base md:text-lg tracking-wider mb-3 select-none">{HOLIDAYS[holiday].banner}</div>}
           <h1 className="font-bold mb-2 leading-none">
             <span 
@@ -1587,10 +1606,10 @@ export default function App() {
           </h2>
         </div>
         <div className="h-24 mb-8 animate-bounce flex items-end justify-center gap-4">
-          {HolidayDecor && <div className="w-9 h-9"><HolidayDecor /></div>}
-          <div className="w-16 h-16"><FarmerSprite /></div>
+          {HolidayDecor && <div className="w-12 h-12"><HolidayDecor /></div>}
+          <div className="w-16 h-16"><FarmerSprite costume={holiday} /></div>
           <div className="w-12 h-16"><WallaceFollowerSprite costume={holiday} /></div>
-          {HolidayDecor && <div className="w-7 h-7"><HolidayDecor /></div>}
+          {HolidayDecor && <div className="w-10 h-10"><HolidayDecor /></div>}
         </div>
         {savedGame ? (
           // A saved game puts Continue beside New Game so the card stays the same height
@@ -2077,7 +2096,7 @@ export default function App() {
                     <MovingActor apiRef={farmerApi} start={farmerRenderPos} className="absolute w-10 h-10 z-30">
                       {(pos) => (
                         <div className={pos.isWalking ? 'farmer-walking' : ''}>
-                          <div className={pos.slipping ? 'animate-slip' : ''}><FarmerSprite /></div>
+                          <div className={pos.slipping ? 'animate-slip' : ''}><FarmerSprite costume={holiday} /></div>
                           {heldBubble}
                         </div>
                       )}
@@ -2157,7 +2176,7 @@ export default function App() {
                      <TumbleweedSprite />
                    </div>
                    
-                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 grayscale z-10"><FarmerSprite /></div>
+                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 grayscale z-10"><FarmerSprite costume={holiday} /></div>
                 </div>
                 </div>
                 </div>
@@ -2178,7 +2197,7 @@ export default function App() {
                        </div>
                      );
                    })}
-                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 z-30"><FarmerSprite /></div>
+                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 z-30"><FarmerSprite costume={holiday} /></div>
                    
                    {/* Riot (Gold/White Buff Laced Polish Hen) */}
                    <div className="absolute bottom-[30%] left-[20%] z-20 animate-hen-walk" style={{ animationDelay: '0.5s' }}>

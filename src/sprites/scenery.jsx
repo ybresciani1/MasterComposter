@@ -263,3 +263,11 @@ export const CobwebSprite = React.memo(() => (
     <path d={COBWEB.threads} fill="#fafafa" />
   </svg>
 ));
+
+// Falling snowflake (Christmas title)
+export const SnowflakeSprite = React.memo(() => (
+  <svg viewBox="0 0 5 5" className="w-full h-full" shapeRendering="crispEdges">
+    <path d="M2,0 h1 v5 h-1 z M0,2 h5 v1 h-5 z" fill="#ffffff" />
+    <path d="M1,1 h1 v1 h-1 z M3,1 h1 v1 h-1 z M1,3 h1 v1 h-1 z M3,3 h1 v1 h-1 z" fill="#e3f2fd" />
+  </svg>
+));

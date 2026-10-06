@@ -152,3 +152,24 @@ export const PapelPicadoSprite = React.memo(() => (
     })}
   </svg>
 ));
+
+// String of Christmas lights over the title: a scalloped wire with bulbs hanging from its low points.
+// The bulbs blink in two alternating sets.
+const LIGHT_COLORS = [['#ff5252', '#c62828'], ['#ffeb3b', '#f9a825'], ['#40c4ff', '#0288d1'], ['#69f0ae', '#00c853']];
+const LIGHTS_WIRE = [...Array(62)].map((_, x) => `M${x},${[0, 1, 2, 2, 1, 0][x % 6]} h1 v1 h-1 z`).join(' ');
+export const ChristmasLightsSprite = React.memo(() => (
+  <svg viewBox="0 0 62 8" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
+    <path d={LIGHTS_WIRE} fill="#2e7d32" />
+    {[...Array(10)].map((_, i) => {
+      const x = 2 + i * 6, [base, shade] = LIGHT_COLORS[i % 4];
+      return (
+        <g key={i} className={`tree-twinkle-${i % 2}`}>
+          <path d={`M${x},3 h2 v1 h-2 z`} fill="#757575" />
+          <path d={`M${x},4 h2 v3 h-2 z`} fill={base} />
+          <path d={`M${x + 1},5 h1 v2 h-1 z`} fill={shade} />
+          <path d={`M${x},4 h1 v1 h-1 z`} fill="#ffffff" opacity="0.7" />
+        </g>
+      );
+    })}
+  </svg>
+));
