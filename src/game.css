@@ -557,3 +557,45 @@
 .animate-steam { animation: steam-rise 1.4s ease-out forwards; }
 .party-worm { transform: translateY(72%); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .party-worm-up { transform: translateY(0); }
+
+/* Halloween title: ghosts rise out of jack-o'-lanterns and drift back and forth; skeletons dance */
+@keyframes ghost-rise {
+  0% { transform: translate(-50%, 0) scale(0.3); opacity: 0; }
+  100% { transform: translate(-50%, -70px) scale(1); opacity: 0.9; }
+}
+.animate-ghost-rise { animation: ghost-rise 0.9s ease-out forwards; }
+@keyframes ghost-drift {
+  0% { transform: translateX(0) scaleX(1); }
+  47% { transform: translateX(var(--dx)) scaleX(1); }
+  50% { transform: translateX(var(--dx)) scaleX(-1); }
+  97% { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+.animate-ghost-drift { animation: ghost-drift ease-in-out infinite 0.9s; }
+@keyframes ghost-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.animate-ghost-bob { animation: ghost-bob 1.8s ease-in-out infinite; }
+@keyframes dance-pose { 0%, 49.9% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.dance-pose-a { animation: dance-pose 0.6s infinite; }
+.dance-pose-b { animation: dance-pose 0.6s infinite -0.3s; }
+@keyframes skeleton-bounce { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
+.animate-skeleton-bounce { animation: skeleton-bounce 0.6s ease-in-out infinite; }
+@keyframes skeleton-spin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1); } }
+.animate-skeleton-spin { animation: skeleton-spin 0.6s ease-in-out; }
+@keyframes ghost-boo { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.45); } 60% { transform: scale(0.9); } }
+.animate-ghost-boo { animation: ghost-boo 0.5s ease-out; }
+@keyframes boo-pop {
+  0% { transform: translate(-50%, 0) scale(0.4); opacity: 0; }
+  15% { transform: translate(-50%, -10px) scale(1.2); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(-50%, -34px) scale(1); opacity: 0; }
+}
+.animate-boo-pop { animation: boo-pop 1.1s ease-out forwards; }
+
+/* Día de los Muertos title: papel picado flags flutter when tapped */
+@keyframes picado-flutter {
+  0%, 100% { transform: rotate(0deg) skewX(0deg); }
+  25% { transform: rotate(6deg) skewX(-6deg); }
+  50% { transform: rotate(-5deg) skewX(5deg); }
+  75% { transform: rotate(3deg) skewX(-3deg); }
+}
+.picado-flutter { transform-box: fill-box; transform-origin: 50% 0; animation: picado-flutter 0.8s ease-in-out; }

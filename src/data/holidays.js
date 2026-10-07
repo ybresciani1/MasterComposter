@@ -1,12 +1,14 @@
 import { PumpkinSprite, PresentSprite } from '../sprites/props.jsx';
 import { MarigoldSprite } from '../sprites/plants.jsx';
+import { spookyMusic } from './assets.js';
 
 // Real-world dates that dress up the game: a title banner, a Wallace costume (see WallaceFollowerSprite) and,
-// for some, a `decor` sprite that sits on the compost piles and beside the title characters.
+// for some, a `decor` sprite that sits on the compost piles and beside the title characters, and `music` that replaces
+// the theme song.
 // Add ?holiday=<key> to the URL to preview one.
 export const HOLIDAYS = {
-  halloween: { banner: 'Happy Halloween!', decor: PumpkinSprite },
-  muertos: { banner: '¡Feliz Día de los Muertos!', decor: MarigoldSprite },
+  halloween: { banner: 'Happy Halloween!', decor: PumpkinSprite, music: spookyMusic },
+  muertos: { banner: '¡Feliz Día de los Muertos!', decor: MarigoldSprite, music: spookyMusic },
   christmas: { banner: 'Merry Christmas!', decor: PresentSprite },
   earthday: { banner: 'Happy Earth Day!' },
   compostweek: { banner: 'Happy Compost Awareness Week!' },

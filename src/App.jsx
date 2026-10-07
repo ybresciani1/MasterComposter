@@ -6,7 +6,7 @@ import { MovingActor } from './components/MovingActor.jsx';
 import { useSpaceKey } from './hooks/useSpaceKey.js';
 import { PeckingHens, HenSparkles } from './components/PeckingHens.jsx';
 import { WormOnAString, AchievementToast } from './components/EasterEggs.jsx';
-import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite, playJingle, playGrow, playPartyHorn } from './audio/synth.js';
+import { unlockSynth, playGoatScream, playSlip, playAchievement, playIgnite, playJingle, playGrow, playPartyHorn, playGhost, playBoneRattle, playBoo, playChime, playFlutter, playMaraca, playMarimba, playGuitarStrum, playTrumpet, playRustle } from './audio/synth.js';
 import { getHoliday, HOLIDAYS } from './data/holidays.js';
 import { InstructorPortrait, StudentPortrait } from './components/portraits.jsx';
 import { PixelBox, DialogBox } from './components/ui.jsx';
@@ -14,12 +14,12 @@ import { backgroundMusic, wowSound, endCreditsVideo, pitchforkSound, hammerSound
 import { DREAM_LEVELS, SOIL_COMPONENTS, FALSE_COMPONENTS, INGREDIENT_ICONS, EXAMPLE_ITEMS, EXAMPLE_BINS, NO_COMPOST_ITEMS, SOIL_PROBLEMS, COMPOST_PROBLEMS, WORM_BEDDING_ITEMS, WORM_FOODS, PLANTS, BED_SPOTS } from './data/gameData.js';
 import { PolishHenSprite, CowSprite, PigSprite, ChickenSprite, RoosterSprite, ChickSprite, SheepSprite, GoatSprite, FrogSprite, RabbitSprite, CatSprite, DogSprite } from './sprites/animals.jsx';
 import { FarmerSprite, WallaceFollowerSprite } from './sprites/characters.jsx';
-import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite } from './sprites/critters.jsx';
+import { SakuraSprite, MonarchSprite, PaintedLadySprite, DogfaceSprite, WoodlouseSprite, RolledWoodlouseSprite, PixelHeartSprite, BeeSprite, SpiderSprite, GhostSprite, DancingSkeletonSprite, MariachiSkeletonSprite } from './sprites/critters.jsx';
 import { CanopySprite } from './sprites/garden.jsx';
 import { ChoppedVeggiesIcon, CleanCardboardIcon, LifeHeartSprite, SparkleSprite, SproutSprite, MusicNoteIcon, SpeakerIcon } from './sprites/icons.jsx';
 import { TrashCanSprite, ScrapBucketSprite, WormBinSprite, WigglerSprite, PapelPicadoSprite, PumpkinSprite, ChristmasLightsSprite, CandleSprite, SugarSkullSprite, AlebrijeSprite, MiniCompostBinSprite, DirtMoundSprite, PartyWormSprite, ConfettiSprite, PartyBuntingSprite } from './sprites/props.jsx';
 import { LightningSprite, TumbleweedSprite, FireSprite, SkeletonCowSprite, SkeletonPigSprite, SkeletonSheepSprite, SkeletonGoatSprite, SkeletonChickenSprite, SkeletonRoosterSprite, SkeletonChickSprite, SkeletonCatSprite, SkeletonDogSprite, SkeletonFrogSprite, LocustSprite, BareTreeSprite, WiltedSunflowerSprite, WiltedZinniaSprite, WiltedMarigoldSprite, WiltedLavenderSprite } from './sprites/nightmare.jsx';
-import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite, MarigoldPetalSprite, SeedlingSprite, FallingLeafSprite } from './sprites/plants.jsx';
+import { CornSprite, CarrotSprite, MelonSprite, TreeSprite, SunflowerSprite, ZinniaSprite, MarigoldSprite, LavenderSprite, GrassSprite, GrassTuftSprite, ChristmasTreeSprite, MarigoldPetalSprite, SeedlingSprite, FallingLeafSprite, SpookyWillowSprite } from './sprites/plants.jsx';
 import { PondSprite, BarnSprite, SiloSprite, CobwebSprite, SnowflakeSprite, EarthSprite } from './sprites/scenery.jsx';
 import { PitchforkSprite, WateringCanSprite, CompostBagSprite, MulchSprite, HammerSprite, CuttingStationSprite, PrepStationSprite, CompostBucketSprite, BrownsBucketSprite, ComposterSprite } from './sprites/tools.jsx';
 
@@ -78,13 +78,27 @@ const TITLE_FLOWERS = [
 // Holidays whose title flowers become things you tap to light up (tap again to put them out). Every third one also
 // lets out a burst: spiders from a jack-o'-lantern, snow from a tree. With `Alt`, every other slot shows that instead
 // (marigolds between the ofrenda candles); tapping one releases the burst (monarch butterflies) and nothing lights.
-// burstClass/burstStyle animate each burst critter (spiders skitter, monarchs flap).
+// burstClass/burstStyle animate each burst critter (spiders skitter, monarchs flap). `box` sizes the sprite in its spot;
+// `emptySpots` leaves those TITLE_FLOWERS spots bare (two marigolds that crowded the bottom sugar skulls);
+// with `ghosts`, the rest let out a ghost that floats back and forth across the screen.
 const TITLE_LIGHT_UPS = {
-  halloween: { Sprite: PumpkinSprite, aspect: 'aspect-[16/14]', glow: 'animate-pumpkin-glow', sound: playIgnite, Burst: SpiderSprite, burstClass: 'animate-spider-skitter' },
-  muertos: { Sprite: CandleSprite, aspect: 'aspect-[10/20] w-[70%]! mx-auto', glow: 'animate-candle-glow', sound: playIgnite, Burst: MonarchSprite, burstClass: 'animate-butterfly-flap', burstStyle: { animationDuration: '0.12s' }, Alt: MarigoldSprite },
-  christmas: { Sprite: ChristmasTreeSprite, aspect: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, burstClass: '' },
+  halloween: { Sprite: PumpkinSprite, box: 'aspect-[16/14] scale-130 origin-bottom', ghosts: true, glow: 'animate-pumpkin-glow', sound: playIgnite, Burst: SpiderSprite, burstClass: 'animate-spider-skitter' },
+  muertos: { Sprite: CandleSprite, box: 'aspect-[10/20] w-[70%]! mx-auto', glow: 'animate-candle-glow', sound: (v) => { playIgnite(v); playChime(v); }, Burst: MonarchSprite, burstClass: 'animate-butterfly-flap', burstStyle: { animationDuration: '0.12s' }, Alt: MarigoldSprite, emptySpots: [1, 5] },
+  christmas: { Sprite: ChristmasTreeSprite, box: 'aspect-[16/21]', glow: 'animate-tree-glow', sound: playJingle, Burst: SnowflakeSprite, burstClass: '' },
 };
 const BURST_EVERY = 3;
+const MAX_GHOSTS = 6;
+// A ghost starting at x heads for the far side of a screen this wide: well across it, but not off the far edge
+const ghostFlight = (x, width) => {
+  const goRight = x < width / 2;
+  const reach = Math.max(80, Math.min(width * (0.5 + Math.random() * 0.25), goRight ? width - 40 - x : x - 40));
+  return { goRight, reach, duration: 9 + Math.random() * 6 };
+};
+// Skeletons dancing beside the Halloween title card: [side, top %, how far across, mirrored]
+const DANCING_SKELETONS = [['left', 40, 0.55], ['right', 62, 0.5, true]];
+// Mariachi calacas dancing beside the Día de los Muertos title card: [side, top %, how far across, instrument, mirrored]
+const MARIACHIS = [['left', 64, 0.4, 'guitar'], ['right', 71, 0.45, 'trumpet', true]];
+const MARIACHI_SOUNDS = { guitar: playGuitarStrum, trumpet: playTrumpet };
 // Earth Day: the title flowers start as seedlings and grow when tapped (every third lets out bees).
 // Compost Awareness Week: they're little compost bins; three taps fill one, then it steams and sprouts.
 const BEE_BURST = { Sprite: BeeSprite, cls: 'animate-spider-skitter' };
@@ -117,12 +131,49 @@ const MUERTOS_EXTRAS = [
   ['skull', 'left', 16, 0.7, SKULL_SIZE, SKULL_COLORS[0]],
   ['dog', 'left', 33, 0.45, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[2]],
   ['cat', 'left', 52, 0.6, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[0]],
-  ['skull', 'left', 68, 0.8, SKULL_SIZE, SKULL_COLORS[1]],
+  ['skull', 'left', 86, 0.8, SKULL_SIZE, SKULL_COLORS[1]],
   ['skull', 'right', 19, 0.8, SKULL_SIZE, SKULL_COLORS[2]],
   ['cat', 'right', 34, 0.6, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[2], true],
   ['dog', 'right', 56, 0.5, ALEBRIJE_SIZE, ALEBRIJE_PALETTES[1], true],
-  ['skull', 'right', 76, 0.7, SKULL_SIZE, SKULL_COLORS[3]],
+  ['skull', 'right', 88, 0.75, SKULL_SIZE, SKULL_COLORS[3]],
 ];
+
+// The farm's background flowers: [position, size, opacity, flower, wilted (nightmare), hover tilt]
+const DREAM_FLOWERS = [
+  ['top-32 left-6', 'w-6 h-12', 'opacity-80', SunflowerSprite, WiltedSunflowerSprite, 'hover:-rotate-3'],
+  ['top-36 left-16', 'w-5 h-10', 'opacity-80', SunflowerSprite, WiltedSunflowerSprite, 'hover:rotate-3'],
+  ['top-40 right-8', 'w-6 h-12', 'opacity-80', SunflowerSprite, WiltedSunflowerSprite, 'hover:-rotate-3'],
+  ['top-48 left-10', 'w-4 h-8', 'opacity-90', ZinniaSprite, WiltedZinniaSprite, 'hover:rotate-3'],
+  ['top-52 left-14', 'w-4 h-8', 'opacity-90', MarigoldSprite, WiltedMarigoldSprite, 'hover:-rotate-6'],
+  ['top-46 left-16', 'w-4 h-10', 'opacity-90', LavenderSprite, WiltedLavenderSprite, 'hover:rotate-6'],
+  ['top-64 right-10', 'w-4 h-10', 'opacity-90', LavenderSprite, WiltedLavenderSprite, 'hover:-rotate-3'],
+  ['top-60 right-16', 'w-4 h-8', 'opacity-90', ZinniaSprite, WiltedZinniaSprite, 'hover:rotate-3'],
+];
+// Holiday decorations that take some of those flowers' places, keyed by flower index: [kind, size, options].
+// They stay still until tapped (see handleFarmTap). Día de los Muertos keeps its marigold (index 4).
+const FARM_SWAPS = {
+  muertos: {
+    0: ['mariachi', 'w-7 h-10', { instrument: 'guitar' }],
+    1: ['candle', 'w-3 h-6'],
+    2: ['mariachi', 'w-7 h-10', { instrument: 'trumpet', mirrored: true }],
+    3: ['skull', 'w-5 h-5', { colors: SKULL_COLORS[0] }],
+    5: ['candle', 'w-3 h-6'],
+    6: ['candle', 'w-3 h-6'],
+    7: ['skull', 'w-5 h-5', { colors: SKULL_COLORS[2] }],
+  },
+  halloween: {
+    0: ['skeleton', 'w-6 h-9'],
+    1: ['pumpkin', 'w-6 h-5'],
+    2: ['skeleton', 'w-6 h-9', { mirrored: true }],
+    3: ['pumpkin', 'w-5 h-4'],
+    4: ['ghost', 'w-5 h-6'],
+    5: ['pumpkin', 'w-5 h-4'],
+    6: ['ghost', 'w-5 h-6'],
+    7: ['pumpkin', 'w-6 h-5'],
+  },
+};
+const FARM_ACTIVE_MS = 3000; // how long a tapped mariachi or skeleton dances, or a ghost bobs
+const WILLOW_HOLIDAYS = ['halloween', 'muertos']; // the farm's pines become spooky willows (bare ones in the nightmare)
 
 // Marigold petals strewn on the ground at Día de los Muertos: [left %, top %, size px, quarter turns].
 // Half are scattered everywhere, half carpet the bottom of the screen.
@@ -223,6 +274,55 @@ export default function App() {
     if (!lighting) return;
     titleLightUp.sound(volumeRef.current);
     if (!titleLightUp.Alt && i % BURST_EVERY === 0) releaseTitleBurst(e, { Sprite: titleLightUp.Burst, cls: titleLightUp.burstClass, style: titleLightUp.burstStyle });
+    else if (titleLightUp.ghosts) releaseGhost(e);
+  };
+  // A ghost rises out of the jack-o'-lantern, then floats across the screen and back for as long as the title is up
+  const [ghosts, setGhosts] = useState([]);
+  const releaseGhost = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height * 0.4;
+    const ghost = { id: ++eggIdRef.current, x, y, ...ghostFlight(x, window.innerWidth) };
+    setGhosts(prev => [...prev, ghost].slice(-MAX_GHOSTS));
+    playGhost(volumeRef.current);
+  };
+  // Tap a ghost and it startles with a "BOOO!" (the bubble stays where it was tapped, so it reads the right way round)
+  const [ghostBoos, setGhostBoos] = useState({});
+  const [booBubbles, setBooBubbles] = useState([]);
+  const handleGhostTap = (e, ghostId) => {
+    e.stopPropagation();
+    const r = e.currentTarget.getBoundingClientRect();
+    const id = ++eggIdRef.current;
+    setGhostBoos(prev => ({ ...prev, [ghostId]: id }));
+    setBooBubbles(prev => [...prev, { id, x: r.left + r.width / 2, y: r.top - 6 }]);
+    setTimeout(() => setBooBubbles(prev => prev.filter(b => b.id !== id)), 1100);
+    playBoo(volumeRef.current);
+  };
+  // Farm decorations (FARM_SWAPS): candles and jack-o'-lanterns light up, skulls shake, mariachis and skeletons dance
+  // for a few seconds, ghosts go BOOO and bob
+  const [farmLit, setFarmLit] = useState([]);
+  const [farmTaps, setFarmTaps] = useState({});
+  const [farmActive, setFarmActive] = useState({});
+  const handleFarmTap = (i, kind, opts) => {
+    const v = volumeRef.current;
+    if (kind === 'candle' || kind === 'pumpkin') {
+      const lighting = !farmLit.includes(i);
+      setFarmLit(prev => (lighting ? [...prev, i] : prev.filter(p => p !== i)));
+      if (lighting) { playIgnite(v); if (kind === 'candle') playChime(v); }
+      return;
+    }
+    setFarmTaps(prev => ({ ...prev, [i]: (prev[i] ?? 0) + 1 }));
+    if (kind === 'skull') { playMaraca(v); return; }
+    if (kind === 'mariachi') MARIACHI_SOUNDS[opts.instrument](v);
+    if (kind === 'skeleton') playBoneRattle(v);
+    if (kind === 'ghost') playBoo(v);
+    const id = ++eggIdRef.current;
+    setFarmActive(prev => ({ ...prev, [i]: id }));
+    setTimeout(() => setFarmActive(prev => (prev[i] === id ? { ...prev, [i]: undefined } : prev)), FARM_ACTIVE_MS);
+  };
+  const [skeletonSpins, setSkeletonSpins] = useState({});
+  const handleSkeletonTap = (i) => {
+    setSkeletonSpins(prev => ({ ...prev, [i]: (prev[i] ?? 0) + 1 }));
+    playBoneRattle(volumeRef.current);
   };
   // Earth Day: tap a seedling to grow it into the flower that belongs in that spot
   const [grownFlowers, setGrownFlowers] = useState([]);
@@ -259,9 +359,25 @@ export default function App() {
     setTimeout(() => setPoppedWorms(prev => (prev[i] === id ? { ...prev, [i]: undefined } : prev)), 3000);
   };
   const [extraTaps, setExtraTaps] = useState({}); // replays a sugar skull's wiggle or an alebrije's hop
-  const handleExtraTap = (i) => setExtraTaps(t => ({ ...t, [i]: (t[i] ?? 0) + 1 }));
+  const handleExtraTap = (i) => {
+    setExtraTaps(t => ({ ...t, [i]: (t[i] ?? 0) + 1 }));
+    const kind = MUERTOS_EXTRAS[i][0];
+    if (kind === 'skull') playMaraca(volumeRef.current);
+    else playMarimba(volumeRef.current, kind);
+  };
+  const [picadoFlutters, setPicadoFlutters] = useState(0);
+  const handlePicadoTap = () => {
+    setPicadoFlutters(n => n + 1);
+    playRustle(volumeRef.current);
+  };
+  const [mariachiSpins, setMariachiSpins] = useState({});
+  const handleMariachiTap = (i) => {
+    setMariachiSpins(prev => ({ ...prev, [i]: (prev[i] ?? 0) + 1 }));
+    MARIACHI_SOUNDS[MARIACHIS[i][3]](volumeRef.current);
+  };
   const handleTitleAltTap = (e) => {
     playSfx(butterflyTapSound);
+    playFlutter(volumeRef.current);
     releaseTitleBurst(e, { Sprite: titleLightUp.Burst, cls: titleLightUp.burstClass, style: titleLightUp.burstStyle });
   };
   // kind: { Sprite, cls (animates each critter), style, size, colors, count }
@@ -1552,6 +1668,7 @@ export default function App() {
       <div className="absolute inset-0 pointer-events-none z-[6] overflow-hidden">
         {TITLE_FLOWERS.map((flower, i) => {
           const [position, size, Flower, tilt] = flower;
+          if (titleLightUp?.emptySpots?.includes(i)) return null;
           // Earth Day: seedlings that grow into this spot's flower when tapped
           if (holiday === 'earthday' && !grownFlowers.includes(i)) return (
             <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleSeedlingTap(e, i)}>
@@ -1580,18 +1697,36 @@ export default function App() {
           );
           return titleLightUp ? (
             <div key={i} className={`absolute ${position} ${size} flex flex-col justify-end pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={(e) => handleTitleDecorTap(e, i)}>
-              <div className={`w-full ${titleLightUp.aspect} ${litTitleDecor.includes(i) ? titleLightUp.glow : ''}`}><titleLightUp.Sprite lit={litTitleDecor.includes(i)} /></div>
+              <div className={`w-full ${titleLightUp.box} ${litTitleDecor.includes(i) ? titleLightUp.glow : ''}`}><titleLightUp.Sprite lit={litTitleDecor.includes(i)} /></div>
             </div>
           ) : (
             <div key={i} className={`absolute ${position} ${size} pointer-events-auto cursor-pointer hover:scale-110 ${tilt} transition-transform`} onClick={triggerButterflies}><Flower /></div>
           );
         })}
+        {holiday === 'halloween' && DANCING_SKELETONS.map(([side, top, across, mirrored], i) => (
+          <div key={`skeleton-${i}`} className={`absolute w-10 h-14 md:w-14 md:h-20 ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleSkeletonTap(i)}>
+            <div key={skeletonSpins[i] ?? 0} className={`w-full h-full ${skeletonSpins[i] ? 'animate-skeleton-spin' : ''}`}>
+              <div className="w-full h-full animate-skeleton-bounce" style={{ animationDelay: `${-i * 0.3}s` }}>
+                <div className="w-full h-full" style={{ transform: mirrored ? 'scaleX(-1)' : undefined }}><DancingSkeletonSprite /></div>
+              </div>
+            </div>
+          </div>
+        ))}
         {holiday === 'compostweek' && PARTY_WORM_HOLES.map(([side, top, across], i) => (
           <div key={`worm-${i}`} className={`absolute w-10 h-12 md:w-12 md:h-14 ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleWormHoleTap(i)}>
             <div className="absolute bottom-0 inset-x-0 h-3 md:h-3.5"><DirtMoundSprite /></div>
             {/* The worm rises out of the hole: it's clipped at the hole's mouth */}
             <div className="absolute inset-x-0 top-0 bottom-1.5 overflow-hidden">
               <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-10 md:w-6 md:h-12 party-worm ${poppedWorms[i] ? 'party-worm-up' : ''}`}><PartyWormSprite /></div>
+            </div>
+          </div>
+        ))}
+        {holiday === 'muertos' && MARIACHIS.map(([side, top, across, instrument, mirrored], i) => (
+          <div key={`mariachi-${i}`} className={`absolute w-10 h-14 md:w-14 md:h-20 ${side === 'left' ? '-translate-x-1/2' : 'translate-x-1/2'} pointer-events-auto cursor-pointer`} style={{ top: `${top}%`, [side]: `max(1.5rem, calc((50% - 16rem) * ${across}))` }} onClick={() => handleMariachiTap(i)}>
+            <div key={mariachiSpins[i] ?? 0} className={`w-full h-full ${mariachiSpins[i] ? 'animate-skeleton-spin' : ''}`}>
+              <div className="w-full h-full animate-skeleton-bounce" style={{ animationDelay: `${-i * 0.3}s` }}>
+                <div className="w-full h-full" style={{ transform: mirrored ? 'scaleX(-1)' : undefined }}><MariachiSkeletonSprite instrument={instrument} /></div>
+              </div>
             </div>
           </div>
         ))}
@@ -1648,6 +1783,27 @@ export default function App() {
               <div style={{ transform: `rotate(${c.rot}rad)` }}><div className={`${burst.kind.size ?? 'w-5 h-5'} ${burst.kind.cls ?? ''}`} style={burst.kind.style}><burst.kind.Sprite color={c.color} /></div></div>
             </div>
           ))}
+        </div>
+      ))}
+
+      {/* Ghosts from the jack-o'-lanterns, floating back and forth over everything but the controls (tap one: BOOO!) */}
+      {ghosts.map(g => (
+        <div key={g.id} className="fixed z-[25] pointer-events-none" style={{ left: g.x, top: g.y }} aria-hidden="true">
+          <div className="animate-ghost-rise">
+            <div style={{ transform: g.goRight ? undefined : 'scaleX(-1)' }}>
+              <div className="animate-ghost-drift" style={{ '--dx': `${g.reach}px`, animationDuration: `${g.duration}s` }}>
+                <div className="w-9 h-10 md:w-11 md:h-12 animate-ghost-bob pointer-events-auto cursor-pointer" onClick={(e) => handleGhostTap(e, g.id)}>
+                  <div key={ghostBoos[g.id] ?? 0} className={`w-full h-full ${ghostBoos[g.id] ? 'animate-ghost-boo' : ''}`}><GhostSprite /></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {booBubbles.map(b => (
+        <div key={b.id} className="fixed z-[26] pointer-events-none animate-boo-pop" style={{ left: b.x, top: b.y }} aria-hidden="true">
+          <div className="bg-white border-2 border-[#263238] rounded px-1.5 text-xs font-bold text-[#263238] whitespace-nowrap" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>BOOO!</div>
         </div>
       ))}
 
@@ -1726,7 +1882,7 @@ export default function App() {
 
       <PixelBox className="text-center max-w-lg w-full relative z-10">
         <div className="mb-8 mt-4 leading-tight">
-          {holiday === 'muertos' && <div className="w-56 max-w-full h-12 mx-auto -mt-2 mb-1"><PapelPicadoSprite /></div>}
+          {holiday === 'muertos' && <div className="w-56 max-w-full h-12 mx-auto -mt-2 mb-1 cursor-pointer" onClick={handlePicadoTap}><PapelPicadoSprite flutter={picadoFlutters} /></div>}
           {holiday === 'christmas' && <div className="w-64 max-w-full h-8 mx-auto -mt-2 mb-2"><ChristmasLightsSprite /></div>}
           {holiday === 'compostweek' && <div className="w-64 max-w-full h-10 mx-auto -mt-2 mb-1"><PartyBuntingSprite /></div>}
           {holiday && <div className="stardew-credit text-base md:text-lg tracking-wider mb-3 select-none">{HOLIDAYS[holiday].banner}</div>}
@@ -1809,6 +1965,9 @@ export default function App() {
   );
 
   const renderDream = () => {
+    const nightmare = dreamStage === 'NIGHTMARE_END';
+    const willows = WILLOW_HOLIDAYS.includes(holiday);
+    const farmTree = willows ? <SpookyWillowSprite bare={nightmare} /> : nightmare ? <BareTreeSprite /> : <TreeSprite />;
     const currentDay = `Day ${dayOf(dreamStage)}`;
     const heldBubble = heldItem && (() => {
                          const HeldIcon = heldItem.icon || heldItem.component;
@@ -1862,13 +2021,13 @@ export default function App() {
           ))}
 
           {/* Background farm scenery */}
-          <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
-          <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
-          <div className={`absolute top-2 left-40 w-10 h-14 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-4 left-4 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
+          <div className={`absolute top-8 left-20 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
+          <div className={`absolute top-2 left-40 w-10 h-14 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
           
-          <div className={`absolute top-6 right-10 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
-          <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
-          <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <BareTreeSprite /> : <TreeSprite />}</div>
+          <div className={`absolute top-6 right-10 w-16 h-20 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
+          <div className={`absolute top-12 right-28 w-12 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
+          <div className={`absolute top-2 right-44 w-14 h-18 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}>{farmTree}</div>
 
           {/* Pond & Frog */}
           <div className={`absolute top-28 sm:top-20 left-[50%] w-32 h-16 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale sepia' : ''}`}><PondSprite /></div>
@@ -1947,13 +2106,13 @@ export default function App() {
           <div className="absolute bottom-46 left-24 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
           <div className="absolute bottom-45 left-26 w-3 h-3 opacity-90">{dreamStage === 'NIGHTMARE_END' ? <SkeletonChickSprite /> : <ChickSprite />}</div>
 
-          {/* Pets */}
-          <div ref={catRef} className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : <CatSprite />}</div>
+          {/* Pets (alebrijes at Día de los Muertos) */}
+          <div ref={catRef} className={`absolute bottom-54 left-56 w-8 h-6 opacity-90 z-50 cursor-pointer ${catSpinning ? 'animate-cat-spin' : ''}`} onClick={handleCatClick}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonCatSprite /> : holiday === 'muertos' ? <AlebrijeSprite kind="cat" palette={ALEBRIJE_PALETTES[0]} /> : <CatSprite />}</div>
           {/* Can you pet the dog? Yes: tap it. On wide screens it sits beside the field's top left */}
           <div className="absolute bottom-50 left-72 lg:bottom-auto lg:top-[372px] lg:left-[calc(50%-351px)] w-10 h-8 opacity-90 z-10 cursor-pointer" onClick={handleDogPet}>
             {dogPets.map(p => <div key={p.id} className="absolute -top-5 left-2.5 w-5 h-4 animate-float-up pointer-events-none"><PixelHeartSprite /></div>)}
             {dogPets.length > 0 && <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-[8px] bg-white px-1 rounded border border-black font-bold whitespace-nowrap pointer-events-none">You can pet the dog!</div>}
-            <div key={dogPets.at(-1)?.id ?? 'still'} className={`w-full h-full ${dogPets.length ? 'animate-dog-pet' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : <DogSprite />}</div>
+            <div key={dogPets.at(-1)?.id ?? 'still'} className={`w-full h-full ${dogPets.length ? 'animate-dog-pet' : ''}`}>{dreamStage === 'NIGHTMARE_END' ? <SkeletonDogSprite /> : holiday === 'muertos' ? <AlebrijeSprite kind="dog" palette={ALEBRIJE_PALETTES[1]} /> : <DogSprite />}</div>
           </div>
 
           {/* Running Rabbit */}
@@ -1965,16 +2124,36 @@ export default function App() {
              </div>
           )}
 
-          {/* Flowers */}
-          <div onClick={triggerButterflies} className={`absolute top-32 left-6 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-36 left-16 w-5 h-10 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-40 right-8 w-6 h-12 opacity-80 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedSunflowerSprite /> : <SunflowerSprite />}</div>
-
-          <div onClick={triggerButterflies} className={`absolute top-48 left-10 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-52 left-14 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-6 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedMarigoldSprite /> : <MarigoldSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-46 left-16 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-6 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-64 right-10 w-4 h-10 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:-rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedLavenderSprite /> : <LavenderSprite />}</div>
-          <div onClick={triggerButterflies} className={`absolute top-60 right-16 w-4 h-8 opacity-90 ${dreamStage === 'NIGHTMARE_END' ? 'grayscale' : 'cursor-pointer hover:scale-110 hover:rotate-3 transition-transform z-30'}`}>{dreamStage === 'NIGHTMARE_END' ? <WiltedZinniaSprite /> : <ZinniaSprite />}</div>
+          {/* Flowers (Halloween and Día de los Muertos swap some for decorations that only move when tapped; in the
+              nightmare those decorations stay but are spoiled: grayed out, unlit, still and not tappable) */}
+          {DREAM_FLOWERS.map((flower, i) => {
+            const [position, size, opacity, Flower, Wilted, tilt] = flower;
+            const swap = FARM_SWAPS[holiday]?.[i];
+            if (!swap && nightmare) return <div key={i} className={`absolute ${position} ${size} ${opacity} grayscale`}><Wilted /></div>;
+            if (!swap) return <div key={i} onClick={triggerButterflies} className={`absolute ${position} ${size} ${opacity} cursor-pointer hover:scale-110 ${tilt} transition-transform z-30`}><Flower /></div>;
+            const [kind, swapSize, opts = {}] = swap;
+            const lit = !nightmare && farmLit.includes(i), taps = nightmare ? 0 : farmTaps[i] ?? 0, active = !nightmare && Boolean(farmActive[i]);
+            const tapAnim = taps ? { skull: 'animate-skull-wiggle', mariachi: 'animate-skeleton-spin', skeleton: 'animate-skeleton-spin', ghost: 'animate-ghost-boo' }[kind] ?? '' : '';
+            const activeAnim = active ? { mariachi: 'animate-skeleton-bounce', skeleton: 'animate-skeleton-bounce', ghost: 'animate-ghost-bob' }[kind] ?? '' : '';
+            const glow = lit ? { candle: 'animate-candle-glow', pumpkin: 'animate-pumpkin-glow' }[kind] ?? '' : '';
+            return (
+              <div key={i} className={`absolute ${position} ${swapSize} ${nightmare ? 'grayscale sepia opacity-80' : 'z-30 cursor-pointer'}`} onClick={nightmare ? undefined : () => handleFarmTap(i, kind, opts)}>
+                {kind === 'ghost' && taps > 0 && <div key={`boo-${taps}`} className="absolute -top-5 left-1/2 animate-boo-pop pointer-events-none bg-white border border-[#263238] rounded px-1 text-[8px] font-bold text-[#263238] whitespace-nowrap">BOOO!</div>}
+                <div key={taps} className={`w-full h-full ${tapAnim}`}>
+                  <div className={`w-full h-full ${activeAnim}`}>
+                    <div className={`w-full h-full ${glow}`} style={{ transform: opts.mirrored ? 'scaleX(-1)' : undefined }}>
+                      {kind === 'mariachi' && <MariachiSkeletonSprite instrument={opts.instrument} dancing={active} />}
+                      {kind === 'skeleton' && <DancingSkeletonSprite dancing={active} />}
+                      {kind === 'candle' && <CandleSprite lit={lit} />}
+                      {kind === 'pumpkin' && <PumpkinSprite lit={lit} />}
+                      {kind === 'skull' && <SugarSkullSprite rim={opts.colors[0]} accent={opts.colors[1]} />}
+                      {kind === 'ghost' && <GhostSprite />}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
 
           {/* Bees */}
           <div className="absolute top-1/4 left-1/4 w-3 h-3 z-50 animate-fly">{dreamStage === 'NIGHTMARE_END' ? <LocustSprite /> : <BeeSprite />}</div>
@@ -2553,7 +2732,7 @@ export default function App() {
         </div>
       )}
       {toastMsg && <div key="toast-notification-popup" className="fixed top-10 left-1/2 -translate-x-1/2 z-[200] bg-[#5d4037] text-white px-6 py-3 border-4 border-[#8b5a2b] shadow-xl font-mono text-center w-11/12 max-w-md">{toastMsg}</div>}
-      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={backgroundMusic} className="hidden" />
+      <audio ref={audioRef} key="background-audio-element" loop preload="auto" src={HOLIDAYS[holiday]?.music ?? backgroundMusic} className="hidden" />
       <audio ref={wowAudioRef} key="wow-audio-element" src={wowSound} preload="auto" className="hidden" />
     </div>
   );

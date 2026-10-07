@@ -2,6 +2,10 @@ export const BASE = 'https://master-composter.vercel.app/assets';
 
 export const backgroundMusic = `${BASE}/nastelbom-background-music-486996.mp3`;
 
+// Replaces the theme music at Halloween and Día de los Muertos (see data/holidays.js). Loaded from the game's own
+// public/assets (same origin) rather than BASE, so it plays in local dev too, before it's deployed.
+export const spookyMusic = '/assets/Spooky Theme 1.mp3';
+
 export const wowSound = `${BASE}/anime-wow-sound-effect.mp3`;
 
 export const endCreditsVideo = `${BASE}/Compost Class Credits-compressed.mp4`;

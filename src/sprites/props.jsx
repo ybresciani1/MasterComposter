@@ -137,13 +137,14 @@ export const PresentSprite = React.memo(() => (
 
 // Papel picado garland strung across the title at Día de los Muertos
 const PICADO_COLORS = [['#ec407a', '#c2185b'], ['#ff9800', '#e65100'], ['#26c6da', '#00838f'], ['#ab47bc', '#7b1fa2'], ['#66bb6a', '#2e7d32']];
-export const PapelPicadoSprite = React.memo(() => (
+// Bump `flutter` to make the flags flutter, one after another
+export const PapelPicadoSprite = React.memo(({ flutter = 0 }) => (
   <svg viewBox="0 0 62 14" className="w-full h-full drop-shadow-sm" shapeRendering="crispEdges">
     <path d="M0,1 h62 v1 h-62 z" fill="#8d6e63" />
     {PICADO_COLORS.map(([base, shade], i) => {
       const x = 2 + i * 12;
       return (
-        <g key={base}>
+        <g key={`${base}-${flutter}`} className={flutter ? 'picado-flutter' : undefined} style={{ animationDelay: `${i * 0.08}s` }}>
           {/* Flag with a zigzag hem and cut-out holes */}
           <path fillRule="evenodd" fill={base} d={`M${x},2 h10 v9 h-1 v1 h-1 v1 h-1 v-1 h-1 v-1 h-2 v1 h-1 v1 h-1 v-1 h-1 v-1 h-1 z M${x + 4},4 h2 v2 h-2 z M${x + 2},7 h1 v1 h-1 z M${x + 7},7 h1 v1 h-1 z M${x + 4},8 h2 v1 h-2 z`} />
           <path d={`M${x},2 h1 v9 h-1 z`} fill={shade} />

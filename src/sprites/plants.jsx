@@ -193,3 +193,30 @@ export const FallingLeafSprite = React.memo(() => (
     <path d="M3,0 h1 v1 h-1 z" fill="#a5d6a7" />
   </svg>
 ));
+
+// Spooky weeping willow for the farm at Halloween and Día de los Muertos: a gnarled trunk under a dusky canopy with
+// long strands drooping down. `bare` is the dead version for the nightmare: just drooping twigs
+export const SpookyWillowSprite = React.memo(({ bare = false }) => (
+  <svg viewBox="0 0 24 28" className="w-full h-full drop-shadow-md" shapeRendering="crispEdges">
+    {/* Gnarled trunk with a knothole, flaring into roots */}
+    <path d="M10,12 h4 v13 h-4 z M9,25 h6 v2 h-6 z M7,27 h10 v1 h-10 z M8,10 h2 v3 h-2 z M14,10 h2 v3 h-2 z" fill={bare ? '#5d4037' : '#4e342e'} />
+    <path d="M10,12 h1 v13 h-1 z M9,25 h1 v2 h-1 z M7,27 h2 v1 h-2 z M8,10 h1 v3 h-1 z" fill="#3e2723" />
+    <path d="M13,14 h1 v4 h-1 z M15,10 h1 v1 h-1 z" fill="#6d4c41" />
+    <path d="M11,19 h1 v2 h-1 z" fill="#1b0f0a" />
+    {bare ? <>
+      {/* Dead branches arching over, with bare twigs hanging */}
+      <path d="M6,4 h12 v1 h-12 z M3,5 h3 v1 h-3 z M18,5 h3 v1 h-3 z M1,6 h2 v1 h-2 z M21,6 h2 v1 h-2 z M0,7 h1 v4 h-1 z M23,7 h1 v4 h-1 z M8,5 h1 v5 h-1 z M15,5 h1 v5 h-1 z M4,6 h1 v5 h-1 z M19,6 h1 v5 h-1 z" fill="#5d4037" />
+      <path d="M0,11 h1 v7 h-1 z M2,11 h1 v6 h-1 z M4,11 h1 v8 h-1 z M6,11 h1 v9 h-1 z M8,11 h1 v3 h-1 z M14,11 h1 v3 h-1 z M16,11 h1 v10 h-1 z M18,11 h1 v9 h-1 z M20,11 h1 v5 h-1 z M22,11 h1 v10 h-1 z" fill="#6d5d52" />
+    </> : <>
+      {/* Dusky canopy */}
+      <path d="M6,2 h12 v1 h-12 z M3,3 h18 v2 h-18 z M1,5 h22 v4 h-22 z M0,9 h24 v2 h-24 z" fill="#3e5f4f" />
+      <path d="M3,3 h3 v2 h-3 z M1,5 h3 v4 h-3 z M0,9 h3 v2 h-3 z M6,2 h2 v1 h-2 z" fill="#2c4438" />
+      <path d="M13,2 h4 v1 h-4 z M15,3 h4 v1 h-4 z M18,5 h3 v1 h-3 z M10,4 h3 v1 h-3 z" fill="#5f8a6e" />
+      <path d="M7,6 h2 v1 h-2 z M16,7 h2 v1 h-2 z M11,8 h2 v1 h-2 z M4,9 h1 v1 h-1 z M20,9 h1 v1 h-1 z" fill="#5c4d6b" />
+      {/* Long drooping strands (short in the middle so the trunk shows) */}
+      <path d="M1,11 h1 v12 h-1 z M2,14 h1 v5 h-1 z M4,11 h1 v10 h-1 z M5,14 h1 v3 h-1 z M7,11 h1 v7 h-1 z M8,14 h1 v1 h-1 z M14,14 h1 v1 h-1 z M16,11 h1 v12 h-1 z M17,14 h1 v3 h-1 z M19,11 h1 v13 h-1 z M20,14 h1 v4 h-1 z M22,11 h1 v12 h-1 z M23,14 h1 v6 h-1 z" fill="#3e5f4f" />
+      <path d="M0,11 h1 v9 h-1 z M3,11 h1 v13 h-1 z M6,11 h1 v11 h-1 z M15,11 h1 v8 h-1 z M18,11 h1 v11 h-1 z M21,11 h1 v10 h-1 z" fill="#2c4438" />
+      <path d="M2,11 h1 v3 h-1 z M5,11 h1 v3 h-1 z M8,11 h1 v3 h-1 z M14,11 h1 v3 h-1 z M17,11 h1 v3 h-1 z M20,11 h1 v3 h-1 z M23,11 h1 v3 h-1 z" fill="#5f8a6e" />
+    </>}
+  </svg>
+));
