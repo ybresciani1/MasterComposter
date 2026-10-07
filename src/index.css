@@ -54,6 +54,10 @@
 
 body {
   margin: 0;
+  /* It's a game: taps and drags shouldn't highlight text or pop up the long-press menu on phones */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #root {

@@ -599,3 +599,18 @@
   75% { transform: rotate(3deg) skewX(-3deg); }
 }
 .picado-flutter { transform-box: fill-box; transform-origin: 50% 0; animation: picado-flutter 0.8s ease-in-out; }
+
+/* Halloween play field: ghosts float with a slight bounce; the farmer jumps when one says BOO */
+@keyframes ghost-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.animate-ghost-float { animation: ghost-float 1.6s ease-in-out infinite; }
+@keyframes farmer-scared {
+  0% { transform: translate(0, 0); }
+  15% { transform: translate(0, -10px); }
+  30% { transform: translate(0, 0); }
+  40% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, 0); }
+  60% { transform: translate(-2px, 0); }
+  70% { transform: translate(2px, 0); }
+  100% { transform: translate(0, 0); }
+}
+.animate-farmer-scared { animation: farmer-scared 0.9s ease-out; }

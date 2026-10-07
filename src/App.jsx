@@ -166,14 +166,20 @@ const FARM_SWAPS = {
     1: ['pumpkin', 'w-6 h-5'],
     2: ['skeleton', 'w-6 h-9', { mirrored: true }],
     3: ['pumpkin', 'w-5 h-4'],
-    4: ['ghost', 'w-5 h-6'],
+    4: ['pumpkin', 'w-5 h-4'],
     5: ['pumpkin', 'w-5 h-4'],
-    6: ['ghost', 'w-5 h-6'],
+    6: ['pumpkin', 'w-6 h-5'],
     7: ['pumpkin', 'w-6 h-5'],
   },
 };
-const FARM_ACTIVE_MS = 3000; // how long a tapped mariachi or skeleton dances, or a ghost bobs
-const WILLOW_HOLIDAYS = ['halloween', 'muertos']; // the farm's pines become spooky willows (bare ones in the nightmare)
+const FARM_ACTIVE_MS = 3000; // how long a tapped mariachi or skeleton dances
+const WILLOW_HOLIDAYS = ['halloween', 'muertos'];
+// Halloween: two ghosts drift around the play field. The first time each one bumps into the farmer it says BOO, she
+// jumps, Wallace reassures her and a heart floats up. Positions are top-left corners in the 340x300 field.
+const FIELD_GHOST_STARTS = [{ x: 30, y: 200, dir: 'right' }, { x: 270, y: 40, dir: 'left' }];
+const FIELD_GHOST_SPEED = 0.35; // per 60fps frame: a slow drift
+const randomGhostTarget = () => ({ tx: 10 + Math.random() * 290, ty: 10 + Math.random() * 245 });
+const newFieldGhosts = () => FIELD_GHOST_STARTS.map(start => ({ ...start, ...randomGhostTarget(), pauseUntil: 0 })); // the farm's pines become spooky willows (bare ones in the nightmare)
 
 // Marigold petals strewn on the ground at Día de los Muertos: [left %, top %, size px, quarter turns].
 // Half are scattered everywhere, half carpet the bottom of the screen.
@@ -225,6 +231,10 @@ export default function App() {
   const wallaceDancingRef = useRef(false);
   const lastActivityRef = useRef(0); // reset whenever dancing isn't possible (e.g. on the title screen)
   const slipUntilRef = useRef(0);
+  const scaredUntilRef = useRef(0);
+  const fieldGhostsRef = useRef(newFieldGhosts());
+  const fieldGhostApi0 = useRef(null), fieldGhostApi1 = useRef(null); // one per FIELD_GHOST_STARTS entry
+  const metGhostsRef = useRef(new Set()); // each ghost only spooks the farmer once
   const onPeelRef = useRef(false);
   const eggIdRef = useRef(0); // ids for hearts, screams and achievements
 
@@ -244,6 +254,23 @@ export default function App() {
       showToast("Riot & Beyonce: Flawless! ✨");
       setTimeout(() => setHenFlip(false), 1700);
     }
+  };
+
+  // A ghost meets the farmer: BOO, she jumps, Wallace says they're friendly, and a heart floats up from the ghost
+  const startGhostEncounter = (gi, now) => {
+    const ghost = gi ? fieldGhostApi1 : fieldGhostApi0;
+    ghost.current?.(prev => ({ ...prev, boo: true }));
+    playBoo(volumeRef.current);
+    scaredUntilRef.current = now + 1000;
+    targetPosRef.current = null;
+    farmerApi.current?.(prev => ({ ...prev, isWalking: false, scared: true }));
+    setTimeout(() => farmerApi.current?.(prev => ({ ...prev, scared: false })), 1000);
+    setTimeout(() => {
+      ghost.current?.(prev => ({ ...prev, boo: false }));
+      showToast("Wallace: Don't worry, partner! They're friendly ghosts.", 'surprised');
+    }, 1100);
+    setTimeout(() => ghost.current?.(prev => ({ ...prev, heart: true })), 1900);
+    setTimeout(() => ghost.current?.(prev => ({ ...prev, heart: false })), 3100);
   };
 
   const handleDogPet = () => {
@@ -298,7 +325,7 @@ export default function App() {
     playBoo(volumeRef.current);
   };
   // Farm decorations (FARM_SWAPS): candles and jack-o'-lanterns light up, skulls shake, mariachis and skeletons dance
-  // for a few seconds, ghosts go BOOO and bob
+  // for a few seconds
   const [farmLit, setFarmLit] = useState([]);
   const [farmTaps, setFarmTaps] = useState({});
   const [farmActive, setFarmActive] = useState({});
@@ -314,7 +341,6 @@ export default function App() {
     if (kind === 'skull') { playMaraca(v); return; }
     if (kind === 'mariachi') MARIACHI_SOUNDS[opts.instrument](v);
     if (kind === 'skeleton') playBoneRattle(v);
-    if (kind === 'ghost') playBoo(v);
     const id = ++eggIdRef.current;
     setFarmActive(prev => ({ ...prev, [i]: id }));
     setTimeout(() => setFarmActive(prev => (prev[i] === id ? { ...prev, [i]: undefined } : prev)), FARM_ACTIVE_MS);
@@ -1035,6 +1061,9 @@ export default function App() {
     setFarmerRenderPos({ x, y, isWalking: false }); setWallaceRenderPos({ ...wallacePosRef.current });
     farmerApi.current?.({ x, y, isWalking: false });
     wallaceApi.current?.({ ...wallacePosRef.current, dir: wallaceDirRef.current });
+    fieldGhostsRef.current = newFieldGhosts();
+    fieldGhostApi0.current?.({ ...FIELD_GHOST_STARTS[0] });
+    fieldGhostApi1.current?.({ ...FIELD_GHOST_STARTS[1] });
   };
 
   const initializeGroundItems = () => {
@@ -1205,13 +1234,14 @@ export default function App() {
        const speed = basePace * frames;
        let moved = false;
        const slipping = now < slipUntilRef.current; // spinning out on a banana peel: no steering
-       const k = slipping ? {} : keys.current;
+       const frozen = slipping || now < scaredUntilRef.current; // ...or jumping at a ghost
+       const k = frozen ? {} : keys.current;
        if (k['w'] || k['W'] || k['ArrowUp'] || k['arrowup']) { farmerPosRef.current.y -= speed; moved = true; }
        if (k['s'] || k['S'] || k['ArrowDown'] || k['arrowdown']) { farmerPosRef.current.y += speed; moved = true; }
        if (k['a'] || k['A'] || k['ArrowLeft'] || k['arrowleft']) { farmerPosRef.current.x -= speed; moved = true; }
        if (k['d'] || k['D'] || k['ArrowRight'] || k['arrowright']) { farmerPosRef.current.x += speed; moved = true; }
 
-       if (!slipping && !moved && targetPosRef.current) {
+       if (!frozen && !moved && targetPosRef.current) {
          const dx = targetPosRef.current.x - farmerPosRef.current.x;
          const dy = targetPosRef.current.y - farmerPosRef.current.y;
          const dist = Math.hypot(dx, dy);
@@ -1255,6 +1285,26 @@ export default function App() {
            showToast("Wallace: Peel-ow! Watch your step, partner!", 'surprised');
          }
          onPeelRef.current = onPeel;
+       }
+       if (holiday === 'halloween') {
+         fieldGhostsRef.current.forEach((g, gi) => {
+           if (now >= g.pauseUntil) {
+             const dx = g.tx - g.x, dy = g.ty - g.y, dist = Math.hypot(dx, dy);
+             if (dist < 2) Object.assign(g, randomGhostTarget());
+             else {
+               const step = Math.min(dist, FIELD_GHOST_SPEED * frames);
+               g.x += (dx / dist) * step; g.y += (dy / dist) * step;
+               if (Math.abs(dx) > 1) g.dir = dx > 0 ? 'right' : 'left';
+             }
+             (gi ? fieldGhostApi1 : fieldGhostApi0).current?.(prev => ({ ...prev, x: g.x, y: g.y, dir: g.dir }));
+           }
+           // ghost box is 28x32, farmer 40x40: compare centres
+           if (!metGhostsRef.current.has(gi) && Math.hypot(g.x + 14 - (farmerPosRef.current.x + 20), g.y + 16 - (farmerPosRef.current.y + 20)) < 26) {
+             metGhostsRef.current.add(gi);
+             g.pauseUntil = now + 3200; // hovers in place while it says hello
+             startGhostEncounter(gi, now);
+           }
+         });
        }
        if (!touchedGrassRef.current) {
          const onGrass = Math.hypot(farmerPosRef.current.x + 20 - GRASS_SPOT.x, farmerPosRef.current.y + 20 - GRASS_SPOT.y) < 18;
@@ -1964,6 +2014,21 @@ export default function App() {
     </div>
   );
 
+  // One of the Halloween ghosts drifting around the play field (moved by the game loop through apiRef)
+  const renderFieldGhost = (apiRef, gi) => (
+    <MovingActor key={`field-ghost-${gi}`} apiRef={apiRef} start={FIELD_GHOST_STARTS[gi]} className="absolute w-7 h-8 z-[28] pointer-events-none">
+      {(pos) => (
+        <>
+          {pos.boo && <div className="absolute -top-5 left-1/2 animate-boo-pop bg-white border border-[#263238] rounded px-1 text-[9px] font-bold text-[#263238] whitespace-nowrap">BOO!</div>}
+          {pos.heart && <div className="absolute -top-5 left-1 w-5 h-4 animate-float-up"><PixelHeartSprite /></div>}
+          <div className="w-full h-full animate-ghost-float opacity-90">
+            <div className="w-full h-full" style={{ transform: pos.dir === 'left' ? 'scaleX(-1)' : undefined }}><GhostSprite /></div>
+          </div>
+        </>
+      )}
+    </MovingActor>
+  );
+
   const renderDream = () => {
     const nightmare = dreamStage === 'NIGHTMARE_END';
     const willows = WILLOW_HOLIDAYS.includes(holiday);
@@ -2133,12 +2198,11 @@ export default function App() {
             if (!swap) return <div key={i} onClick={triggerButterflies} className={`absolute ${position} ${size} ${opacity} cursor-pointer hover:scale-110 ${tilt} transition-transform z-30`}><Flower /></div>;
             const [kind, swapSize, opts = {}] = swap;
             const lit = !nightmare && farmLit.includes(i), taps = nightmare ? 0 : farmTaps[i] ?? 0, active = !nightmare && Boolean(farmActive[i]);
-            const tapAnim = taps ? { skull: 'animate-skull-wiggle', mariachi: 'animate-skeleton-spin', skeleton: 'animate-skeleton-spin', ghost: 'animate-ghost-boo' }[kind] ?? '' : '';
-            const activeAnim = active ? { mariachi: 'animate-skeleton-bounce', skeleton: 'animate-skeleton-bounce', ghost: 'animate-ghost-bob' }[kind] ?? '' : '';
+            const tapAnim = taps ? { skull: 'animate-skull-wiggle', mariachi: 'animate-skeleton-spin', skeleton: 'animate-skeleton-spin' }[kind] ?? '' : '';
+            const activeAnim = active ? { mariachi: 'animate-skeleton-bounce', skeleton: 'animate-skeleton-bounce' }[kind] ?? '' : '';
             const glow = lit ? { candle: 'animate-candle-glow', pumpkin: 'animate-pumpkin-glow' }[kind] ?? '' : '';
             return (
               <div key={i} className={`absolute ${position} ${swapSize} ${nightmare ? 'grayscale sepia opacity-80' : 'z-30 cursor-pointer'}`} onClick={nightmare ? undefined : () => handleFarmTap(i, kind, opts)}>
-                {kind === 'ghost' && taps > 0 && <div key={`boo-${taps}`} className="absolute -top-5 left-1/2 animate-boo-pop pointer-events-none bg-white border border-[#263238] rounded px-1 text-[8px] font-bold text-[#263238] whitespace-nowrap">BOOO!</div>}
                 <div key={taps} className={`w-full h-full ${tapAnim}`}>
                   <div className={`w-full h-full ${activeAnim}`}>
                     <div className={`w-full h-full ${glow}`} style={{ transform: opts.mirrored ? 'scaleX(-1)' : undefined }}>
@@ -2147,7 +2211,6 @@ export default function App() {
                       {kind === 'candle' && <CandleSprite lit={lit} />}
                       {kind === 'pumpkin' && <PumpkinSprite lit={lit} />}
                       {kind === 'skull' && <SugarSkullSprite rim={opts.colors[0]} accent={opts.colors[1]} />}
-                      {kind === 'ghost' && <GhostSprite />}
                     </div>
                   </div>
                 </div>
@@ -2403,6 +2466,8 @@ export default function App() {
                       );
                     })}
 
+                    {holiday === 'halloween' && <>{renderFieldGhost(fieldGhostApi0, 0)}{renderFieldGhost(fieldGhostApi1, 1)}</>}
+
                     <MovingActor apiRef={wallaceApi} start={wallaceRenderPos} className="absolute w-8 h-10 z-[29]">
                       {(pos) => (
                         <>
@@ -2419,7 +2484,8 @@ export default function App() {
                     <MovingActor apiRef={farmerApi} start={farmerRenderPos} className="absolute w-10 h-10 z-30">
                       {(pos) => (
                         <div className={pos.isWalking ? 'farmer-walking' : ''}>
-                          <div className={pos.slipping ? 'animate-slip' : ''}><FarmerSprite costume={holiday} /></div>
+                          <div className={pos.slipping ? 'animate-slip' : pos.scared ? 'animate-farmer-scared' : ''}><FarmerSprite costume={holiday} /></div>
+                          {pos.scared && <div className="absolute -top-5 right-0 text-sm font-bold text-[#e53935] animate-bounce" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>!</div>}
                           {heldBubble}
                         </div>
                       )}
