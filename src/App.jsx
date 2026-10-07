@@ -2633,7 +2633,8 @@ export default function App() {
               </div>
             )}
 
-            {['CRAFT_SOIL', 'MATCH_EXAMPLES', 'FIX_PLOTS', 'PLANT_SEEDS'].includes(dreamStage) && (
+            {/* Touch buttons for phones and tablets, on every level */}
+            {PLAYABLE_STAGES.includes(dreamStage) && (
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-xl px-2 md:px-4 z-40">
                 <div className="flex gap-2">
                   <div className="flex-1 bg-[#5d4037]/80 text-[#f4e2b8] font-bold py-1 rounded-md border-b-2 border-[#3e2723]/80 text-[10px] text-center leading-tight flex flex-col items-center justify-center pointer-events-none">
