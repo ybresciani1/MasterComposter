@@ -48,9 +48,10 @@ export const riotBeyonceTapSound = `${BASE}/RiotBeyonce Tap Sound.mp3`;
 
 export const kittenTossSound = `${BASE}/Kitten toss sound.mp3`;
 
+// Preloaded at startup. The intro music (introAnxietySound, ~1 MB) isn't: it loads when a new game starts.
 export const SOUND_URLS = [
   pitchforkSound, hammerSound, patDirtSound, magicSound, wakeUpSound,
-  nightmareSound, tossBinSound, questSound, introAnxietySound, sakuraSound,
+  nightmareSound, tossBinSound, questSound, sakuraSound,
   woodliceSound, beeTapSound, butterflyTapSound, frogTapSound, wateringCanSound,
   loseHeartSound, riotBeyonceTapSound, kittenTossSound,
 ];

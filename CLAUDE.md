@@ -35,6 +35,7 @@ Node version is pinned to 24.15.0 (see `.nvmrc`).
 - `src/components/` — `PixelBox`/`DialogBox` (`ui.jsx`), `ClassroomScene`, `CrowOverlay`, `PeckingHens`, `CompostKittens`, portraits, and `EasterEggs` (worm-on-a-string overlay, achievement card).
 - `src/data/holidays.js` — date-based holiday skins (Halloween, Día de los Muertos, Christmas, Earth Day, Compost Awareness Week); preview one with `?holiday=halloween` / `muertos` / `christmas` / `earthday` / `compostweek`.
 - `src/audio/synth.js` — Web Audio sound effects for easter eggs that have no recorded sound (goat scream, slip, achievement chime).
+- `public/assets/` — the deployed audio, images and credits video, compressed for size: sound effects are mono 48–64 kb/s MP3, music 96–112 kb/s, portraits 160px palette PNGs. Full-quality originals and unused source files live in `asset-originals/` (git-ignored, local only); re-encode from there when replacing an asset.
 
 ### Game State Machine
 

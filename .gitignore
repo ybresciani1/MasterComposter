@@ -27,3 +27,6 @@ dist-ssr
 
 # Claude Code local preview config
 .claude/launch.json
+
+# Original, full-quality audio/images and unused source files (kept locally, not deployed)
+asset-originals/

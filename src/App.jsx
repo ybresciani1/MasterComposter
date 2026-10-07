@@ -570,6 +570,7 @@ export default function App() {
     if (audioRef.current) audioRef.current.volume = 0.15 * volume;
     if (wowAudioRef.current) wowAudioRef.current.volume = 0.6 * volume;
     Object.values(preloadedSfx.current).forEach(sfx => { sfx.volume = volume; });
+    if (introAnxietyRef.current) introAnxietyRef.current.volume = volume;
     try { localStorage.setItem('mc-volume', String(volume)); } catch { /* storage unavailable */ }
   }, [volume]);
 
@@ -789,7 +790,7 @@ export default function App() {
     // Pre-unlock sounds that play outside user gesture handlers (setTimeout/useEffect).
     // audio.volume is read-only on iOS so volume=0 plays audibly — use muted=true instead,
     // which iOS respects as a logical property and genuinely silences the brief unlock play.
-    [loseHeartSound, nightmareSound, wakeUpSound, questSound, introAnxietySound].forEach(url => {
+    [loseHeartSound, nightmareSound, wakeUpSound, questSound].forEach(url => {
       const sfx = preloadedSfx.current[url];
       if (sfx) {
         sfx.muted = true;
@@ -807,6 +808,17 @@ export default function App() {
     });
   }, []);
 
+  // The intro music only downloads once a new game starts (it plays during the opening story), and starts right from
+  // the New Game tap so browsers allow it
+  const startIntroMusic = () => {
+    if (!introAnxietyRef.current) {
+      introAnxietyRef.current = new Audio(introAnxietySound);
+      introAnxietyRef.current.loop = true;
+    }
+    introAnxietyRef.current.volume = volumeRef.current;
+    introAnxietyRef.current.play().catch(() => {});
+  };
+
   const playSfx = (url) => {
     const sfx = preloadedSfx.current[url];
     if (!sfx) return;
@@ -816,7 +828,7 @@ export default function App() {
   };
 
   const stopAllSfx = () => {
-    Object.values(preloadedSfx.current).forEach(audio => {
+    [...Object.values(preloadedSfx.current), introAnxietyRef.current].filter(Boolean).forEach(audio => {
       audio.pause();
       audio.currentTime = 0;
     });
@@ -1037,13 +1049,8 @@ export default function App() {
   }, [gameState]);
 
   useEffect(() => {
-    if (!introAnxietyRef.current) {
-      const sfx = preloadedSfx.current[introAnxietySound];
-      if (!sfx) return;
-      introAnxietyRef.current = sfx;
-      introAnxietyRef.current.loop = true;
-    }
-    const audio = introAnxietyRef.current;
+    const audio = introAnxietyRef.current; // created by startIntroMusic on New Game
+    if (!audio) return;
     const shouldPlay = ['INTRO', 'CLASS', 'SLEEP_TRANSITION'].includes(gameState);
     if (shouldPlay) {
       if (audio.paused) audio.play().catch(() => {});
@@ -1967,10 +1974,10 @@ export default function App() {
             <button onClick={() => jumpToChapter(savedGame.stage, savedGame.lives)} className="flex-1 bg-[#4caf50] text-white px-2 py-2 font-bold text-base md:text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 pointer-events-auto leading-tight">
               Continue<span className="block text-[10px] md:text-xs tracking-normal normal-case font-normal">Day {dayOf(savedGame.stage)}</span>
             </button>
-            <button onClick={() => { clearSave(); setGameState('INTRO'); }} className="flex-1 bg-[#689f38] text-white px-2 py-2 font-bold text-base md:text-xl uppercase tracking-wider hover:bg-[#558b2f] border-b-4 border-[#33691e] active:border-b-0 active:translate-y-1 pointer-events-auto">New Game</button>
+            <button onClick={() => { clearSave(); startIntroMusic(); setGameState('INTRO'); }} className="flex-1 bg-[#689f38] text-white px-2 py-2 font-bold text-base md:text-xl uppercase tracking-wider hover:bg-[#558b2f] border-b-4 border-[#33691e] active:border-b-0 active:translate-y-1 pointer-events-auto">New Game</button>
           </div>
         ) : (
-          <button onClick={() => setGameState('INTRO')} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3 relative z-20 pointer-events-auto">New Game</button>
+          <button onClick={() => { startIntroMusic(); setGameState('INTRO'); }} className="bg-[#4caf50] text-white px-8 py-4 font-bold text-xl uppercase tracking-wider hover:bg-[#388e3c] border-b-4 border-[#1b5e20] active:border-b-0 active:translate-y-1 w-full mb-3 relative z-20 pointer-events-auto">New Game</button>
         )}
         <button onClick={() => setIsChapterSelectOpen(true)} className="bg-[#8b5a2b] text-white px-8 py-3 font-bold text-sm uppercase tracking-wider hover:bg-[#5d4037] border-b-4 border-[#3e2723] active:border-b-0 active:translate-y-1 w-full relative z-20 pointer-events-auto">Chapter Select</button>
         <div className="mt-3 text-sm md:text-base leading-5 md:leading-6 tracking-[0.15em]">
